@@ -1,0 +1,9 @@
+CHANGES
+lib/Amazon/S3.pm
+lib/Amazon/S3/Bucket.pm
+Makefile.PL
+MANIFEST			This list of files
+README
+t/01api.t
+t/99-pod-coverage.t
+t/99-pod.t
