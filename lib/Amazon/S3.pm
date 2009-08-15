@@ -13,7 +13,7 @@ use XML::Simple;
 
 use base qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(
-    qw(aws_access_key_id aws_secret_access_key secure ua err errstr timeout retry)
+    qw(aws_access_key_id aws_secret_access_key secure ua err errstr timeout retry host)
 );
 our $VERSION = '0.441';
 
@@ -28,23 +28,23 @@ sub new {
     die "No aws_access_key_id"     unless $self->aws_access_key_id;
     die "No aws_secret_access_key" unless $self->aws_secret_access_key;
 
-    $self->secure(0)   if not defined $self->secure;
-    $self->timeout(30) if not defined $self->timeout;
+    $self->secure(0)                if not defined $self->secure;
+    $self->timeout(30)              if not defined $self->timeout;
+    $self->host('s3.amazonaws.com') if not defined $self->host;
 
     my $ua;
     if ($self->retry) {
-        $ua =
-          LWP::UserAgent::Determined->new(
-                             keep_alive            => $KEEP_ALIVE_CACHESIZE,
-                             requests_redirectable => [qw(GET HEAD DELETE PUT)],
-          );
+        $ua = LWP::UserAgent::Determined->new(
+            keep_alive            => $KEEP_ALIVE_CACHESIZE,
+            requests_redirectable => [qw(GET HEAD DELETE PUT)],
+        );
         $ua->timing('1,2,4,8,16,32');
-    } else {
-        $ua =
-          LWP::UserAgent->new(
-                             keep_alive            => $KEEP_ALIVE_CACHESIZE,
-                             requests_redirectable => [qw(GET HEAD DELETE PUT)],
-          );
+    }
+    else {
+        $ua = LWP::UserAgent->new(
+            keep_alive            => $KEEP_ALIVE_CACHESIZE,
+            requests_redirectable => [qw(GET HEAD DELETE PUT)],
+        );
     }
 
     $ua->timeout($self->timeout);
@@ -55,7 +55,7 @@ sub new {
 
 sub buckets {
     my $self = shift;
-    my $r    = $self->_send_request('GET', '', {});
+    my $r = $self->_send_request('GET', '', {});
 
     return undef unless $r && !$self->_remember_errors($r);
 
@@ -63,21 +63,24 @@ sub buckets {
     my $owner_displayname = $r->{Owner}{DisplayName};
 
     my @buckets;
-    foreach my $node (@{$r->{Buckets}{Bucket}}) {
-        push @buckets,
-          Amazon::S3::Bucket->new(
-                                  {
-                                   bucket        => $node->{Name},
-                                   creation_date => $node->{CreationDate},
-                                   account       => $self,
-                                  }
-          );
+    if (ref $r->{Buckets}) {
+        my $buckets = $r->{Buckets}{Bucket};
+        $buckets = [$buckets] unless ref $buckets eq 'ARRAY';
+        foreach my $node (@$buckets) {
+            push @buckets,
+              Amazon::S3::Bucket->new(
+                {   bucket        => $node->{Name},
+                    creation_date => $node->{CreationDate},
+                    account       => $self,
+                }
+              );
 
+        }
     }
     return {
-            owner_id          => $owner_id,
-            owner_displayname => $owner_displayname,
-            buckets           => \@buckets,
+        owner_id          => $owner_id,
+        owner_displayname => $owner_displayname,
+        buckets           => \@buckets,
     };
 }
 
@@ -104,8 +107,8 @@ sub add_bucket {
     }
 
     return 0
-      unless $self->_send_request_expect_nothing('PUT', "$bucket/", $header_ref,
-                                                 $data);
+      unless $self->_send_request_expect_nothing('PUT', "$bucket/",
+        $header_ref, $data);
 
     return $self->bucket($bucket);
 }
@@ -120,7 +123,8 @@ sub delete_bucket {
     my $bucket;
     if (eval { $conf->isa("Amazon::S3::Bucket"); }) {
         $bucket = $conf->bucket;
-    } else {
+    }
+    else {
         $bucket = $conf->{bucket};
     }
     croak 'must specify bucket' unless $bucket;
@@ -137,22 +141,22 @@ sub list_bucket {
     if (%$conf) {
         $path .= "?"
           . join('&',
-                 map { $_ . "=" . $self->_urlencode($conf->{$_}) } keys %$conf);
+            map { $_ . "=" . $self->_urlencode($conf->{$_}) } keys %$conf);
     }
 
     my $r = $self->_send_request('GET', $path, {});
     return undef unless $r && !$self->_remember_errors($r);
     my $return = {
-                  bucket       => $r->{Name},
-                  prefix       => $r->{Prefix},
-                  marker       => $r->{Marker},
-                  next_marker  => $r->{NextMarker},
-                  max_keys     => $r->{MaxKeys},
-                  is_truncated => (
-                                   scalar $r->{IsTruncated} eq 'true'
-                                   ? 1
-                                   : 0
-                  ),
+        bucket       => $r->{Name},
+        prefix       => $r->{Prefix},
+        marker       => $r->{Marker},
+        next_marker  => $r->{NextMarker},
+        max_keys     => $r->{MaxKeys},
+        is_truncated => (
+            scalar $r->{IsTruncated} eq 'true'
+            ? 1
+            : 0
+        ),
     };
 
     my @keys;
@@ -160,8 +164,7 @@ sub list_bucket {
         my $etag = $node->{ETag};
         $etag =~ s{(^"|"$)}{}g if defined $etag;
         push @keys,
-          {
-            key               => $node->{Key},
+          { key               => $node->{Key},
             last_modified     => $node->{LastModified},
             etag              => $etag,
             size              => $node->{Size},
@@ -218,10 +221,9 @@ sub list_bucket_all {
 sub _validate_acl_short {
     my ($self, $policy_name) = @_;
 
-    if (
-        !grep({$policy_name eq $_}
-              qw(private public-read public-read-write authenticated-read))
-      ) {
+    if (!grep({$policy_name eq $_}
+            qw(private public-read public-read-write authenticated-read)))
+    {
         croak "$policy_name is not a supported canned access policy";
     }
 }
@@ -260,9 +262,10 @@ sub _make_request {
     $self->_add_auth_header($http_headers, $method, $path)
       unless exists $headers->{Authorization};
     my $protocol = $self->secure ? 'https' : 'http';
-    my $url = "$protocol://s3.amazonaws.com/$path";
+    my $host     = $self->host;
+    my $url      = "$protocol://$host/$path";
     if ($path =~ m{^([^/?]+)(.*)} && _is_dns_bucket($1)) {
-        $url = "$protocol://$1.s3.amazonaws.com$2";
+        $url = "$protocol://$1.$host$2";
     }
 
     my $request = HTTP::Request->new($method, $url, $http_headers);
@@ -283,7 +286,8 @@ sub _send_request {
     my $request;
     if (@_ == 1) {
         $request = shift;
-    } else {
+    }
+    else {
         $request = $self->_make_request(@_);
     }
 
@@ -329,7 +333,7 @@ sub _send_request_expect_nothing {
 sub _send_request_expect_nothing_probed {
     my $self = shift;
     my ($method, $path, $conf, $value) = @_;
-    my $request      = $self->_make_request('HEAD', $path);
+    my $request = $self->_make_request('HEAD', $path);
     my $override_uri = undef;
 
     my $old_redirectable = $self->ua->requests_redirectable;
@@ -402,7 +406,7 @@ sub _add_auth_header {
     my $encoded_canonical =
       $self->_encode($aws_secret_access_key, $canonical_string);
     $headers->header(
-                  Authorization => "AWS $aws_access_key_id:$encoded_canonical");
+        Authorization => "AWS $aws_access_key_id:$encoded_canonical");
 }
 
 # generates an HTTP::Headers objects given one hash that represents http
@@ -433,7 +437,8 @@ sub _canonical_string {
         if (   $lk eq 'content-md5'
             or $lk eq 'content-type'
             or $lk eq 'date'
-            or $lk =~ /^$AMAZON_HEADER_PREFIX/) {
+            or $lk =~ /^$AMAZON_HEADER_PREFIX/)
+        {
             $interesting_headers{$lk} = $self->_trim($value);
         }
     }
@@ -454,7 +459,8 @@ sub _canonical_string {
     foreach my $key (sort keys %interesting_headers) {
         if ($key =~ /^$AMAZON_HEADER_PREFIX/) {
             $buf .= "$key:$interesting_headers{$key}\n";
-        } else {
+        }
+        else {
             $buf .= "$interesting_headers{$key}\n";
         }
     }
@@ -466,9 +472,11 @@ sub _canonical_string {
     # ...unless there is an acl or torrent parameter
     if ($path =~ /[&?]acl($|=|&)/) {
         $buf .= '?acl';
-    } elsif ($path =~ /[&?]torrent($|=|&)/) {
+    }
+    elsif ($path =~ /[&?]torrent($|=|&)/) {
         $buf .= '?torrent';
-    } elsif ($path =~ /[&?]location($|=|&)/) {
+    }
+    elsif ($path =~ /[&?]location($|=|&)/) {
         $buf .= '?location';
     }
 
@@ -491,7 +499,8 @@ sub _encode {
     my $b64 = encode_base64($hmac->digest, '');
     if ($urlencode) {
         return $self->_urlencode($b64);
-    } else {
+    }
+    else {
         return $b64;
     }
 }

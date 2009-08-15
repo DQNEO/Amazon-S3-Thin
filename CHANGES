@@ -1,5 +1,9 @@
 Revision history for Perl module Amazon::S3:
 
+0.45    Aug 14 2009
+    - Applied patch to support any S3 end points (Tokuhiro Matsuno)
+    - Applied patches to not die when 0 or 1 buckets are return also (Tokuhiro Matsuno)
+
 0.441   Jun 16 2008
     - Added handling to get_key_filename where the key is used as the file 
       name if one is not provided.

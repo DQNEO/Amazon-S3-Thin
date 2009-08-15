@@ -37,7 +37,8 @@ sub add_key {
     if (ref($value) eq 'SCALAR') {
         $conf->{'Content-Length'} ||= -s $$value;
         $value = _content_sub($$value);
-    } else {
+    }
+    else {
         $conf->{'Content-Length'} ||= length $value;
     }
 
@@ -46,13 +47,12 @@ sub add_key {
     # we'll just send a HEAD first to see what's going on
 
     if (ref($value)) {
-        return
-          $self->account->_send_request_expect_nothing_probed('PUT',
-                                              $self->_uri($key), $conf, $value);
-    } else {
-        return
-          $self->account->_send_request_expect_nothing('PUT', $self->_uri($key),
-                                                       $conf, $value);
+        return $self->account->_send_request_expect_nothing_probed('PUT',
+            $self->_uri($key), $conf, $value);
+    }
+    else {
+        return $self->account->_send_request_expect_nothing('PUT',
+            $self->_uri($key), $conf, $value);
     }
 }
 
@@ -88,10 +88,10 @@ sub get_key {
     }
 
     my $return = {
-                  content_length => $response->content_length || 0,
-                  content_type   => $response->content_type,
-                  etag           => $etag,
-                  value          => $response->content,
+        content_length => $response->content_length || 0,
+        content_type   => $response->content_type,
+        etag           => $etag,
+        value          => $response->content,
     };
 
     foreach my $header ($response->headers->header_field_names) {
@@ -113,9 +113,8 @@ sub get_key_filename {
 sub delete_key {
     my ($self, $key) = @_;
     croak 'must specify key' unless $key && length $key;
-    return
-      $self->account->_send_request_expect_nothing('DELETE', $self->_uri($key),
-                                                   {});
+    return $self->account->_send_request_expect_nothing('DELETE',
+        $self->_uri($key), {});
 }
 
 sub delete_bucket {
@@ -142,7 +141,7 @@ sub get_acl {
     my ($self, $key) = @_;
     my $acct = $self->account;
 
-    my $request  = $acct->_make_request('GET', $self->_uri($key) . '?acl', {});
+    my $request = $acct->_make_request('GET', $self->_uri($key) . '?acl', {});
     my $response = $acct->_do_http($request);
 
     if ($response->code == 404) {
@@ -175,9 +174,8 @@ sub set_acl {
 
     my $xml = $conf->{acl_xml} || '';
 
-    return
-      $self->account->_send_request_expect_nothing('PUT', $path, $hash_ref,
-                                                   $xml);
+    return $self->account->_send_request_expect_nothing('PUT', $path,
+        $hash_ref, $xml);
 
 }
 
@@ -209,7 +207,7 @@ sub _content_sub {
 
     croak "$filename not a readable file with fixed size"
       unless -r $filename
-      and $remaining;
+          and $remaining;
 
     my $fh = IO::File->new($filename, 'r')
       or croak "Could not open $filename: $!";
@@ -228,12 +226,12 @@ sub _content_sub {
 
         unless (my $read = $fh->read($buffer, $blksize)) {
             croak
-"Error while reading upload content $filename ($remaining remaining) $!"
+              "Error while reading upload content $filename ($remaining remaining) $!"
               if $! and $remaining;
             $fh->close    # otherwise, we found EOF
               or croak "close of upload content $filename failed: $!";
-            $buffer ||=
-              '';    # LWP expects an empty string on finish, read returns 0
+            $buffer
+              ||= '';  # LWP expects an empty string on finish, read returns 0
         }
         $remaining -= length($buffer);
         return $buffer;
