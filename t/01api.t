@@ -18,6 +18,10 @@ use_ok('Amazon::S3::Bucket');
 
 # this synopsis is presented as a test file
 
+# TO DO: Need host method tests, default is
+# s3.amazonaws.com, can change host, host is changed to
+# something other than s3.amazonaws.com.
+
 use vars qw/$OWNER_ID $OWNER_DISPLAYNAME/;
 
 my $aws_access_key_id     = $ENV{'AWS_ACCESS_KEY_ID'};

@@ -652,6 +652,11 @@ uses exponential backoff with retries after 1, 2, 4, 8, 16,
 32 seconds, as recommended by Amazon. Defaults to off, no
 retries.
 
+=item host
+
+Defines the S3 host endpoint to use. Defaults to
+'s3.amazonaws.com'.
+
 =back
 
 =head2 buckets
