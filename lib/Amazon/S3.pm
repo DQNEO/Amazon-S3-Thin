@@ -15,7 +15,7 @@ use base qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(
     qw(aws_access_key_id aws_secret_access_key secure ua err errstr timeout retry host)
 );
-our $VERSION = '0.441';
+our $VERSION = '0.45';
 
 my $AMAZON_HEADER_PREFIX = 'x-amz-';
 my $METADATA_PREFIX      = 'x-amz-meta-';
