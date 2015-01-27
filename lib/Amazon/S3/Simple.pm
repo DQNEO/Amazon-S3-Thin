@@ -3,24 +3,33 @@ use strict;
 use warnings;
 use HTTP::Response;
 
+use Amazon::S3;
+use Amazon::S3::Bucket;
+
+
 use base qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(
     qw(aws_access_key_id aws_secret_access_key)
 );
 
 sub new {
+    my $class = shift;
     my $self  = $class->SUPER::new(@_);
+    $self->{s3} = Amazon::S3->new(@_);
     return $self;
 }
 
 sub get_object {
     my ($self, $bucket, $key) = @_;
-    return HTTP::Response->new;
+    my $ob = $self->{s3}->bucket($bucket) or die 'cannot get bucket';
+    my $request = $self->{s3}->_make_request('GET', $ob->_uri($key), {});
+    return $self->{s3}->_do_http($request);
 }
 
 sub put_object {
-    my ($self, $bucket, $key, $content) = @_;
-    return HTTP::Response->new;
+    my ($self, $bucket, $key, $content, $opt) = @_;
+    my $ob = $self->{s3}->bucket($bucket) or die 'cannot get bucket';
+    return $ob->add_key($key, $content, $opt);
 }
 
 1;
