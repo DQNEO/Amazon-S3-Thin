@@ -57,11 +57,6 @@ sub get_object {
 }
 
 sub put_object {
-    my ($self, $bucket, $key, $content, $opt) = @_;
-    return $self->add_key($bucket, $key, $content, $opt);
-}
-
-sub add_key {
     my ($self, $bucket, $key, $value, $conf) = @_;
     croak 'must specify key' unless $key && length $key;
     
