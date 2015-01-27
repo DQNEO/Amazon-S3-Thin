@@ -1,6 +1,8 @@
 package Amazon::S3::Simple;
 use strict;
 use warnings;
+use HTTP::Response;
+
 use base qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(
     qw(aws_access_key_id aws_secret_access_key)
@@ -11,14 +13,14 @@ sub new {
     return $self;
 }
 
-# return HTTP::Response
 sub get_object {
-
+    my ($self, $bucket, $key) = @_;
+    return HTTP::Response->new;
 }
 
-# return HTTP::Response
 sub put_object {
-
+    my ($self, $bucket, $key, $content) = @_;
+    return HTTP::Response->new;
 }
 
 1;
