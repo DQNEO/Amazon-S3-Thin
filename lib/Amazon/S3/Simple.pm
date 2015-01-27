@@ -16,6 +16,8 @@ __PACKAGE__->mk_accessors(
     qw(aws_access_key_id aws_secret_access_key account secure host ua timeout retry)
 );
 
+our $VERSION = '0.01';
+
 my $AMAZON_HEADER_PREFIX = 'x-amz-';
 my $METADATA_PREFIX      = 'x-amz-meta-';
 my $KEEP_ALIVE_CACHESIZE = 10;
