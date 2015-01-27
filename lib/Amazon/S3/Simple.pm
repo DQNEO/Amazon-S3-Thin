@@ -9,7 +9,7 @@ use Amazon::S3::Bucket;
 
 use base qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(
-    qw(aws_access_key_id aws_secret_access_key)
+    qw(aws_access_key_id aws_secret_access_key account)
 );
 
 sub new {
@@ -21,15 +21,55 @@ sub new {
 
 sub get_object {
     my ($self, $bucket, $key) = @_;
-    my $ob = $self->{s3}->bucket($bucket) or die 'cannot get bucket';
-    my $request = $self->{s3}->_make_request('GET', $ob->_uri($key), {});
+    my $request = $self->{s3}->_make_request('GET', $self->_uri($bucket, $key), {});
     return $self->{s3}->_do_http($request);
 }
 
 sub put_object {
     my ($self, $bucket, $key, $content, $opt) = @_;
-    my $ob = $self->{s3}->bucket($bucket) or die 'cannot get bucket';
-    return $ob->add_key($key, $content, $opt);
+    return $self->add_key($bucket, $key, $content, $opt);
+}
+
+sub _uri {
+    my ($self, $bucket, $key) = @_;
+    return ($key)
+      ? $bucket . "/" . $self->{s3}->_urlencode($key)
+      : $bucket . "/";
+}
+
+use Carp;
+
+sub add_key {
+    my ($self, $bucket, $key, $value, $conf) = @_;
+    croak 'must specify key' unless $key && length $key;
+    my $s3 = $self->{account} = $self->{s3};
+    
+    if ($conf->{acl_short}) {
+        $self->account->_validate_acl_short($conf->{acl_short});
+        $conf->{'x-amz-acl'} = $conf->{acl_short};
+        delete $conf->{acl_short};
+    }
+
+    if (ref($value) eq 'SCALAR') {
+        $conf->{'Content-Length'} ||= -s $$value;
+        $value = _content_sub($$value);
+    }
+    else {
+        $conf->{'Content-Length'} ||= length $value;
+    }
+
+    # If we're pushing to a bucket that's under DNS flux, we might get a 307
+    # Since LWP doesn't support actually waiting for a 100 Continue response,
+    # we'll just send a HEAD first to see what's going on
+
+    if (ref($value)) {
+        return $self->account->_send_request_expect_nothing_probed('PUT',
+            $self->_uri($bucket, $key), $conf, $value);
+    }
+    else {
+        return $self->account->_send_request_expect_nothing('PUT',
+            $self->_uri($bucket, $key), $conf, $value);
+    }
 }
 
 1;
