@@ -1,4 +1,5 @@
 package Amazon::S3::Simple;
+use 5.008001;
 use strict;
 use warnings;
 
@@ -314,9 +315,18 @@ Amazon::S3::Simple - A very simple Amazon S3 client
 
   my $response = $s3client->put_object($bucket, $key, $content);
 
+=head1 LICENSE
+
+Copyright (C) DQNEO.
+
+This library is free software; you can redistribute it and/or modify
+it under the same terms as Perl itself.
+
 =head1 AUTHOR
 
-DQNEQ
+DQNEO
+
+=cut
 
 
 
