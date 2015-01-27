@@ -7,13 +7,12 @@ use Digest::HMAC_SHA1;
 use HTTP::Date;
 use MIME::Base64 qw(encode_base64);
 use LWP::UserAgent;
-use LWP::UserAgent::Determined;
 use URI::Escape qw(uri_escape_utf8);
 use HTTP::Response;
 
 use base qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(
-    qw(aws_access_key_id aws_secret_access_key account secure host ua timeout retry)
+    qw(aws_access_key_id aws_secret_access_key account secure host ua)
 );
 
 our $VERSION = '0.01';
@@ -30,28 +29,25 @@ sub new {
     die "No aws_secret_access_key" unless $self->aws_secret_access_key;
 
     $self->secure(0)                if not defined $self->secure;
-    $self->timeout(30)              if not defined $self->timeout;
     $self->host('s3.amazonaws.com') if not defined $self->host;
 
-    my $ua;
-    if ($self->retry) {
-        $ua = LWP::UserAgent::Determined->new(
-            keep_alive            => $KEEP_ALIVE_CACHESIZE,
-            requests_redirectable => [qw(GET HEAD DELETE PUT)],
-        );
-        $ua->timing('1,2,4,8,16,32');
-    }
-    else {
-        $ua = LWP::UserAgent->new(
-            keep_alive            => $KEEP_ALIVE_CACHESIZE,
-            requests_redirectable => [qw(GET HEAD DELETE PUT)],
-        );
+    if (! defined $self->ua) {
+        $self->ua($self->_default_ua);
     }
 
-    $ua->timeout($self->timeout);
-    $ua->env_proxy;
-    $self->ua($ua);
     return $self;
+}
+
+sub _default_ua {
+    my $self = shift;
+
+    my $ua = LWP::UserAgent->new(
+        keep_alive            => $KEEP_ALIVE_CACHESIZE,
+        requests_redirectable => [qw(GET HEAD DELETE PUT)],
+        );
+    $ua->timeout(30);
+    $ua->env_proxy;
+    return $ua;
 }
 
 sub get_object {
