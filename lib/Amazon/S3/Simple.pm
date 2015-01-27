@@ -12,7 +12,7 @@ use HTTP::Response;
 
 use base qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(
-    qw(aws_access_key_id aws_secret_access_key account secure host ua)
+    qw(aws_access_key_id aws_secret_access_key secure host ua)
 );
 
 our $VERSION = '0.01';
