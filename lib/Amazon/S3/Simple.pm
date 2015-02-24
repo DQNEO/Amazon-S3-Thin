@@ -53,7 +53,7 @@ sub _default_ua {
 
 sub get_object {
     my ($self, $bucket, $key) = @_;
-    my $request = $self->_make_request('GET', $self->_uri($bucket, $key), {});
+    my $request = $self->_compose_request('GET', $self->_uri($bucket, $key), {});
     return $self->ua->request($request);
 }
 
@@ -85,7 +85,7 @@ sub put_object {
         die "unable to handle reference";
     }
     else {
-        my $request = $self->_make_request('PUT', $self->_uri($bucket, $key), $conf, $value);
+        my $request = $self->_compose_request('PUT', $self->_uri($bucket, $key), $conf, $value);
         return $self->ua->request($request);
     }
 }
@@ -129,7 +129,7 @@ sub _is_dns_bucket {
 }
 
 # make the HTTP::Request object
-sub _make_request {
+sub _compose_request {
     my ($self, $method, $path, $headers, $data, $metadata) = @_;
     croak 'must specify method' unless $method;
     croak 'must specify path'   unless defined $path;
