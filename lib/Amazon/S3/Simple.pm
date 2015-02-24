@@ -85,7 +85,14 @@ sub put_object {
         die "unable to handle reference";
     }
     else {
-        return $self->_send_request_expect_nothing('PUT', $self->_uri($bucket, $key), $conf, $value);
+        my $request = $self->_make_request('PUT', $self->_uri($bucket, $key), $conf, $value);
+        my $response = $self->_do_http($request);
+        my $content  = $response->content;
+        if ($response->code =~ /^2\d\d$/) {
+            return 1;
+        } else {
+            return 0;
+        }
     }
 }
 
@@ -165,14 +172,6 @@ sub _do_http {
 
 sub _send_request_expect_nothing {
     my $self    = shift;
-    my $request = $self->_make_request(@_);
-
-    my $response = $self->_do_http($request);
-    my $content  = $response->content;
-
-    return 1 if $response->code =~ /^2\d\d$/;
-
-    return 0;
 }
 
 sub _add_auth_header {
