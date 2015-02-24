@@ -86,13 +86,7 @@ sub put_object {
     }
     else {
         my $request = $self->_make_request('PUT', $self->_uri($bucket, $key), $conf, $value);
-        my $response = $self->_do_http($request);
-        my $content  = $response->content;
-        if ($response->code =~ /^2\d\d$/) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return $self->_do_http($request);
     }
 }
 
