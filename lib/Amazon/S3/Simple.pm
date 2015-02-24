@@ -75,17 +75,18 @@ sub put_object {
         $conf->{'Content-Length'} ||= length $value;
     }
 
-    # If we're pushing to a bucket that's under DNS flux, we might get a 307
-    # Since LWP doesn't support actually waiting for a 100 Continue response,
-    # we'll just send a HEAD first to see what's going on
-
     if (ref($value)) {
-        return $self->_send_request_expect_nothing_probed('PUT',
-            $self->_uri($bucket, $key), $conf, $value);
+        # TODO
+        # I do not understand what it is :(
+        #
+        # return $self->_send_request_expect_nothing_probed('PUT',
+        #    $self->_uri($bucket, $key), $conf, $value);
+        #
+        die "unable to handle reference";
     }
     else {
-        return $self->_send_request_expect_nothing('PUT',
-            $self->_uri($bucket, $key), $conf, $value);
+        my $request = $self->_make_request('PUT', $self->_uri($bucket, $key), $conf, $value);
+        return $self->_do_http($request);
     }
 }
 
@@ -161,18 +162,6 @@ sub _make_request {
 sub _do_http {
     my ($self, $request, $filename) = @_;
     return $self->ua->request($request, $filename);
-}
-
-sub _send_request_expect_nothing {
-    my $self    = shift;
-    my $request = $self->_make_request(@_);
-
-    my $response = $self->_do_http($request);
-    my $content  = $response->content;
-
-    return 1 if $response->code =~ /^2\d\d$/;
-
-    return 0;
 }
 
 sub _add_auth_header {
@@ -311,8 +300,10 @@ Amazon::S3::Simple - A very simple Amazon S3 client
       }
   );
 
+  # returns HTTP::Response
   my $response = $s3client->get_object($bucket, $key);
 
+  # returns HTTP::Response
   my $response = $s3client->put_object($bucket, $key, $content);
 
 =head1 LICENSE
