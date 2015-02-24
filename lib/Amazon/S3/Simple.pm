@@ -296,6 +296,8 @@ Amazon::S3::Simple - A very simple Amazon S3 client
   my $content = "hello world";
   $response = $s3client->put_object($bucket, $key, $content);
 
+  $response = $s3client->delete_object($bucket, $key);
+
 
 =head1 LICENSE
 
