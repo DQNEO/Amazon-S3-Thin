@@ -291,11 +291,11 @@ Amazon::S3::Simple - A very simple Amazon S3 client
       }
   );
 
-  # returns HTTP::Response
-  my $response = $s3client->get_object($bucket, $key);
+  $response = $s3client->get_object($bucket, $key);
 
-  # returns HTTP::Response
-  my $response = $s3client->put_object($bucket, $key, $content);
+  my $content = "hello world";
+  $response = $s3client->put_object($bucket, $key, $content);
+
 
 =head1 LICENSE
 
