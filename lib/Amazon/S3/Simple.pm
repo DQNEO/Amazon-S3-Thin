@@ -57,6 +57,12 @@ sub get_object {
     return $self->ua->request($request);
 }
 
+sub delete_object {
+    my ($self, $bucket, $key) = @_;
+    my $request = $self->_compose_request('DELETE', $self->_uri($bucket, $key), {});
+    return $self->ua->request($request);
+}
+
 sub put_object {
     my ($self, $bucket, $key, $content, $conf) = @_;
     croak 'must specify key' unless $key && length $key;
