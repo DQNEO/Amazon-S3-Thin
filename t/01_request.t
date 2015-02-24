@@ -11,7 +11,7 @@ my $config_file = $ENV{HOME} . "/.aws/credentials";
 my $crd = Config::Tiny->read($config_file)->{dqneo};
 
 my $arg = $crd;
-$arg->{ua} = MyUA->new;
+$arg->{ua} = MockUA->new;
 my $client = Amazon::S3::Simple->new($arg);
 
 my $bucket = "tmpfoobar";
@@ -36,7 +36,7 @@ is $req2->method, "GET";
 
 done_testing;
 
-package MyUA;
+package MockUA;
 
 sub new {
     my $class = shift;
@@ -46,10 +46,10 @@ sub new {
 sub request {
     my $self = shift;
     my $request = shift;
-    return MyResponse->new({request =>$request});
+    return MockResponse->new({request =>$request});
 }
 
-package MyResponse;
+package MockResponse;
 use base qw(Class::Accessor::Fast);
 
 sub request {
