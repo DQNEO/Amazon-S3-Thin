@@ -149,12 +149,6 @@ sub _compose_request {
 
     my $request = HTTP::Request->new($method, $url, $http_headers);
     $request->content($data);
-
-    # my $req_as = $request->as_string;
-    # $req_as =~ s/[^\n\r\x20-\x7f]/?/g;
-    # $req_as = substr( $req_as, 0, 1024 ) . "\n\n";
-    # warn $req_as;
-
     return $request;
 }
 
