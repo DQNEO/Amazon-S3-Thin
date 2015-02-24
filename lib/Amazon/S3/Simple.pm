@@ -164,10 +164,6 @@ sub _do_http {
     return $self->ua->request($request, $filename);
 }
 
-sub _send_request_expect_nothing {
-    my $self    = shift;
-}
-
 sub _add_auth_header {
     my ($self, $headers, $method, $path) = @_;
     my $aws_access_key_id     = $self->aws_access_key_id;
