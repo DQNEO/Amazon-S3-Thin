@@ -58,7 +58,7 @@ sub get_object {
 }
 
 sub put_object {
-    my ($self, $bucket, $key, $value, $conf) = @_;
+    my ($self, $bucket, $key, $content, $conf) = @_;
     croak 'must specify key' unless $key && length $key;
     
     if ($conf->{acl_short}) {
@@ -67,25 +67,25 @@ sub put_object {
         delete $conf->{acl_short};
     }
 
-    if (ref($value) eq 'SCALAR') {
-        $conf->{'Content-Length'} ||= -s $$value;
-        $value = _content_sub($$value);
+    if (ref($content) eq 'SCALAR') {
+        $conf->{'Content-Length'} ||= -s $$content;
+        $content = _content_sub($$content);
     }
     else {
-        $conf->{'Content-Length'} ||= length $value;
+        $conf->{'Content-Length'} ||= length $content;
     }
 
-    if (ref($value)) {
+    if (ref($content)) {
         # TODO
         # I do not understand what it is :(
         #
         # return $self->_send_request_expect_nothing_probed('PUT',
-        #    $self->_uri($bucket, $key), $conf, $value);
+        #    $self->_uri($bucket, $key), $conf, $content);
         #
         die "unable to handle reference";
     }
     else {
-        my $request = $self->_compose_request('PUT', $self->_uri($bucket, $key), $conf, $value);
+        my $request = $self->_compose_request('PUT', $self->_uri($bucket, $key), $conf, $content);
         return $self->ua->request($request);
     }
 }
@@ -130,11 +130,11 @@ sub _is_dns_bucket {
 
 # make the HTTP::Request object
 sub _compose_request {
-    my ($self, $method, $path, $headers, $data, $metadata) = @_;
+    my ($self, $method, $path, $headers, $content, $metadata) = @_;
     croak 'must specify method' unless $method;
     croak 'must specify path'   unless defined $path;
     $headers ||= {};
-    $data = '' if not defined $data;
+    $content = '' if not defined $content;
     $metadata ||= {};
     my $http_headers = $self->_merge_meta($headers, $metadata);
 
@@ -148,7 +148,7 @@ sub _compose_request {
     }
 
     my $request = HTTP::Request->new($method, $url, $http_headers);
-    $request->content($data);
+    $request->content($content);
     return $request;
 }
 
