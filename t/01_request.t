@@ -30,9 +30,12 @@ my $req2 = $res2->request;
 diag "test PUT request";
 is $req1->method, "PUT";
 is $req1->content, $body;
+is $req1->uri, "http://tmpfoobar.s3.amazonaws.com/dir%2Fprivate%2Etxt";
+
 
 diag "test GET request";
 is $req2->method, "GET";
+is $req2->uri, "http://tmpfoobar.s3.amazonaws.com/dir%2Fprivate%2Etxt";
 
 done_testing;
 
