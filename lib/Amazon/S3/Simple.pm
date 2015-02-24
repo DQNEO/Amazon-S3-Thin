@@ -75,13 +75,14 @@ sub put_object {
         $conf->{'Content-Length'} ||= length $value;
     }
 
-    # If we're pushing to a bucket that's under DNS flux, we might get a 307
-    # Since LWP doesn't support actually waiting for a 100 Continue response,
-    # we'll just send a HEAD first to see what's going on
-
     if (ref($value)) {
-        return $self->_send_request_expect_nothing_probed('PUT',
-            $self->_uri($bucket, $key), $conf, $value);
+        # TODO
+        # I do not understand what it is :(
+        #
+        # return $self->_send_request_expect_nothing_probed('PUT',
+        #    $self->_uri($bucket, $key), $conf, $value);
+        #
+        die "unable to handle reference";
     }
     else {
         return $self->_send_request_expect_nothing('PUT',
