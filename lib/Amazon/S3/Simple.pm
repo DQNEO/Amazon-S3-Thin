@@ -54,7 +54,7 @@ sub _default_ua {
 sub get_object {
     my ($self, $bucket, $key) = @_;
     my $request = $self->_make_request('GET', $self->_uri($bucket, $key), {});
-    return $self->_do_http($request);
+    return $self->ua->request($request);
 }
 
 sub put_object {
@@ -86,7 +86,7 @@ sub put_object {
     }
     else {
         my $request = $self->_make_request('PUT', $self->_uri($bucket, $key), $conf, $value);
-        return $self->_do_http($request);
+        return $self->ua->request($request);
     }
 }
 
@@ -156,12 +156,6 @@ sub _make_request {
     # warn $req_as;
 
     return $request;
-}
-
-# centralize all HTTP work, for debugging
-sub _do_http {
-    my ($self, $request, $filename) = @_;
-    return $self->ua->request($request, $filename);
 }
 
 sub _add_auth_header {
