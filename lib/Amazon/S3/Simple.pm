@@ -146,8 +146,7 @@ sub _compose_request {
         $url = "$protocol://$1.$host$2";
     }
 
-    my $request = HTTP::Request->new($method, $url, $http_headers, $content);
-    return $request;
+    return HTTP::Request->new($method, $url, $http_headers, $content);
 }
 
 sub _add_auth_header {
