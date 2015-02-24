@@ -85,8 +85,7 @@ sub put_object {
         die "unable to handle reference";
     }
     else {
-        return $self->_send_request_expect_nothing('PUT',
-            $self->_uri($bucket, $key), $conf, $value);
+        return $self->_send_request_expect_nothing('PUT', $self->_uri($bucket, $key), $conf, $value);
     }
 }
 
