@@ -134,7 +134,6 @@ sub _compose_request {
     croak 'must specify method' unless $method;
     croak 'must specify path'   unless defined $path;
     $headers ||= {};
-    $content = '' if not defined $content;
     $metadata ||= {};
     my $http_headers = $self->_merge_meta($headers, $metadata);
 
@@ -147,8 +146,7 @@ sub _compose_request {
         $url = "$protocol://$1.$host$2";
     }
 
-    my $request = HTTP::Request->new($method, $url, $http_headers);
-    $request->content($content);
+    my $request = HTTP::Request->new($method, $url, $http_headers, $content);
     return $request;
 }
 
