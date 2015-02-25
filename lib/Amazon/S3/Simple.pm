@@ -53,13 +53,13 @@ sub _default_ua {
 
 sub get_object {
     my ($self, $bucket, $key) = @_;
-    my $request = $self->_compose_request('GET', $self->_uri($bucket, $key), {});
+    my $request = $self->_compose_request('GET', $self->_uri($bucket, $key));
     return $self->ua->request($request);
 }
 
 sub delete_object {
     my ($self, $bucket, $key) = @_;
-    my $request = $self->_compose_request('DELETE', $self->_uri($bucket, $key), {});
+    my $request = $self->_compose_request('DELETE', $self->_uri($bucket, $key));
     return $self->ua->request($request);
 }
 
