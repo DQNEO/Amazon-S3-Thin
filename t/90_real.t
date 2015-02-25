@@ -50,13 +50,22 @@ is $req->method, "PUT";
 is $req->content, $body;
 is $req->uri, "http://tmpdqneo.s3.amazonaws.com/dir%2Fs3test%2Etxt";
 
+diag "COPY request";
+my $key2 = $key . "_copied";
+$res = $client->copy_object($bucket, $key, $bucket, $key2);
+ok $res->is_success, "is_success";
+$req =  $res->request;
+is $req->method, "PUT";
+
+
 diag "GET request";
-$res = $client->get_object($bucket, $key);
+$res = $client->get_object($bucket, $key2);
 ok $res->is_success, "is_success";
 $req = $res->request;
 
 is $req->method, "GET";
-is $req->uri, "http://tmpdqneo.s3.amazonaws.com/dir%2Fs3test%2Etxt";
+is $req->uri, "http://tmpdqneo.s3.amazonaws.com/dir%2Fs3test%2Etxt_copied";
+
 
 done_testing;
 

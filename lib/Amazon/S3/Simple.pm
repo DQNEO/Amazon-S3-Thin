@@ -63,6 +63,14 @@ sub delete_object {
     return $self->ua->request($request);
 }
 
+sub copy_object {
+    my ($self, $src_bucket, $src_key, $dst_bucket, $dst_key) = @_;
+    my $conf = {};
+    $conf->{'x-amz-copy-source'} = $src_bucket . "/" . $src_key;
+    my $request = $self->_compose_request('PUT', $self->_uri($dst_bucket, $dst_key), $conf);
+    return $self->ua->request($request);
+}
+
 sub put_object {
     my ($self, $bucket, $key, $content, $conf) = @_;
     croak 'must specify key' unless $key && length $key;
