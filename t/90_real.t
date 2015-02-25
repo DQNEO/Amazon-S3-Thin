@@ -66,6 +66,12 @@ $req = $res->request;
 is $req->method, "GET";
 is $req->uri, "http://tmpdqneo.s3.amazonaws.com/dir%2Fs3test%2Etxt_copied";
 
+diag "DELETE request";
+$res =  $client->delete_object($bucket, $key);
+ok $res->is_success, "is_success";
+
+$res =  $client->delete_object($bucket, $key2);
+ok $res->is_success, "is_success";
 
 done_testing;
 
