@@ -72,21 +72,21 @@ sub copy_object {
 }
 
 sub put_object {
-    my ($self, $bucket, $key, $content, $conf) = @_;
+    my ($self, $bucket, $key, $content, $headers) = @_;
     croak 'must specify key' unless $key && length $key;
     
-    if ($conf->{acl_short}) {
-        $self->_validate_acl_short($conf->{acl_short});
-        $conf->{'x-amz-acl'} = $conf->{acl_short};
-        delete $conf->{acl_short};
+    if ($headers->{acl_short}) {
+        $self->_validate_acl_short($headers->{acl_short});
+        $headers->{'x-amz-acl'} = $headers->{acl_short};
+        delete $headers->{acl_short};
     }
 
     if (ref($content) eq 'SCALAR') {
-        $conf->{'Content-Length'} ||= -s $$content;
+        $headers->{'Content-Length'} ||= -s $$content;
         $content = _content_sub($$content);
     }
     else {
-        $conf->{'Content-Length'} ||= length $content;
+        $headers->{'Content-Length'} ||= length $content;
     }
 
     if (ref($content)) {
@@ -94,12 +94,12 @@ sub put_object {
         # I do not understand what it is :(
         #
         # return $self->_send_request_expect_nothing_probed('PUT',
-        #    $self->_uri($bucket, $key), $conf, $content);
+        #    $self->_uri($bucket, $key), $headers, $content);
         #
         die "unable to handle reference";
     }
     else {
-        my $request = $self->_compose_request('PUT', $self->_uri($bucket, $key), $conf, $content);
+        my $request = $self->_compose_request('PUT', $self->_uri($bucket, $key), $headers, $content);
         return $self->ua->request($request);
     }
 }
