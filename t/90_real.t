@@ -37,6 +37,7 @@ is $req->uri, "http://tmpdqneo.s3.amazonaws.com/dir%2Fs3test%2Etxt";
 diag "GET request";
 $res = $client->get_object($bucket, $key);
 $req = $res->request;
+ok !$res->is_success, "is not success";
 is $res->code, 404;
 is $req->method, "GET";
 is $req->uri, "http://tmpdqneo.s3.amazonaws.com/dir%2Fs3test%2Etxt";
