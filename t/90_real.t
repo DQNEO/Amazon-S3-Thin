@@ -23,9 +23,9 @@ my $body = "hello amazon s3";
 # 3. GET
 # 4. PUT to update
 # 5. DELETE
-diag "test PUT request";
 my $res;
 my $req;
+diag "DELETE request";
 $res =  $client->delete_object($bucket, $key);
 $req = $res->request;
 ok $res->is_success, "is_success";
@@ -34,21 +34,19 @@ is $req->content, '';
 is $req->uri, "http://tmpdqneo.s3.amazonaws.com/dir%2Fs3test%2Etxt";
 
 
+diag "PUT request";
 $res = $client->put_object($bucket, $key, $body);
 ok $res->is_success, "is_success";
-
-
 $req =  $res->request;
-diag "test PUT request";
 is $req->method, "PUT";
 is $req->content, $body;
 is $req->uri, "http://tmpdqneo.s3.amazonaws.com/dir%2Fs3test%2Etxt";
 
+diag "GET request";
 $res = $client->get_object($bucket, $key);
 ok $res->is_success, "is_success";
 $req = $res->request;
 
-diag "test GET request";
 is $req->method, "GET";
 is $req->uri, "http://tmpdqneo.s3.amazonaws.com/dir%2Fs3test%2Etxt";
 
