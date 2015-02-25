@@ -306,6 +306,9 @@ Amazon::S3::Simple - A very simple Amazon S3 client
 
   $response = $s3client->delete_object($bucket, $key);
 
+  $response = $s3client->copy_object($src_bucket, $src_key,
+                                       $dst_bucket, $dst_key);
+
 
 =head1 LICENSE
 
