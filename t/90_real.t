@@ -34,6 +34,13 @@ is $req->content, '';
 is $req->uri, "http://tmpdqneo.s3.amazonaws.com/dir%2Fs3test%2Etxt";
 
 
+diag "GET request";
+$res = $client->get_object($bucket, $key);
+$req = $res->request;
+is $res->code, 404;
+is $req->method, "GET";
+is $req->uri, "http://tmpdqneo.s3.amazonaws.com/dir%2Fs3test%2Etxt";
+
 diag "PUT request";
 $res = $client->put_object($bucket, $key, $body);
 ok $res->is_success, "is_success";
