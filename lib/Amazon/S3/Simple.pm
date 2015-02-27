@@ -104,6 +104,44 @@ sub put_object {
     }
 }
 
+sub _send_request {
+    my $self = shift;
+    my $request;
+    if (@_ == 1) {
+        $request = shift;
+    }
+    else {
+        $request = $self->_compose_request(@_);
+    }
+
+    my $response = $self->ua->request($request);
+}
+
+sub list_objects {
+    my ($self, $bucket, $conf) = @_;
+    croak 'must specify bucket' unless $bucket;
+    $conf ||= {};
+
+    my $path = $bucket . "/";
+    if (%$conf) {
+        $path .= "?"
+          . join('&',
+            map { $_ . "=" . $self->_urlencode($conf->{$_}) } keys %$conf);
+    }
+
+    my $r = my $response = $self->_send_request('GET', $path, {});
+    return $r;
+    if ($r->code != 200) {
+    use Data::Dumper;
+        warn Dumper $response;
+        die;
+    }
+
+
+    return $response unless $response->content_type eq 'application/xml';
+
+}
+
 sub _uri {
     my ($self, $bucket, $key) = @_;
     return ($key)
