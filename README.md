@@ -1,14 +1,14 @@
 # NAME
 
-Amazon::S3::Simple - It's new $module
+Amazon::S3::Thin - It's new $module
 
 # SYNOPSIS
 
-    use Amazon::S3::Simple;
+    use Amazon::S3::Thin;
 
 # DESCRIPTION
 
-Amazon::S3::Simple is ...
+Amazon::S3::Thin is ...
 
 # LICENSE
 
