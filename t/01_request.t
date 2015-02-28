@@ -40,7 +40,7 @@ is $req2->uri, "http://tmpfoobar.s3.amazonaws.com/dir%2Fprivate%2Etxt";
 my $res3 = $client->list_objects($bucket, {prefix => "12012", delimiter => "/"});
 my $req3 = $res3->request;
 is $req3->method, "GET";
-is $req3->uri, "http://tmpfoobar.s3.amazonaws.com/?prefix=12012&delimiter=%2F";
+is $req3->uri, "http://tmpfoobar.s3.amazonaws.com/?delimiter=%2F&prefix=12012";
 
 done_testing;
 
