@@ -104,6 +104,7 @@ sub put_object {
     }
 }
 
+# http://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGET.html
 sub list_objects {
     my ($self, $bucket, $opt) = @_;
     croak 'must specify bucket' unless $bucket;
