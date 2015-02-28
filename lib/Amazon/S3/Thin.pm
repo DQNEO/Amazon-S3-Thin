@@ -114,7 +114,7 @@ sub list_objects {
     if (%$opt) {
         $path .= "?"
           . join('&',
-            map { $_ . "=" . $self->_urlencode($opt->{$_}) } keys %$opt);
+            map { $_ . "=" . $self->_urlencode($opt->{$_}) } sort keys %$opt);
     }
 
     my $request = $self->_compose_request('GET', $path, {});
