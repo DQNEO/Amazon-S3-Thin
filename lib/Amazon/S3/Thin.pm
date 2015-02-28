@@ -307,8 +307,6 @@ Amazon::S3::Thin - A very simple, ligthweight Amazon S3 client
 
 =head1 SYNOPSIS
 
-  use strict;
-  use warnings;
   use Amazon::S3::Thin;
 
   my $s3client = Amazon::S3::Thin->new(
