@@ -4,7 +4,7 @@ use warnings;
 use ExtUtils::MakeMaker;
 WriteMakefile(
     NAME         => 'Amazon::S3::Thin',
-    VERSION_FROM => 'lib/Amazon/S3/Simple.pm',
+    VERSION_FROM => 'lib/Amazon/S3/Thin.pm',
     AUTHOR       => 'DQNEO <dqneoo@gmail.com>',
     LICENSE      => 'perl',
     PREREQ_PM    => {

@@ -42,7 +42,6 @@ This module requires these other modules and libraries:
         LWP::UserAgent             
         MIME::Base64               
         Test::More                  # for testing
-        XML::Simple
         URI::Escape                
 
 COPYRIGHT AND LICENCE

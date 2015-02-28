@@ -303,12 +303,10 @@ __END__
 
 =head1 NAME
 
-Amazon::S3::Thin - A very simple Amazon S3 client
+Amazon::S3::Thin - A very simple, ligthweight Amazon S3 client
 
 =head1 SYNOPSIS
 
-  use strict;
-  use warnings;
   use Amazon::S3::Thin;
 
   my $s3client = Amazon::S3::Thin->new(
@@ -319,13 +317,17 @@ Amazon::S3::Thin - A very simple Amazon S3 client
 
   $response = $s3client->get_object($bucket, $key);
 
-  my $content = "hello world";
-  $response = $s3client->put_object($bucket, $key, $content);
+  $response = $s3client->put_object($bucket, $key, "hello world");
 
   $response = $s3client->delete_object($bucket, $key);
 
   $response = $s3client->copy_object($src_bucket, $src_key,
-                                       $dst_bucket, $dst_key);
+                                     $dst_bucket, $dst_key);
+
+  $response = $s3client->list_objects(
+                              $bucket,
+                              {prefix => "foo", delimter => "/"}
+                             );
 
 
 =head1 LICENSE
