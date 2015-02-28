@@ -105,15 +105,15 @@ sub put_object {
 }
 
 sub list_objects {
-    my ($self, $bucket, $conf) = @_;
+    my ($self, $bucket, $opt) = @_;
     croak 'must specify bucket' unless $bucket;
-    $conf ||= {};
+    $opt ||= {};
 
     my $path = $bucket . "/";
-    if (%$conf) {
+    if (%$opt) {
         $path .= "?"
           . join('&',
-            map { $_ . "=" . $self->_urlencode($conf->{$_}) } keys %$conf);
+            map { $_ . "=" . $self->_urlencode($opt->{$_}) } keys %$opt);
     }
 
     my $request = $self->_compose_request('GET', $path, {});
