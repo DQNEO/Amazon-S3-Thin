@@ -317,8 +317,7 @@ Amazon::S3::Thin - A very simple, ligthweight Amazon S3 client
 
   $response = $s3client->get_object($bucket, $key);
 
-  my $content = "hello world";
-  $response = $s3client->put_object($bucket, $key, $content);
+  $response = $s3client->put_object($bucket, $key, "hello world");
 
   $response = $s3client->delete_object($bucket, $key);
 
