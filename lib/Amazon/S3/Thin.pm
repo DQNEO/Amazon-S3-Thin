@@ -367,12 +367,8 @@ it under the same terms as Perl itself.
 
 DQNEO
 
+=head1 SEE ALSO
+
+L<Amazon::S3>, L<Net::Amazon::S3>
+
 =cut
-
-
-
-
-
-
-
-
