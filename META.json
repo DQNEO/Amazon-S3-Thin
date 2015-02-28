@@ -1,7 +1,7 @@
 {
-   "abstract" : "It's new $module",
+   "abstract" : "A very simple, ligthweight Amazon S3 client",
    "author" : [
-      "DQNEO <dqneoo@gmail.com>"
+      "DQNEO"
    ],
    "dynamic_config" : 0,
    "generated_by" : "Minilla/v2.3.0, CPAN::Meta::Converter version 2.142690",
@@ -42,6 +42,13 @@
       },
       "runtime" : {
          "requires" : {
+            "Class::Accessor::Fast" : "0",
+            "Digest::HMAC_SHA1" : "0",
+            "HTTP::Date" : "0",
+            "HTTP::Response" : "0",
+            "LWP::UserAgent" : "0",
+            "MIME::Base64" : "0",
+            "URI::Escape" : "0",
             "perl" : "5.008001"
          }
       },
@@ -52,5 +59,20 @@
       }
    },
    "release_status" : "unstable",
-   "version" : "0.01"
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/DQNEO/Amazon-S3-Thin/issues"
+      },
+      "homepage" : "https://github.com/DQNEO/Amazon-S3-Thin",
+      "repository" : {
+         "type" : "git",
+         "url" : "git://github.com/DQNEO/Amazon-S3-Thin.git",
+         "web" : "https://github.com/DQNEO/Amazon-S3-Thin"
+      }
+   },
+   "version" : "0.01",
+   "x_contributors" : [
+      "Timothy Appnel <tim@appnel.com>",
+      "DQNEO <dqneoo@gmail.com>"
+   ]
 }
