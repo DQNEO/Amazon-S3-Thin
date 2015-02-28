@@ -92,3 +92,9 @@ Timothy Appnel <tima@cpan.org> [Amazon::S3](https://metacpan.org/pod/Amazon::S3)
 # SEE ALSO
 
 [Amazon::S3](https://metacpan.org/pod/Amazon::S3), [Net::Amazon::S3](https://metacpan.org/pod/Net::Amazon::S3)
+
+API Reference : REST API
+http://docs.aws.amazon.com/AmazonS3/latest/API/APIRest.html
+
+API Reference : List of Error Codes
+http://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html#ErrorCodeList
