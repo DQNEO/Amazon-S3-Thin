@@ -104,6 +104,24 @@ sub put_object {
     }
 }
 
+# http://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGET.html
+sub list_objects {
+    my ($self, $bucket, $opt) = @_;
+    croak 'must specify bucket' unless $bucket;
+    $opt ||= {};
+
+    my $path = $bucket . "/";
+    if (%$opt) {
+        $path .= "?"
+          . join('&',
+            map { $_ . "=" . $self->_urlencode($opt->{$_}) } keys %$opt);
+    }
+
+    my $request = $self->_compose_request('GET', $path, {});
+    my $response = $self->ua->request($request);
+    return $response;
+}
+
 sub _uri {
     my ($self, $bucket, $key) = @_;
     return ($key)
