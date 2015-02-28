@@ -324,6 +324,11 @@ Amazon::S3::Thin - A very simple, ligthweight Amazon S3 client
   $response = $s3client->copy_object($src_bucket, $src_key,
                                      $dst_bucket, $dst_key);
 
+  $response = $s3client->list_objects(
+                              $bucket,
+                              {prefix => "foo", delimter => "/"}
+                             );
+
 
 =head1 LICENSE
 
