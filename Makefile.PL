@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use ExtUtils::MakeMaker;
 WriteMakefile(
-    NAME         => 'Amazon::S3::Simple',
+    NAME         => 'Amazon::S3::Thin',
     VERSION_FROM => 'lib/Amazon/S3/Simple.pm',
     AUTHOR       => 'DQNEO <dqneoo@gmail.com>',
     LICENSE      => 'perl',

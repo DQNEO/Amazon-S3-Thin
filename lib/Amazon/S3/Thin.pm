@@ -1,4 +1,4 @@
-package Amazon::S3::Simple;
+package Amazon::S3::Thin;
 use 5.008001;
 use strict;
 use warnings;
@@ -303,15 +303,15 @@ __END__
 
 =head1 NAME
 
-Amazon::S3::Simple - A very simple Amazon S3 client
+Amazon::S3::Thin - A very simple Amazon S3 client
 
 =head1 SYNOPSIS
 
   use strict;
   use warnings;
-  use Amazon::S3::Simple;
+  use Amazon::S3::Thin;
 
-  my $s3client = Amazon::S3::Simple->new(
+  my $s3client = Amazon::S3::Thin->new(
       {   aws_access_key_id     => $aws_access_key_id,
           aws_secret_access_key => $aws_secret_access_key,
       }

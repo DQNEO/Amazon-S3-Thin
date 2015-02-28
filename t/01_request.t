@@ -3,7 +3,7 @@ use strict;
 use warnings;
 use Config::Tiny;
 use Data::Dumper;
-use Amazon::S3::Simple;
+use Amazon::S3::Thin;
 use Test::More;
 
 my $config_file = $ENV{HOME} . "/.aws/credentials";
@@ -12,7 +12,7 @@ my $crd = Config::Tiny->read($config_file)->{dqneo};
 
 my $arg = $crd;
 $arg->{ua} = MockUA->new;
-my $client = Amazon::S3::Simple->new($arg);
+my $client = Amazon::S3::Thin->new($arg);
 
 my $bucket = "tmpfoobar";
 my $key =  "dir/private.txt";
