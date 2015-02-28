@@ -1,3 +1,4 @@
+[![Build Status](https://travis-ci.org/DQNEO/Amazon-S3-Thin.svg?branch=master)](https://travis-ci.org/DQNEO/Amazon-S3-Thin)
 # NAME
 
 Amazon::S3::Thin - A thin, ligthweight, low-level Amazon S3 client

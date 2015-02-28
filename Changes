@@ -1,6 +1,10 @@
-Revision history for Perl extension Amazon-S3-Simple
+Revision history for Perl extension Amazon-S3-Thin
 
 {{$NEXT}}
+
+0.05 2015-02-28T16:53:23Z
+
+    - move developer test into xt dir to pass travis-ci
 
 0.04 2015-02-28T12:43:30Z
 

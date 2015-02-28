@@ -15,7 +15,7 @@ __PACKAGE__->mk_accessors(
     qw(aws_access_key_id aws_secret_access_key secure host ua)
 );
 
-our $VERSION = '0.04';
+our $VERSION = '0.05';
 
 my $AMAZON_HEADER_PREFIX = 'x-amz-';
 my $METADATA_PREFIX      = 'x-amz-meta-';
