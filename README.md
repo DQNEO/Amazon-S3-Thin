@@ -29,6 +29,15 @@ Amazon::S3::Thin - A thin, ligthweight, low-level Amazon S3 client
                                 {prefix => "foo", delimter => "/"}
                                );
 
+You can also pass any useragent as you like
+
+    my $s3client = Amazon::S3::Thin->new(
+        {   aws_access_key_id     => $aws_access_key_id,
+            aws_secret_access_key => $aws_secret_access_key,
+            ua                    => $any_LWP_copmatible_useragent,
+        }
+    );
+
 # DESCRIPTION
 
 Amazon::S3::Thin - A thin, ligthweight, low-level Amazon S3 client.
@@ -39,15 +48,31 @@ Amazon::S3::Thin - A thin, ligthweight, low-level Amazon S3 client.
 
 - Low Dependency
 
-    It does not depend on any XML::\* modules, so that you can install it easily.
+    It does require no XML::\* modules, so that installation be easy;
 
 - Low Learning Cost
 
     The interfaces are designed to follow S3 official REST APIs. So it is easy to learn.
 
+# comparison to precedent modules
+
+There are already usuful modules [Amazon::S3](https://metacpan.org/pod/Amazon::S3) and [Net::Amazon::S3](https://metacpan.org/pod/Net::Amazon::S3).
+The 2 precedent modules provides "a Perlish interface", which is easy to understand for Perl programmers.
+But they also hide low-level behaviors.
+For example, the "get\_key" method returns undef on 404 status and raises exception on 5xx status.
+
+In some situations, it is very important to see raw HTTP communications.
+That's why I made this module.
+
 # TO DO
 
 lots of APIs are not implemented yet.
+
+# SUPPORT
+
+Bugs should be reported via Github
+
+https://github.com/DQNEO/Amazon-S3-Thin/issues
 
 # LICENSE
 
@@ -59,6 +84,10 @@ it under the same terms as Perl itself.
 # AUTHOR
 
 DQNEO
+
+## ORIGINAL AUTHOR
+
+Timothy Appnel <tima@cpan.org> [Amazon::S3](https://metacpan.org/pod/Amazon::S3)
 
 # SEE ALSO
 
