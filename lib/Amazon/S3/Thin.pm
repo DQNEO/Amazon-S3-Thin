@@ -303,7 +303,7 @@ __END__
 
 =head1 NAME
 
-Amazon::S3::Thin - A very simple Amazon S3 client
+Amazon::S3::Thin - A very simple, ligthweight Amazon S3 client
 
 =head1 SYNOPSIS
 
