@@ -129,17 +129,9 @@ sub list_objects {
             map { $_ . "=" . $self->_urlencode($conf->{$_}) } keys %$conf);
     }
 
-    my $r = my $response = $self->_send_request('GET', $path, {});
-    return $r;
-    if ($r->code != 200) {
-    use Data::Dumper;
-        warn Dumper $response;
-        die;
-    }
-
-
-    return $response unless $response->content_type eq 'application/xml';
-
+    my $request = $self->_compose_request('GET', $path, {});
+    my $response = $self->ua->request($request);
+    return $response;
 }
 
 sub _uri {
