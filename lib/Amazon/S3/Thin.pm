@@ -302,7 +302,7 @@ __END__
 
 =head1 NAME
 
-Amazon::S3::Thin - A very simple, ligthweight Amazon S3 client
+Amazon::S3::Thin - A thin, ligthweight, low-level Amazon S3 client
 
 =head1 SYNOPSIS
 
@@ -331,6 +331,30 @@ Amazon::S3::Thin - A very simple, ligthweight Amazon S3 client
                               {prefix => "foo", delimter => "/"}
                              );
 
+=head1 DESCRIPTION
+
+Amazon::S3::Thin - A thin, ligthweight, low-level Amazon S3 client.
+
+=over
+
+=item Low Level
+
+It returns HTTP::Response. So you can inspect easily what's happening inside , and can handle error as you like.
+
+
+=item Low Dependency
+
+It does not depend on any XML::* modules, so that you can install it easily.
+
+=item Low Learning Cost
+
+The interfaces are designed to follow S3 official REST APIs. So it is easy to learn.
+
+=back
+
+=head1 TO DO
+
+lots of APIs are not implemented yet.
 
 =head1 LICENSE
 
