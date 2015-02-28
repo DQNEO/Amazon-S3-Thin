@@ -302,7 +302,7 @@ __END__
 
 =head1 NAME
 
-Amazon::S3::Thin - A very simple, ligthweight Amazon S3 client
+Amazon::S3::Thin - A thin, ligthweight, low-level Amazon S3 client
 
 =head1 SYNOPSIS
 
@@ -314,9 +314,12 @@ Amazon::S3::Thin - A very simple, ligthweight Amazon S3 client
       }
   );
 
-  $response = $s3client->get_object($bucket, $key);
-
+  my $key = "dir/file.txt";
+  my $response;
   $response = $s3client->put_object($bucket, $key, "hello world");
+
+  $response = $s3client->get_object($bucket, $key);
+  print $response->content; # => "hello world"
 
   $response = $s3client->delete_object($bucket, $key);
 
@@ -328,6 +331,30 @@ Amazon::S3::Thin - A very simple, ligthweight Amazon S3 client
                               {prefix => "foo", delimter => "/"}
                              );
 
+=head1 DESCRIPTION
+
+Amazon::S3::Thin - A thin, ligthweight, low-level Amazon S3 client.
+
+=over
+
+=item Low Level
+
+It returns HTTP::Response. So you can inspect easily what's happening inside , and can handle error as you like.
+
+
+=item Low Dependency
+
+It does not depend on any XML::* modules, so that you can install it easily.
+
+=item Low Learning Cost
+
+The interfaces are designed to follow S3 official REST APIs. So it is easy to learn.
+
+=back
+
+=head1 TO DO
+
+lots of APIs are not implemented yet.
 
 =head1 LICENSE
 
@@ -340,12 +367,8 @@ it under the same terms as Perl itself.
 
 DQNEO
 
+=head1 SEE ALSO
+
+L<Amazon::S3>, L<Net::Amazon::S3>
+
 =cut
-
-
-
-
-
-
-
-
