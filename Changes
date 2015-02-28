@@ -2,6 +2,10 @@ Revision history for Perl extension Amazon-S3-Simple
 
 {{$NEXT}}
 
+0.03 2015-02-28T10:44:08Z
+
+    - refine document
+
 0.02 2015-02-28T10:36:45Z
 
     - refine document

@@ -1,6 +1,6 @@
 # NAME
 
-Amazon::S3::Thin - A very simple, ligthweight Amazon S3 client
+Amazon::S3::Thin - A thin, ligthweight, low-level Amazon S3 client
 
 # SYNOPSIS
 
@@ -12,9 +12,12 @@ Amazon::S3::Thin - A very simple, ligthweight Amazon S3 client
         }
     );
 
-    $response = $s3client->get_object($bucket, $key);
-
+    my $key = "dir/file.txt";
+    my $response;
     $response = $s3client->put_object($bucket, $key, "hello world");
+
+    $response = $s3client->get_object($bucket, $key);
+    print $response->content; # => "hello world"
 
     $response = $s3client->delete_object($bucket, $key);
 
@@ -26,6 +29,26 @@ Amazon::S3::Thin - A very simple, ligthweight Amazon S3 client
                                 {prefix => "foo", delimter => "/"}
                                );
 
+# DESCRIPTION
+
+Amazon::S3::Thin - A thin, ligthweight, low-level Amazon S3 client.
+
+- Low Level
+
+    It returns HTTP::Response. So you can inspect easily what's happening inside , and can handle error as you like.
+
+- Low Dependency
+
+    It does not depend on any XML::\* modules, so that you can install it easily.
+
+- Low Learning Cost
+
+    The interfaces are designed to follow S3 official REST APIs. So it is easy to learn.
+
+# TO DO
+
+lots of APIs are not implemented yet.
+
 # LICENSE
 
 Copyright (C) DQNEO.
@@ -36,3 +59,7 @@ it under the same terms as Perl itself.
 # AUTHOR
 
 DQNEO
+
+# SEE ALSO
+
+[Amazon::S3](https://metacpan.org/pod/Amazon::S3), [Net::Amazon::S3](https://metacpan.org/pod/Net::Amazon::S3)
