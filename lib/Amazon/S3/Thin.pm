@@ -10,7 +10,7 @@ use MIME::Base64 qw(encode_base64);
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape_utf8);
 
-use base qw(Class::Accessor::Fast);
+use parent qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(
     qw(aws_access_key_id aws_secret_access_key secure host ua)
 );
