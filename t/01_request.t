@@ -1,16 +1,15 @@
 #!/usr/bin/env perl
 use strict;
 use warnings;
-use Config::Tiny;
 use Data::Dumper;
 use Amazon::S3::Thin;
 use Test::More;
 
-my $config_file = $ENV{HOME} . "/.aws/credentials";
+my $arg = +{
+    aws_access_key_id     => "dummy",
+    aws_secret_access_key => "dummy",
+};
 
-my $crd = Config::Tiny->read($config_file)->{dqneo};
-
-my $arg = $crd;
 $arg->{ua} = MockUA->new;
 my $client = Amazon::S3::Thin->new($arg);
 
