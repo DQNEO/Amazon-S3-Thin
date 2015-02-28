@@ -331,6 +331,16 @@ Amazon::S3::Thin - A thin, ligthweight, low-level Amazon S3 client
                               {prefix => "foo", delimter => "/"}
                              );
 
+You can also pass any useragent as you like
+
+  my $s3client = Amazon::S3::Thin->new(
+      {   aws_access_key_id     => $aws_access_key_id,
+          aws_secret_access_key => $aws_secret_access_key,
+          ua                    => $any_LWP_copmatible_useragent,
+      }
+  );
+
+
 =head1 DESCRIPTION
 
 Amazon::S3::Thin - A thin, ligthweight, low-level Amazon S3 client.
@@ -344,7 +354,7 @@ It returns HTTP::Response. So you can inspect easily what's happening inside , a
 
 =item Low Dependency
 
-It does not depend on any XML::* modules, so that you can install it easily.
+It does require no XML::* modules, so that installation be easy;
 
 =item Low Learning Cost
 
@@ -352,9 +362,25 @@ The interfaces are designed to follow S3 official REST APIs. So it is easy to le
 
 =back
 
+=head1 comparison to precedent modules
+
+There are already usuful modules L<Amazon::S3> and L<Net::Amazon::S3>.
+The 2 precedent modules provides "a Perlish interface", which is easy to understand for Perl programmers.
+But they also hide low-level behaviors.
+For example, the "get_key" method returns undef on 404 status and raises exception on 5xx status.
+
+In some situations, it is very important to see raw HTTP communications.
+That's why I made this module.
+
 =head1 TO DO
 
 lots of APIs are not implemented yet.
+
+=head1 SUPPORT
+
+Bugs should be reported via Github
+
+https://github.com/DQNEO/Amazon-S3-Thin/issues
 
 =head1 LICENSE
 
@@ -366,6 +392,10 @@ it under the same terms as Perl itself.
 =head1 AUTHOR
 
 DQNEO
+
+=head2 ORIGINAL AUTHOR
+
+Timothy Appnel <tima@cpan.org> L<Amazon::S3>
 
 =head1 SEE ALSO
 
