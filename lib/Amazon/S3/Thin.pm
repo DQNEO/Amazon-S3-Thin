@@ -9,7 +9,6 @@ use HTTP::Date;
 use MIME::Base64 qw(encode_base64);
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape_utf8);
-use HTTP::Response;
 
 use base qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(
