@@ -104,19 +104,6 @@ sub put_object {
     }
 }
 
-sub _send_request {
-    my $self = shift;
-    my $request;
-    if (@_ == 1) {
-        $request = shift;
-    }
-    else {
-        $request = $self->_compose_request(@_);
-    }
-
-    my $response = $self->ua->request($request);
-}
-
 sub list_objects {
     my ($self, $bucket, $conf) = @_;
     croak 'must specify bucket' unless $bucket;
