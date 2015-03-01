@@ -12,7 +12,7 @@ use URI::Escape qw(uri_escape_utf8);
 
 use parent qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(
-    qw(secure host ua)
+    qw(ua)
 );
 
 our $VERSION = '0.05';
