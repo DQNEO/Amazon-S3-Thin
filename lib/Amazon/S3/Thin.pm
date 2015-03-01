@@ -10,7 +10,7 @@ use MIME::Base64 qw(encode_base64);
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape_utf8);
 
-our $VERSION = '0.05';
+our $VERSION = '0.06';
 
 my $AMAZON_HEADER_PREFIX = 'x-amz-';
 my $METADATA_PREFIX      = 'x-amz-meta-';
