@@ -5,8 +5,8 @@ use warnings;
 
 use Carp;
 use Digest::HMAC_SHA1;
-use HTTP::Date qw(time2str);
-use MIME::Base64 qw(encode_base64);
+use HTTP::Date ();
+use MIME::Base64 ();
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape_utf8);
 
@@ -203,13 +203,13 @@ sub _compose_request {
     # do we need check existance of Authorization ?
     if (! exists $headers->{Authorization}) {
         if (not $http_headers->header('Date')) {
-            $http_headers->header(Date => time2str(time));
+            $http_headers->header(Date => HTTP::Date::time2str(time));
         }
         my $string_to_sign = $self->_generate_string_to_sign($method, $path, $http_headers);
 
         my $hmac = Digest::HMAC_SHA1->new($self->{aws_secret_access_key});
         $hmac->add($string_to_sign);
-        my $signature =  encode_base64($hmac->digest, '');
+        my $signature =  MIME::Base64::encode_base64($hmac->digest, '');
 
         $http_headers->header(
             Authorization => sprintf("AWS %s:%s"
