@@ -49,6 +49,16 @@ sub _default_ua {
     return $ua;
 }
 
+# accessor
+sub secure {
+    my $self = shift;
+    if (@_) {
+        $self->{secure} = shift;
+    } else {
+        return $self->{secure};
+    }
+}
+
 sub get_object {
     my ($self, $bucket, $key) = @_;
     my $request = $self->_compose_request('GET', $self->_uri($bucket, $key));
