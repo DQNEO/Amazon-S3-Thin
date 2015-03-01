@@ -189,7 +189,16 @@ sub _compose_request {
     croak 'must specify path'   unless defined $path;
     $headers ||= {};
     $metadata ||= {};
-    my $http_headers = $self->_merge_meta($headers, $metadata);
+
+    # generates an HTTP::Headers objects given one hash that represents http
+    # headers to set and another hash that represents an object's metadata.
+    my $http_headers = HTTP::Headers->new;
+    while (my ($k, $v) = each %$headers) {
+        $http_headers->header($k => $v);
+    }
+    while (my ($k, $v) = each %$metadata) {
+        $http_headers->header("$METADATA_PREFIX$k" => $v);
+    }
 
     $self->_add_auth_header($http_headers, $method, $path)
       unless exists $headers->{Authorization};
@@ -219,24 +228,6 @@ sub _add_auth_header {
         Authorization => sprintf("AWS %s:%s"
                                  , $self->{aws_access_key_id}
                                  , $signature));
-}
-
-# generates an HTTP::Headers objects given one hash that represents http
-# headers to set and another hash that represents an object's metadata.
-sub _merge_meta {
-    my ($self, $headers, $metadata) = @_;
-    $headers  ||= {};
-    $metadata ||= {};
-
-    my $http_headers = HTTP::Headers->new;
-    while (my ($k, $v) = each %$headers) {
-        $http_headers->header($k => $v);
-    }
-    while (my ($k, $v) = each %$metadata) {
-        $http_headers->header("$METADATA_PREFIX$k" => $v);
-    }
-
-    return $http_headers;
 }
 
 # generate a canonical string for the given parameters.  expires is optional and is
