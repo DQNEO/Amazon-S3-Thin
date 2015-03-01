@@ -334,10 +334,10 @@ Timothy Appnel <tima@cpan.org> L<Amazon::S3>
 
 L<Amazon::S3>, L<Net::Amazon::S3>
 
-API Reference : REST API
+Amazon S3 API Reference : REST API
 http://docs.aws.amazon.com/AmazonS3/latest/API/APIRest.html
 
-API Reference : List of Error Codes
+Amazon S3 API Reference : List of Error Codes
 http://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html#ErrorCodeList
 
 =cut
