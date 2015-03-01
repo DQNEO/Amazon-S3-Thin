@@ -201,7 +201,19 @@ sub _compose_request {
     }
 
     if (! exists $headers->{Authorization}) {
-        $self->_add_auth_header($http_headers, $method, $path);
+        if (not $http_headers->header('Date')) {
+            $http_headers->header(Date => time2str(time));
+        }
+        my $string_to_sign = $self->_generate_string_to_sign($method, $path, $http_headers);
+
+        my $hmac = Digest::HMAC_SHA1->new($self->{aws_secret_access_key});
+        $hmac->add($string_to_sign);
+        my $signature =  encode_base64($hmac->digest, '');
+
+        $http_headers->header(
+            Authorization => sprintf("AWS %s:%s"
+                                     , $self->{aws_access_key_id}
+                                     , $signature));
     }
 
     my $protocol = $self->secure ? 'https' : 'http';
@@ -212,24 +224,6 @@ sub _compose_request {
     }
 
     return HTTP::Request->new($method, $url, $http_headers, $content);
-}
-
-sub _add_auth_header {
-    my ($self, $http_headers, $method, $path) = @_;
-
-    if (not $http_headers->header('Date')) {
-        $http_headers->header(Date => time2str(time));
-    }
-    my $string_to_sign = $self->_generate_string_to_sign($method, $path, $http_headers);
-
-    my $hmac = Digest::HMAC_SHA1->new($self->{aws_secret_access_key});
-    $hmac->add($string_to_sign);
-    my $signature =  encode_base64($hmac->digest, '');
-
-    $http_headers->header(
-        Authorization => sprintf("AWS %s:%s"
-                                 , $self->{aws_access_key_id}
-                                 , $signature));
 }
 
 # generate a canonical string for the given parameters.  expires is optional and is
