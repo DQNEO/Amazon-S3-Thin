@@ -228,15 +228,15 @@ sub _merge_meta {
     $headers  ||= {};
     $metadata ||= {};
 
-    my $http_header = HTTP::Headers->new;
+    my $http_headers = HTTP::Headers->new;
     while (my ($k, $v) = each %$headers) {
-        $http_header->header($k => $v);
+        $http_headers->header($k => $v);
     }
     while (my ($k, $v) = each %$metadata) {
-        $http_header->header("$METADATA_PREFIX$k" => $v);
+        $http_headers->header("$METADATA_PREFIX$k" => $v);
     }
 
-    return $http_header;
+    return $http_headers;
 }
 
 # generate a canonical string for the given parameters.  expires is optional and is
