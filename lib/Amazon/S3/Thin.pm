@@ -211,7 +211,8 @@ sub _compose_request {
             $http_headers->header(Date => HTTP::Date::time2str(time));
         }
 
-        my $signature = $self->_generate_signature($method, $path, $http_headers);
+        my $signer = Signer->new({%$self});
+        my $signature = $signer->_generate_signature($method, $path, $http_headers);
         $http_headers->header(
             Authorization => sprintf("AWS %s:%s"
                                      , $self->{aws_access_key_id}
@@ -229,6 +230,13 @@ sub _compose_request {
     }
 
     return HTTP::Request->new($method, $url, $http_headers, $content);
+}
+
+package Signer;
+
+sub new {
+    my ($class, $self) = @_;
+    bless $self, $class;
 }
 
 # generate a canonical string for the given parameters.  expires is optional and is
