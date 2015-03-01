@@ -139,7 +139,7 @@ sub list_objects {
             map { $_ . "=" . $self->_urlencode($opt->{$_}) } sort keys %$opt);
     }
 
-    my $request = $self->_compose_request('GET', $path, {});
+    my $request = $self->_compose_request('GET', $path);
     my $response = $self->ua->request($request);
     return $response;
 }
