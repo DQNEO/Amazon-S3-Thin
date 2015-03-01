@@ -14,7 +14,7 @@ sub new {
 
 # generate a canonical string for the given parameters.  expires is optional and is
 # only used by query string authentication.
-sub _generate_signature {
+sub calculate_signature {
     my ($self, $method, $path, $headers, $expires) = @_;
 
     my %interesting_headers = ();

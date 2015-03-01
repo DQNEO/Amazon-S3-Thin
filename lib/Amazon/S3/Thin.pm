@@ -210,7 +210,7 @@ sub _compose_request {
         }
 
         my $signer = Amazon::S3::Thin::Signer->new($self->{aws_secret_access_key});
-        my $signature = $signer->_generate_signature($method, $path, $http_headers);
+        my $signature = $signer->calculate_signature($method, $path, $http_headers);
         $http_headers->header(
             Authorization => sprintf("AWS %s:%s"
                                      , $self->{aws_access_key_id}
