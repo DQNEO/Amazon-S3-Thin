@@ -164,7 +164,7 @@ sub _validate_acl_short {
 # EU buckets must be accessed via their DNS name. This routine figures out if
 # a given bucket name can be safely used as a DNS name.
 sub _is_dns_bucket {
-    my $bucketname = $_[0];
+    my ($self, $bucketname) = @_;
 
     if (length $bucketname > 63) {
         return 0;
@@ -221,7 +221,7 @@ sub _compose_request {
     my $host     = $self->host;
     my $url;
 
-    if ($path =~ m{^([^/?]+)(.*)} && _is_dns_bucket($1)) {
+    if ($path =~ m{^([^/?]+)(.*)} && $self->_is_dns_bucket($1)) {
         $url = "$protocol://$1.$host$2";
     } else {
         $url = "$protocol://$host/$path";
