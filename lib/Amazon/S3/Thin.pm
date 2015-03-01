@@ -226,6 +226,8 @@ sub _compose_request {
     return HTTP::Request->new($method, $url, $http_headers, $content);
 }
 
+# generate a canonical string for the given parameters.  expires is optional and is
+# only used by query string authentication.
 sub _generate_signature {
     my ($self, $method, $path, $headers, $expires) = @_;
 
@@ -281,12 +283,6 @@ sub _generate_signature {
     my $hmac = Digest::HMAC_SHA1->new($self->{aws_secret_access_key});
     $hmac->add($string_to_sign);
     my $signature =  MIME::Base64::encode_base64($hmac->digest, '');
-}
-
-# generate a canonical string for the given parameters.  expires is optional and is
-# only used by query string authentication.
-sub _generate_string_to_sign {
-    my ($self, $method, $path, $headers, $expires) = @_;
 }
 
 sub _trim {
