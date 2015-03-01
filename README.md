@@ -69,11 +69,9 @@ That's why I made this module.
 
 lots of APIs are not implemented yet.
 
-# SUPPORT
+# REPOSITORY
 
-Bugs should be reported via Github
-
-https://github.com/DQNEO/Amazon-S3-Thin/issues
+https://github.com/DQNEO/Amazon-S3-Thin
 
 # LICENSE
 
@@ -89,13 +87,14 @@ DQNEO
 ## ORIGINAL AUTHOR
 
 Timothy Appnel <tima@cpan.org> [Amazon::S3](https://metacpan.org/pod/Amazon::S3)
+https://github.com/tima/perl-amazon-s3
 
 # SEE ALSO
 
 [Amazon::S3](https://metacpan.org/pod/Amazon::S3), [Net::Amazon::S3](https://metacpan.org/pod/Net::Amazon::S3)
 
-API Reference : REST API
+Amazon S3 API Reference : REST API
 http://docs.aws.amazon.com/AmazonS3/latest/API/APIRest.html
 
-API Reference : List of Error Codes
+Amazon S3 API Reference : List of Error Codes
 http://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html#ErrorCodeList

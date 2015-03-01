@@ -9,7 +9,7 @@ use LWP::UserAgent;
 use URI::Escape qw(uri_escape_utf8);
 use Amazon::S3::Thin::Signer;
 
-our $VERSION = '0.06';
+our $VERSION = '0.07';
 
 my $METADATA_PREFIX      = 'x-amz-meta-';
 

@@ -2,6 +2,10 @@ Revision history for Perl extension Amazon-S3-Thin
 
 {{$NEXT}}
 
+0.07 2015-03-01T15:49:47Z
+
+   - separate Signer class
+
 0.06 2015-03-01T08:37:56Z
 
     - elminate Class::Accessor::Fast
