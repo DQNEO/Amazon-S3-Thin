@@ -151,6 +151,11 @@ sub _uri {
       : $bucket . "/";
 }
 
+sub _urlencode {
+    my ($self, $unencoded) = @_;
+    return uri_escape_utf8($unencoded, '^A-Za-z0-9_-');
+}
+
 sub _validate_acl_short {
     my ($self, $policy_name) = @_;
 
@@ -290,11 +295,6 @@ sub _trim {
     $value =~ s/^\s+//;
     $value =~ s/\s+$//;
     return $value;
-}
-
-sub _urlencode {
-    my ($self, $unencoded) = @_;
-    return uri_escape_utf8($unencoded, '^A-Za-z0-9_-');
 }
 
 1;
