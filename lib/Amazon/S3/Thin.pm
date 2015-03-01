@@ -200,8 +200,10 @@ sub _compose_request {
         $http_headers->header("$METADATA_PREFIX$k" => $v);
     }
 
-    $self->_add_auth_header($http_headers, $method, $path)
-      unless exists $headers->{Authorization};
+    if (! exists $headers->{Authorization}) {
+        $self->_add_auth_header($http_headers, $method, $path);
+    }
+
     my $protocol = $self->secure ? 'https' : 'http';
     my $host     = $self->host;
     my $url      = "$protocol://$host/$path";
