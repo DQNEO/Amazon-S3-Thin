@@ -210,7 +210,11 @@ sub _add_auth_header {
         $headers->header(Date => time2str(time));
     }
     my $canonical_string = $self->_canonical_string($method, $path, $headers);
-    my $encoded_canonical = $self->_encode($canonical_string);
+
+    my $hmac = Digest::HMAC_SHA1->new($self->{aws_secret_access_key});
+    $hmac->add($canonical_string);
+    my $encoded_canonical =  encode_base64($hmac->digest, '');
+
     $headers->header(
         Authorization => sprintf("AWS %s:%s"
                                  , $self->{aws_access_key_id}
@@ -296,13 +300,6 @@ sub _trim {
     $value =~ s/^\s+//;
     $value =~ s/\s+$//;
     return $value;
-}
-
-sub _encode {
-    my ($self, $canonical_string) = @_;
-    my $hmac = Digest::HMAC_SHA1->new($self->{aws_secret_access_key});
-    $hmac->add($canonical_string);
-    return encode_base64($hmac->digest, '');
 }
 
 sub _urlencode {
