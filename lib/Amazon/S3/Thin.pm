@@ -299,9 +299,9 @@ sub _trim {
 }
 
 sub _encode {
-    my ($self, $str) = @_;
+    my ($self, $canonical_string) = @_;
     my $hmac = Digest::HMAC_SHA1->new($self->{aws_secret_access_key});
-    $hmac->add($str);
+    $hmac->add($canonical_string);
     return encode_base64($hmac->digest, '');
 }
 
