@@ -311,11 +311,9 @@ That's why I made this module.
 
 lots of APIs are not implemented yet.
 
-=head1 SUPPORT
+=head1 REPOSITORY
 
-Bugs should be reported via Github
-
-https://github.com/DQNEO/Amazon-S3-Thin/issues
+https://github.com/DQNEO/Amazon-S3-Thin
 
 =head1 LICENSE
 
