@@ -5,19 +5,23 @@ use Test::More;
 
 diag "test secure()";
 
-my $arg = +{
+my %crd = (
     aws_access_key_id     => "dummy",
     aws_secret_access_key => "dummy",
+    );
+
+my $arg = +{
+    %crd,
     secure => 1,
 };
+
 
 my $client = Amazon::S3::Thin->new($arg);
 
 is $client->secure() , 1;
 
 $arg = +{
-    aws_access_key_id     => "dummy",
-    aws_secret_access_key => "dummy",
+    %crd,
     secure => 0,
 };
 
