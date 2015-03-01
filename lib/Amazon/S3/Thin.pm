@@ -19,7 +19,6 @@ our $VERSION = '0.05';
 
 my $AMAZON_HEADER_PREFIX = 'x-amz-';
 my $METADATA_PREFIX      = 'x-amz-meta-';
-my $KEEP_ALIVE_CACHESIZE = 10;
 
 sub new {
     my $class = shift;
@@ -42,7 +41,7 @@ sub _default_ua {
     my $self = shift;
 
     my $ua = LWP::UserAgent->new(
-        keep_alive            => $KEEP_ALIVE_CACHESIZE,
+        keep_alive            => 10,
         requests_redirectable => [qw(GET HEAD DELETE PUT)],
         );
     $ua->timeout(30);
