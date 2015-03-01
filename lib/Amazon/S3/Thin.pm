@@ -29,10 +29,7 @@ sub new {
 
     $self->secure(0)                unless defined $self->secure;
     $self->host('s3.amazonaws.com') unless defined $self->host;
-
-    if (! defined $self->ua) {
-        $self->ua($self->_default_ua);
-    }
+    $self->ua($self->_default_ua)   unless defined $self->ua;
 
     return $self;
 }
