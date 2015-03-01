@@ -52,5 +52,26 @@ diag "test host()";
 
 }
 
+diag "test ua()";
+{
+    $arg = +{
+        %crd,
+    };
+
+    $client = Amazon::S3::Thin->new($arg);
+
+    isa_ok $client->ua() , 'LWP::UserAgent';
+
+    $arg = +{
+        %crd,
+        ua => "foo",
+    };
+
+    $client = Amazon::S3::Thin->new($arg);
+
+    is $client->ua() , "foo";
+
+}
+
 
 done_testing;
