@@ -211,7 +211,9 @@ sub _compose_request {
             $http_headers->header(Date => HTTP::Date::time2str(time));
         }
 
-        my $signer = Amazon::S3::Thin::Signer->new({%$self});
+        my $signer = Amazon::S3::Thin::Signer->new({
+            aws_secret_access_key => $self->{aws_secret_access_key}
+                                                   });
         my $signature = $signer->_generate_signature($method, $path, $http_headers);
         $http_headers->header(
             Authorization => sprintf("AWS %s:%s"
