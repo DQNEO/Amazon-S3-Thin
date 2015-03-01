@@ -42,7 +42,6 @@
       },
       "runtime" : {
          "requires" : {
-            "Class::Accessor::Fast" : "0",
             "Digest::HMAC_SHA1" : "0",
             "HTTP::Date" : "0",
             "LWP::UserAgent" : "0",
