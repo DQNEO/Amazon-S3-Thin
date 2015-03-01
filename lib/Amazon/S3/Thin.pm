@@ -27,8 +27,8 @@ sub new {
     die "No aws_access_key_id"     unless $self->{aws_access_key_id};
     die "No aws_secret_access_key" unless $self->{aws_secret_access_key};
 
-    $self->secure(0)                if not defined $self->secure;
-    $self->host('s3.amazonaws.com') if not defined $self->host;
+    $self->secure(0)                unless defined $self->secure;
+    $self->host('s3.amazonaws.com') unless defined $self->host;
 
     if (! defined $self->ua) {
         $self->ua($self->_default_ua);
