@@ -209,10 +209,10 @@ sub _add_auth_header {
     if (not $headers->header('Date')) {
         $headers->header(Date => time2str(time));
     }
-    my $canonical_string = $self->_canonical_string($method, $path, $headers);
+    my $string_to_sign = $self->_canonical_string($method, $path, $headers);
 
     my $hmac = Digest::HMAC_SHA1->new($self->{aws_secret_access_key});
-    $hmac->add($canonical_string);
+    $hmac->add($string_to_sign);
     my $signature =  encode_base64($hmac->digest, '');
 
     $headers->header(
