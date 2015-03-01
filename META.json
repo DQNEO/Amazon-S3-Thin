@@ -43,7 +43,6 @@
       "runtime" : {
          "requires" : {
             "Digest::HMAC_SHA1" : "0",
-            "HTTP::Date" : "0",
             "LWP::UserAgent" : "0",
             "MIME::Base64" : "0",
             "URI::Escape" : "0",
