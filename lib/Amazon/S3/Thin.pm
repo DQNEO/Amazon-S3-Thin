@@ -59,6 +59,16 @@ sub secure {
     }
 }
 
+# accessor
+sub host {
+    my $self = shift;
+    if (@_) {
+        $self->{host} = shift;
+    } else {
+        return $self->{host};
+    }
+}
+
 sub get_object {
     my ($self, $bucket, $key) = @_;
     my $request = $self->_compose_request('GET', $self->_uri($bucket, $key));
