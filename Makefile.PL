@@ -8,7 +8,6 @@ WriteMakefile(
     AUTHOR       => 'DQNEO <dqneoo@gmail.com>',
     LICENSE      => 'perl',
     PREREQ_PM    => {
-        'Class::Accessor::Fast'      => '0',
         'Digest::HMAC_SHA1'          => '0',
         'HTTP::Date'                 => '0',
         'MIME::Base64'               => '0',

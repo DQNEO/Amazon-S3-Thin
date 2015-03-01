@@ -57,7 +57,11 @@ sub request {
 }
 
 package MockResponse;
-use base qw(Class::Accessor::Fast);
+
+sub new {
+    my ($class, $self) = @_;
+    bless $self, $class;
+}
 
 sub request {
     my $self = shift;

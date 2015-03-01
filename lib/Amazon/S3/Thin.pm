@@ -10,30 +10,23 @@ use MIME::Base64 qw(encode_base64);
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape_utf8);
 
-use parent qw(Class::Accessor::Fast);
-__PACKAGE__->mk_accessors(
-    qw(aws_access_key_id aws_secret_access_key secure host ua)
-);
-
 our $VERSION = '0.05';
 
 my $AMAZON_HEADER_PREFIX = 'x-amz-';
 my $METADATA_PREFIX      = 'x-amz-meta-';
-my $KEEP_ALIVE_CACHESIZE = 10;
 
 sub new {
     my $class = shift;
-    my $self  = $class->SUPER::new(@_);
+    my $self  = shift;
 
-    die "No aws_access_key_id"     unless $self->aws_access_key_id;
-    die "No aws_secret_access_key" unless $self->aws_secret_access_key;
+    bless $self, $class;
 
-    $self->secure(0)                if not defined $self->secure;
-    $self->host('s3.amazonaws.com') if not defined $self->host;
+    die "No aws_access_key_id"     unless $self->{aws_access_key_id};
+    die "No aws_secret_access_key" unless $self->{aws_secret_access_key};
 
-    if (! defined $self->ua) {
-        $self->ua($self->_default_ua);
-    }
+    $self->secure(0)                unless defined $self->secure;
+    $self->host('s3.amazonaws.com') unless defined $self->host;
+    $self->ua($self->_default_ua)   unless defined $self->ua;
 
     return $self;
 }
@@ -42,12 +35,42 @@ sub _default_ua {
     my $self = shift;
 
     my $ua = LWP::UserAgent->new(
-        keep_alive            => $KEEP_ALIVE_CACHESIZE,
+        keep_alive            => 10,
         requests_redirectable => [qw(GET HEAD DELETE PUT)],
         );
     $ua->timeout(30);
     $ua->env_proxy;
     return $ua;
+}
+
+# accessor
+sub secure {
+    my $self = shift;
+    if (@_) {
+        $self->{secure} = shift;
+    } else {
+        return $self->{secure};
+    }
+}
+
+# accessor
+sub host {
+    my $self = shift;
+    if (@_) {
+        $self->{host} = shift;
+    } else {
+        return $self->{host};
+    }
+}
+
+# accessor
+sub ua {
+    my $self = shift;
+    if (@_) {
+        $self->{ua} = shift;
+    } else {
+        return $self->{ua};
+    }
 }
 
 sub get_object {
@@ -182,17 +205,16 @@ sub _compose_request {
 
 sub _add_auth_header {
     my ($self, $headers, $method, $path) = @_;
-    my $aws_access_key_id     = $self->aws_access_key_id;
-    my $aws_secret_access_key = $self->aws_secret_access_key;
 
     if (not $headers->header('Date')) {
         $headers->header(Date => time2str(time));
     }
     my $canonical_string = $self->_canonical_string($method, $path, $headers);
-    my $encoded_canonical =
-      $self->_encode($aws_secret_access_key, $canonical_string);
+    my $encoded_canonical = $self->_encode($canonical_string);
     $headers->header(
-        Authorization => "AWS $aws_access_key_id:$encoded_canonical");
+        Authorization => sprintf("AWS %s:%s"
+                                 , $self->{aws_access_key_id}
+                                 , $encoded_canonical));
 }
 
 # generates an HTTP::Headers objects given one hash that represents http
@@ -279,8 +301,8 @@ sub _trim {
 # finds the hmac-sha1 hash of the canonical string and the aws secret access key and then
 # base64 encodes the result (optionally urlencoding after that).
 sub _encode {
-    my ($self, $aws_secret_access_key, $str, $urlencode) = @_;
-    my $hmac = Digest::HMAC_SHA1->new($aws_secret_access_key);
+    my ($self, $str, $urlencode) = @_;
+    my $hmac = Digest::HMAC_SHA1->new($self->{aws_secret_access_key});
     $hmac->add($str);
     my $b64 = encode_base64($hmac->digest, '');
     if ($urlencode) {
