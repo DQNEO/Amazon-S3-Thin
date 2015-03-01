@@ -23,8 +23,7 @@ diag "test secure()";
     is $client->secure() , 1;
 
     $arg = +{
-        %crd,
-        secure => 0,
+        %crd
     };
 
     $client = Amazon::S3::Thin->new($arg);
