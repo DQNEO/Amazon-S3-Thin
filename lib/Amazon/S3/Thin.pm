@@ -209,7 +209,7 @@ sub _add_auth_header {
     if (not $headers->header('Date')) {
         $headers->header(Date => time2str(time));
     }
-    my $string_to_sign = $self->_canonical_string($method, $path, $headers);
+    my $string_to_sign = $self->_generate_string_to_sign($method, $path, $headers);
 
     my $hmac = Digest::HMAC_SHA1->new($self->{aws_secret_access_key});
     $hmac->add($string_to_sign);
@@ -241,7 +241,7 @@ sub _merge_meta {
 
 # generate a canonical string for the given parameters.  expires is optional and is
 # only used by query string authentication.
-sub _canonical_string {
+sub _generate_string_to_sign {
     my ($self, $method, $path, $headers, $expires) = @_;
     my %interesting_headers = ();
     while (my ($key, $value) = each %$headers) {
