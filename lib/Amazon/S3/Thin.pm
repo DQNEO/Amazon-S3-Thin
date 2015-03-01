@@ -264,32 +264,32 @@ sub _generate_string_to_sign {
     # (and x-amz-date)
     $interesting_headers{'date'} = $expires if $expires;
 
-    my $buf = "$method\n";
+    my $string_to_sign = "$method\n";
     foreach my $key (sort keys %interesting_headers) {
         if ($key =~ /^$AMAZON_HEADER_PREFIX/) {
-            $buf .= "$key:$interesting_headers{$key}\n";
+            $string_to_sign .= "$key:$interesting_headers{$key}\n";
         }
         else {
-            $buf .= "$interesting_headers{$key}\n";
+            $string_to_sign .= "$interesting_headers{$key}\n";
         }
     }
 
     # don't include anything after the first ? in the resource...
     $path =~ /^([^?]*)/;
-    $buf .= "/$1";
+    $string_to_sign .= "/$1";
 
     # ...unless there is an acl or torrent parameter
     if ($path =~ /[&?]acl($|=|&)/) {
-        $buf .= '?acl';
+        $string_to_sign .= '?acl';
     }
     elsif ($path =~ /[&?]torrent($|=|&)/) {
-        $buf .= '?torrent';
+        $string_to_sign .= '?torrent';
     }
     elsif ($path =~ /[&?]location($|=|&)/) {
-        $buf .= '?location';
+        $string_to_sign .= '?location';
     }
 
-    return $buf;
+    return $string_to_sign;
 }
 
 sub _trim {
