@@ -94,7 +94,7 @@ sub copy_object {
 sub put_object {
     my ($self, $bucket, $key, $content, $headers) = @_;
     croak 'must specify key' unless $key && length $key;
-    
+
     if ($headers->{acl_short}) {
         $self->_validate_acl_short($headers->{acl_short});
         $headers->{'x-amz-acl'} = $headers->{acl_short};
