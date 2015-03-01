@@ -205,12 +205,8 @@ sub _compose_request {
         if (not $http_headers->header('Date')) {
             $http_headers->header(Date => HTTP::Date::time2str(time));
         }
-        my $string_to_sign = $self->_generate_string_to_sign($method, $path, $http_headers);
 
-        my $hmac = Digest::HMAC_SHA1->new($self->{aws_secret_access_key});
-        $hmac->add($string_to_sign);
-        my $signature =  MIME::Base64::encode_base64($hmac->digest, '');
-
+        my $signature = $self->_generate_signature($method, $path, $http_headers);
         $http_headers->header(
             Authorization => sprintf("AWS %s:%s"
                                      , $self->{aws_access_key_id}
@@ -228,6 +224,16 @@ sub _compose_request {
     }
 
     return HTTP::Request->new($method, $url, $http_headers, $content);
+}
+
+sub _generate_signature {
+    my ($self, $method, $path, $http_headers, $expires) = @_;
+
+    my $string_to_sign = $self->_generate_string_to_sign($method, $path, $http_headers, $expires);
+
+    my $hmac = Digest::HMAC_SHA1->new($self->{aws_secret_access_key});
+    $hmac->add($string_to_sign);
+    my $signature =  MIME::Base64::encode_base64($hmac->digest, '');
 }
 
 # generate a canonical string for the given parameters.  expires is optional and is
