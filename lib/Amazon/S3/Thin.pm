@@ -200,6 +200,7 @@ sub _compose_request {
         $http_headers->header("$METADATA_PREFIX$k" => $v);
     }
 
+    # do we need check existance of Authorization ?
     if (! exists $headers->{Authorization}) {
         if (not $http_headers->header('Date')) {
             $http_headers->header(Date => time2str(time));
