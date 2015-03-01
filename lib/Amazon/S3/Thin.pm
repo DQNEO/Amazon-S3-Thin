@@ -10,10 +10,6 @@ use MIME::Base64 qw(encode_base64);
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape_utf8);
 
-use parent qw(Class::Accessor::Fast);
-__PACKAGE__->mk_accessors(
-);
-
 our $VERSION = '0.05';
 
 my $AMAZON_HEADER_PREFIX = 'x-amz-';
@@ -21,7 +17,9 @@ my $METADATA_PREFIX      = 'x-amz-meta-';
 
 sub new {
     my $class = shift;
-    my $self  = $class->SUPER::new(@_);
+    my $self  = shift;
+
+    bless $self, $class;
 
     die "No aws_access_key_id"     unless $self->{aws_access_key_id};
     die "No aws_secret_access_key" unless $self->{aws_secret_access_key};
