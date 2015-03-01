@@ -213,12 +213,12 @@ sub _add_auth_header {
 
     my $hmac = Digest::HMAC_SHA1->new($self->{aws_secret_access_key});
     $hmac->add($canonical_string);
-    my $encoded_canonical =  encode_base64($hmac->digest, '');
+    my $signature =  encode_base64($hmac->digest, '');
 
     $headers->header(
         Authorization => sprintf("AWS %s:%s"
                                  , $self->{aws_access_key_id}
-                                 , $encoded_canonical));
+                                 , $signature));
 }
 
 # generates an HTTP::Headers objects given one hash that represents http
