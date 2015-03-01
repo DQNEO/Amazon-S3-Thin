@@ -12,7 +12,6 @@ use URI::Escape qw(uri_escape_utf8);
 
 use parent qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(
-    qw(ua)
 );
 
 our $VERSION = '0.05';
@@ -63,6 +62,16 @@ sub host {
         $self->{host} = shift;
     } else {
         return $self->{host};
+    }
+}
+
+# accessor
+sub ua {
+    my $self = shift;
+    if (@_) {
+        $self->{ua} = shift;
+    } else {
+        return $self->{ua};
     }
 }
 
