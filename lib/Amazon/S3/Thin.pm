@@ -181,17 +181,16 @@ sub _compose_request {
 
 sub _add_auth_header {
     my ($self, $headers, $method, $path) = @_;
-    my $aws_access_key_id     = $self->aws_access_key_id;
-    my $aws_secret_access_key = $self->aws_secret_access_key;
 
     if (not $headers->header('Date')) {
         $headers->header(Date => time2str(time));
     }
     my $canonical_string = $self->_canonical_string($method, $path, $headers);
-    my $encoded_canonical =
-      $self->_encode($aws_secret_access_key, $canonical_string);
+    my $encoded_canonical = $self->_encode($canonical_string);
     $headers->header(
-        Authorization => "AWS $aws_access_key_id:$encoded_canonical");
+        Authorization => sprintf("AWS %s:%s"
+                                 , $self->{aws_access_key_id}
+                                 , $encoded_canonical));
 }
 
 # generates an HTTP::Headers objects given one hash that represents http
@@ -278,8 +277,8 @@ sub _trim {
 # finds the hmac-sha1 hash of the canonical string and the aws secret access key and then
 # base64 encodes the result (optionally urlencoding after that).
 sub _encode {
-    my ($self, $aws_secret_access_key, $str, $urlencode) = @_;
-    my $hmac = Digest::HMAC_SHA1->new($aws_secret_access_key);
+    my ($self, $str, $urlencode) = @_;
+    my $hmac = Digest::HMAC_SHA1->new($self->{aws_secret_access_key});
     $hmac->add($str);
     my $b64 = encode_base64($hmac->digest, '');
     if ($urlencode) {
