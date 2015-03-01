@@ -329,6 +329,7 @@ DQNEO
 =head2 ORIGINAL AUTHOR
 
 Timothy Appnel <tima@cpan.org> L<Amazon::S3>
+https://github.com/tima/perl-amazon-s3
 
 =head1 SEE ALSO
 
