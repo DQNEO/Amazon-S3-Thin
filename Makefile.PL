@@ -9,7 +9,6 @@ WriteMakefile(
     LICENSE      => 'perl',
     PREREQ_PM    => {
         'Digest::HMAC_SHA1'          => '0',
-        'HTTP::Date'                 => '0',
         'MIME::Base64'               => '0',
         'Test::More'                 => '0.01',    # for testing
         'URI::Escape'                => '0',
