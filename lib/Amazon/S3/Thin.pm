@@ -5,7 +5,7 @@ use warnings;
 
 use Carp;
 use Digest::HMAC_SHA1;
-use HTTP::Date;
+use HTTP::Date qw(time2str);
 use MIME::Base64 qw(encode_base64);
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape_utf8);
