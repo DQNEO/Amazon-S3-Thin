@@ -87,9 +87,9 @@ sub delete_object {
 
 sub copy_object {
     my ($self, $src_bucket, $src_key, $dst_bucket, $dst_key) = @_;
-    my $conf = {};
-    $conf->{'x-amz-copy-source'} = $src_bucket . "/" . $src_key;
-    my $request = $self->_compose_request('PUT', $self->_uri($dst_bucket, $dst_key), $conf);
+    my $headers = {};
+    $headers->{'x-amz-copy-source'} = $src_bucket . "/" . $src_key;
+    my $request = $self->_compose_request('PUT', $self->_uri($dst_bucket, $dst_key), $headers);
     return $self->ua->request($request);
 }
 
