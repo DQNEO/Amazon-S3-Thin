@@ -236,7 +236,7 @@ package Amazon::S3::Thin::Signer;
 
 sub new {
     my ($class, $secret) = @_;
-    my $self = {aws_secret_access_key => $secret};
+    my $self = {secret => $secret};
     bless $self, $class;
 }
 
@@ -294,7 +294,7 @@ sub _generate_signature {
         $string_to_sign .= '?location';
     }
 
-    my $hmac = Digest::HMAC_SHA1->new($self->{aws_secret_access_key});
+    my $hmac = Digest::HMAC_SHA1->new($self->{secret});
     $hmac->add($string_to_sign);
     my $signature =  MIME::Base64::encode_base64($hmac->digest, '');
 }
