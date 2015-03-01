@@ -12,7 +12,7 @@ use URI::Escape qw(uri_escape_utf8);
 
 use parent qw(Class::Accessor::Fast);
 __PACKAGE__->mk_accessors(
-    qw(aws_access_key_id aws_secret_access_key secure host ua)
+    qw(secure host ua)
 );
 
 our $VERSION = '0.05';
