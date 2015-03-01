@@ -12,23 +12,25 @@ my $arg;
 my $client;
 
 diag "test secure()";
-$arg = +{
-    %crd,
-    secure => 1,
-};
+{
+    $arg = +{
+        %crd,
+        secure => 1,
+    };
 
-$client = Amazon::S3::Thin->new($arg);
+    $client = Amazon::S3::Thin->new($arg);
 
-is $client->secure() , 1;
+    is $client->secure() , 1;
 
-$arg = +{
-    %crd,
-    secure => 0,
-};
+    $arg = +{
+        %crd,
+        secure => 0,
+    };
 
-$client = Amazon::S3::Thin->new($arg);
+    $client = Amazon::S3::Thin->new($arg);
 
-is $client->secure() , 0;
+    is $client->secure() , 0;
+}
 
 
 done_testing;
