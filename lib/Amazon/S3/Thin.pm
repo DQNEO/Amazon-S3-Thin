@@ -219,9 +219,12 @@ sub _compose_request {
 
     my $protocol = $self->secure ? 'https' : 'http';
     my $host     = $self->host;
-    my $url      = "$protocol://$host/$path";
+    my $url;
+
     if ($path =~ m{^([^/?]+)(.*)} && _is_dns_bucket($1)) {
         $url = "$protocol://$1.$host$2";
+    } else {
+        $url = "$protocol://$host/$path";
     }
 
     return HTTP::Request->new($method, $url, $http_headers, $content);
