@@ -5,7 +5,7 @@ use Test::More;
 use HTTP::Headers;
 
 # What this test does is only to calculate signature,
-# no HTTP communication. :)
+# no HTTP communication.
 {
     my $signer = Amazon::S3::Thin::Signer->new("secretfoobar");
     my $hdr = HTTP::Headers->new;
