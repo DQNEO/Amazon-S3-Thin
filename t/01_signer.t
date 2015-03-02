@@ -8,7 +8,6 @@ use HTTP::Headers;
 # no HTTP communication.
 {
     my $secret_key = "secretfoobar";
-    my $signer = Amazon::S3::Thin::Signer->new($secret_key);
     my $verb = "PUT";
     my $path = "example/file%2Etxt";
 
@@ -16,6 +15,7 @@ use HTTP::Headers;
     $hdr->header("content-length", 15);
     $hdr->header("date", 'Sun, 01 Mar 2015 15:11:25 GMT');
 
+    my $signer = Amazon::S3::Thin::Signer->new($secret_key);
     my $sig = $signer->calculate_signature($verb,$path,$hdr);
 
     is $sig, "n4W+Lf9QQAbx5mo8N3sHWaJUQ/I=";
