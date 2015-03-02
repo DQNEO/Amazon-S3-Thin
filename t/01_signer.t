@@ -22,6 +22,7 @@ use HTTP::Headers;
 }
 
 {
+    diag "test GET request";
     my $secret_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
 
     my $verb = "GET";
@@ -29,13 +30,12 @@ use HTTP::Headers;
     my $path = "johnsmith/photos/puppy.jpg";
     my $string_to_sign = $verb . "\n\n\n$date\n/$path";
 
+    my $signer = Amazon::S3::Thin::Signer->new($secret_key);
+    my $hdr = HTTP::Headers->new;
+    $hdr->header("date", $date);
+    my $sig = $signer->calculate_signature($verb, $path, $hdr);
+    is $sig, 'bWq2s1WEIj+Ydj0vQ697zp+IXMU=', "puppy test";
 
-    my $hmac = Digest::HMAC_SHA1->new($secret_key);
-    $hmac->add($string_to_sign);
-    my $signature = $hmac->b64digest . '=';
-
-    ok $signature;
-    is $signature, 'bWq2s1WEIj+Ydj0vQ697zp+IXMU=', "puppy test";
 }
 
 done_testing;
