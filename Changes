@@ -2,7 +2,8 @@ Revision history for Perl extension Amazon-S3-Thin
 
 {{$NEXT}}
 
-0.08 2015-03-02T12:58:46Z
+0.09 2015-03-02T13:11:39Z
+
    - rename Signer.pm -> SignerV2.pm
 
 0.07 2015-03-01T15:49:47Z
