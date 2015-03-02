@@ -1,6 +1,6 @@
 use strict;
 use warnings;
-use Amazon::S3::Thin::Signer;
+use Amazon::S3::Thin::SignerV2;
 use Test::More;
 use HTTP::Headers;
 
@@ -16,7 +16,7 @@ use HTTP::Headers;
     $hdr->header("content-length", 15);
     $hdr->header("date", 'Sun, 01 Mar 2015 15:11:25 GMT');
 
-    my $signer = Amazon::S3::Thin::Signer->new($secret_key);
+    my $signer = Amazon::S3::Thin::SignerV2->new($secret_key);
     my $sig = $signer->calculate_signature($verb,$path,$hdr);
 
     is $sig, "n4W+Lf9QQAbx5mo8N3sHWaJUQ/I=";
@@ -33,7 +33,7 @@ use HTTP::Headers;
     my $path = "johnsmith/photos/puppy.jpg";
     my $string_to_sign = $verb . "\n\n\n$date\n/$path";
 
-    my $signer = Amazon::S3::Thin::Signer->new($secret_key);
+    my $signer = Amazon::S3::Thin::SignerV2->new($secret_key);
     my $hdr = HTTP::Headers->new;
     $hdr->header("date", $date);
     my $sig = $signer->calculate_signature($verb, $path, $hdr);

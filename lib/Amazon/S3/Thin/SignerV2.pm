@@ -1,4 +1,4 @@
-package Amazon::S3::Thin::Signer;
+package Amazon::S3::Thin::SignerV2;
 use strict;
 use warnings;
 use Digest::HMAC_SHA1;

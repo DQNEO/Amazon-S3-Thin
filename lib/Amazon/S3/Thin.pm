@@ -7,7 +7,7 @@ use Carp;
 use HTTP::Date ();
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape_utf8);
-use Amazon::S3::Thin::Signer;
+use Amazon::S3::Thin::SignerV2;
 
 our $VERSION = '0.07';
 
@@ -209,7 +209,7 @@ sub _compose_request {
             $http_headers->header(Date => HTTP::Date::time2str(time));
         }
 
-        my $signer = Amazon::S3::Thin::Signer->new($self->{aws_secret_access_key});
+        my $signer = Amazon::S3::Thin::SignerV2->new($self->{aws_secret_access_key});
         my $signature = $signer->calculate_signature($method, $path, $http_headers);
         $http_headers->header(
             Authorization => sprintf("AWS %s:%s"
