@@ -19,6 +19,5 @@ use HTTP::Headers;
     is $sig, "n4W+Lf9QQAbx5mo8N3sHWaJUQ/I=";
 }
 
-is $sig, "n4W+Lf9QQAbx5mo8N3sHWaJUQ/I=";
 
 done_testing;
