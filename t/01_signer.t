@@ -7,7 +7,8 @@ use HTTP::Headers;
 # What this test does is only to calculate signature,
 # no HTTP communication.
 {
-    my $signer = Amazon::S3::Thin::Signer->new("secretfoobar");
+    my $secret_key = "secretfoobar";
+    my $signer = Amazon::S3::Thin::Signer->new($secret_key);
     my $verb = "PUT";
     my $path = "example/file%2Etxt";
 
