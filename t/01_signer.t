@@ -7,6 +7,7 @@ use HTTP::Headers;
 # What this test does is only to calculate signature,
 # no HTTP communication.
 {
+    diag "test PUT request";
     my $secret_key = "secretfoobar";
     my $verb = "PUT";
     my $path = "example/file%2Etxt";
@@ -23,6 +24,8 @@ use HTTP::Headers;
 
 {
     diag "test GET request";
+
+    # test the case http://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAuthentication.html#RESTAuthenticationRequestCanonicalization
     my $secret_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
 
     my $verb = "GET";
@@ -34,8 +37,8 @@ use HTTP::Headers;
     my $hdr = HTTP::Headers->new;
     $hdr->header("date", $date);
     my $sig = $signer->calculate_signature($verb, $path, $hdr);
-    is $sig, 'bWq2s1WEIj+Ydj0vQ697zp+IXMU=', "puppy test";
 
+    is $sig, 'bWq2s1WEIj+Ydj0vQ697zp+IXMU=', "puppy test";
 }
 
 done_testing;
