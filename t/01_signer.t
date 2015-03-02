@@ -19,5 +19,21 @@ use HTTP::Headers;
     is $sig, "n4W+Lf9QQAbx5mo8N3sHWaJUQ/I=";
 }
 
+{
+    my $secret_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
+
+    my $verb = "GET";
+    my $date = "Tue, 27 Mar 2007 19:36:42 +0000";
+    my $path = "johnsmith/photos/puppy.jpg";
+    my $string_to_sign = $verb . "\n\n\n$date\n/$path";
+
+
+    my $hmac = Digest::HMAC_SHA1->new($secret_key);
+    $hmac->add($string_to_sign);
+    my $signature = $hmac->b64digest . '=';
+
+    ok $signature;
+    is $signature, 'bWq2s1WEIj+Ydj0vQ697zp+IXMU=', "puppy test";
+}
 
 done_testing;
