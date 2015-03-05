@@ -26,6 +26,8 @@ sub new {
 sub run {
     my ($self, @args) = @_;
 
+    our $VERSION = "0.00";
+
     my $p = Getopt::Long::Parser->new(
         config => [qw(posix_default no_ignore_case bundling)],
         );
@@ -37,7 +39,7 @@ sub run {
         "v|version"     => \(my $version),
     );
     if ($version) {
-        printf "s3%s\n", Daiku->VERSION;
+        printf "s3 %s\n", $VERSION;
         exit 0;
     }
     if ($help) {
