@@ -86,18 +86,18 @@ sub cmd_ls {
 
     my $common_prefixes = $tree->{ListBucketResult}->{CommonPrefixes};
 
-    if (ref $common_prefixes eq "ARRAY") {
-        print $_->{Prefix}, "\n" for  @$common_prefixes;
-    } else {
-        print $common_prefixes->{Prefix}, "\n";
+    if (ref $common_prefixes eq "HASH") {
+        $common_prefixes = [$common_prefixes];
     }
 
+    print $_->{Prefix}, "\n" for  @$common_prefixes;
+
     my $contents = $tree->{ListBucketResult}->{Contents};
-    if (ref $contents eq "ARRAY") {
-        print $_->{Key} , "\n" for @$contents;
-    } else {
-        print $contents->{Key} ,"\n";
+    if (ref $contents eq "HASH") {
+        $contents = [$contents];
     }
+
+    print $_->{Key} , "\n" for @$contents;
 
 }
 
