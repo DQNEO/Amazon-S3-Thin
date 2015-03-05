@@ -58,18 +58,26 @@ sub run {
 
 }
 
+use XML::TreePP;
+use JSON;
+
 sub cmd_ls {
     my ($self, $url) = @_;
     my ($bucket, $key);
     if($url =~ m|s3://([^/]+)/(.+)$| ){
         ($bucket, $key) = ($1, $2);
-        printf "bucket, key = %s, %s\n", $bucket , $key;
+        #warn "bucket, key = %s, %s\n", $bucket , $key;
     } elsif ($url =~ m|s3://([^/]+)/?$| ){
         $bucket = $1;
-        printf "bucket only = %s\n", $bucket;
+        #warn "bucket only = %s\n", $bucket;
     } else {
         die "bad url";
     }
 
+    my $response = $self->{s3client}->list_objects($bucket);
+    my $tpp = XML::TreePP->new();
+    my $tree = $tpp->parse($response->content);
+
+    print JSON->new->utf8->pretty->encode($tree);
 }
 
