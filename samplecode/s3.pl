@@ -81,6 +81,6 @@ sub cmd_ls {
     my $tpp = XML::TreePP->new();
     my $tree = $tpp->parse($response->content);
 
-    print JSON->new->utf8->pretty->encode($tree);
+    print JSON->new->utf8->pretty->encode($tree->{ListBucketResult});
 }
 
