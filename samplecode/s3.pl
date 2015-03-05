@@ -25,33 +25,36 @@ sub new {
 
 sub run {
     my ($self, @args) = @_;
-    my %opts = (
+
+    my $p = Getopt::Long::Parser->new(
+        config => [qw(posix_default no_ignore_case bundling)],
         );
 
-    our $VERSION = "0.00";
-
-    GetOptions(\%opts,
-               'version',
-               'debug',
-        ) or $opts{help}++;
-
-    warn Dumper \%opts;
-
-    if ($opts{help}) {
-        print "help\n";
-        return 0;
+    $p->getoptionsfromarray(
+        \@args,
+        "p|profile=s"   => \(my $profile),
+        "h|help"        => \(my $help),
+        "v|version"     => \(my $version),
+    );
+    if ($version) {
+        printf "s3%s\n", Daiku->VERSION;
+        exit 0;
+    }
+    if ($help) {
+        require Pod::Usage;
+        Pod::Usage::pod2usage(0);
     }
 
-    if ($opts{version}) {
-        print $VERSION , "\n";
-        return 0;
+    my $subcmd = shift @args;
+
+    #warn Dumper $subcmd, $profile , \@args;    n
+    if ($subcmd eq "ls") {
+        return $self->cmd_ls(@args);
     }
+    #my $config_file = $ENV{HOME} . "/.aws/credentials";
+    #my $crd = Config::Tiny->read($config_file)->{$profile};
+    #warn Dumper $crd;
 
-    my $profile = "dqneo";
-    my $config_file = $ENV{HOME} . "/.aws/credentials";
-
-    my $crd = Config::Tiny->read($config_file)->{$profile};
-
-    warn Dumper $crd;
+}
 
 }
