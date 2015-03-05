@@ -1,4 +1,4 @@
-#!/usr/bin/perl
+#!/usr/bin/env perl
 # command tool like aws s3
 use strict;
 use warnings;
