@@ -15,7 +15,7 @@ package S3::CLI;
 use strict;
 use warnings;
 use Getopt::Long;
-
+use Amazon::S3::Thin;
 use Data::Dumper;
 
 sub new {
@@ -48,8 +48,7 @@ sub run {
 
     my $config_file = $ENV{HOME} . "/.aws/credentials";
     my $crd = Config::Tiny->read($config_file)->{$profile};
-    $self->{crd} = $crd;
-
+    $self->{s3client} = Amazon::S3::Thin->new($crd);
     my $subcmd = shift @args;
 
     #warn Dumper $subcmd, $profile , \@args;    n
