@@ -49,7 +49,7 @@ sub run {
 
     my $config_file = $ENV{HOME} . "/.aws/credentials";
     my $crd = Config::Tiny->read($config_file)->{$profile};
-    warn Dumper $crd;
+    $self->{crd} = $crd;
 
     my $subcmd = shift @args;
 
