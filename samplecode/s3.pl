@@ -47,15 +47,16 @@ sub run {
         Pod::Usage::pod2usage(0);
     }
 
+    my $config_file = $ENV{HOME} . "/.aws/credentials";
+    my $crd = Config::Tiny->read($config_file)->{$profile};
+    warn Dumper $crd;
+
     my $subcmd = shift @args;
 
     #warn Dumper $subcmd, $profile , \@args;    n
     if ($subcmd eq "ls") {
         return $self->cmd_ls(@args);
     }
-    #my $config_file = $ENV{HOME} . "/.aws/credentials";
-    #my $crd = Config::Tiny->read($config_file)->{$profile};
-    #warn Dumper $crd;
 
 }
 
