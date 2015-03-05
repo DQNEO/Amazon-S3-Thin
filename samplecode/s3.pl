@@ -12,6 +12,9 @@ S3::CLI->new->run(@ARGV);
 
 
 package S3::CLI;
+use strict;
+use warnings;
+
 use Data::Dumper;
 
 sub new {
