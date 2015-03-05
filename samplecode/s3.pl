@@ -18,9 +18,8 @@ use Getopt::Long;
 
 use Data::Dumper;
 
-
 sub new {
-    return {}, shift;
+    return bless {}, shift;
 }
 
 sub run {
