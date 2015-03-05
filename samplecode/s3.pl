@@ -64,9 +64,13 @@ sub cmd_ls {
     my ($bucket, $key);
     if($url =~ m|s3://([^/]+)/(.+)$| ){
         ($bucket, $key) = ($1, $2);
+        printf "bucket, key = %s, %s\n", $bucket , $key;
+    } elsif ($url =~ m|s3://([^/]+)/?$| ){
+        $bucket = $1;
+        printf "bucket only = %s\n", $bucket;
+    } else {
+        die "bad url";
     }
 
-    warn Dumper $bucket, $key;
-    printf "bucket, key = %s, %s\n", $bucket , $key;
 }
 
