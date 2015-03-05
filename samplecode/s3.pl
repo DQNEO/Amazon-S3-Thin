@@ -77,10 +77,11 @@ sub cmd_ls {
 
     my $response = $self->{s3client}->list_objects($bucket,{
         prefix => $key,
+        delimiter => "/",
                                                    });
     my $tpp = XML::TreePP->new();
     my $tree = $tpp->parse($response->content);
 
-    print JSON->new->utf8->pretty->encode($tree->{ListBucketResult});
+    print $_->{Prefix}, "\n" for  @{$tree->{ListBucketResult}->{CommonPrefixes}};
 }
 
