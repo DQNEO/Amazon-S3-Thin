@@ -76,7 +76,7 @@ sub cmd_ls {
     }
 
     my $response = $self->{s3client}->list_objects($bucket,{
-        prefix => $key
+        prefix => $key,
                                                    });
     my $tpp = XML::TreePP->new();
     my $tree = $tpp->parse($response->content);
