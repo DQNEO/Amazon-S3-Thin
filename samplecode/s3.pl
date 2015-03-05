@@ -8,21 +8,24 @@ use Amazon::S3::Thin;
 #use S3::CLI;
 use Config::Tiny;
 
+S3::CLI->new->run(@ARGV);
+
+
+package S3::CLI;
 use Data::Dumper;
-my $profile = "dqneo";
+
+sub new {
+    return {}, shift;
+}
+
+sub run {
+
+    my $profile = "dqneo";
 my $config_file = $ENV{HOME} . "/.aws/credentials";
 
 my $crd = Config::Tiny->read($config_file)->{$profile};
 
 warn Dumper $crd;
 
-
-package S3::CLI;
-
-sub new {
-
-}
-
-sub run {
 
 }
