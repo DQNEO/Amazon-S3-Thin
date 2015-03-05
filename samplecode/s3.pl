@@ -57,4 +57,7 @@ sub run {
 
 }
 
+sub cmd_ls {
+    my ($self, $url) = @_;
+    print "url:$url\n";
 }
