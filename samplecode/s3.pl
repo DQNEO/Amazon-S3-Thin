@@ -61,7 +61,12 @@ sub run {
 
 sub cmd_ls {
     my ($self, $url) = @_;
-    my ($bucket, $key) = ( $url =~ m|s3://([^/]+)/(.+)$| );
+    my ($bucket, $key);
+    if($url =~ m|s3://([^/]+)/(.+)$| ){
+        ($bucket, $key) = ($1, $2);
+    }
+
+    warn Dumper $bucket, $key;
     printf "bucket, key = %s, %s\n", $bucket , $key;
 }
 
