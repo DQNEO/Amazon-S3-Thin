@@ -61,6 +61,7 @@ sub run {
 use XML::TreePP;
 use JSON;
 
+# aws s3 ls s3://yourbucket/dir/file.txt
 sub cmd_ls {
     my ($self, $url) = @_;
     my ($bucket, $key);
