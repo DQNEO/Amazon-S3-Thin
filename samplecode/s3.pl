@@ -5,7 +5,7 @@ use warnings;
 use FindBin;
 use lib $FindBin::Bin . '/../lib';
 use Amazon::S3::Thin;
-use S3;
+#use S3::CLI;
 use Config::Tiny;
 
 use Data::Dumper;
@@ -17,9 +17,12 @@ my $crd = Config::Tiny->read($config_file)->{$profile};
 warn Dumper $crd;
 
 
-package S3;
+package S3::CLI;
 
-# inspired by https://github.com/Songmu/App-LJ
-sub new_with_options {
+sub new {
+
+}
+
+sub run {
 
 }
