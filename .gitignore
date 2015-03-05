@@ -28,3 +28,5 @@ cover_db/
 MYMETA.*
 
 /Amazon-S3-Simple-*
+
+/samplecode
