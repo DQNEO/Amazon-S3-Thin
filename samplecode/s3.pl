@@ -82,6 +82,22 @@ sub cmd_ls {
     my $tpp = XML::TreePP->new();
     my $tree = $tpp->parse($response->content);
 
-    print $_->{Prefix}, "\n" for  @{$tree->{ListBucketResult}->{CommonPrefixes}};
+    #print Dumper $tree;
+
+    my $common_prefixes = $tree->{ListBucketResult}->{CommonPrefixes};
+
+    if (ref $common_prefixes eq "ARRAY") {
+        print $_->{Prefix}, "\n" for  @$common_prefixes;
+    } else {
+        print $common_prefixes->{Prefix}, "\n";
+    }
+
+    my $contents = $tree->{ListBucketResult}->{Contents};
+    if (ref $contents eq "ARRAY") {
+        print $_->{Key} , "\n" for @$contents;
+    } else {
+        print $contents->{Key} ,"\n";
+    }
+
 }
 
