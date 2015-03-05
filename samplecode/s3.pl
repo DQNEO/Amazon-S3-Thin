@@ -64,6 +64,7 @@ use JSON;
 sub cmd_ls {
     my ($self, $url) = @_;
     my ($bucket, $key);
+    $key = "";
     if($url =~ m|s3://([^/]+)/(.+)$| ){
         ($bucket, $key) = ($1, $2);
         #warn "bucket, key = %s, %s\n", $bucket , $key;
@@ -74,7 +75,9 @@ sub cmd_ls {
         die "bad url";
     }
 
-    my $response = $self->{s3client}->list_objects($bucket);
+    my $response = $self->{s3client}->list_objects($bucket,{
+        prefix => $key
+                                                   });
     my $tpp = XML::TreePP->new();
     my $tree = $tpp->parse($response->content);
 
