@@ -61,5 +61,7 @@ sub run {
 
 sub cmd_ls {
     my ($self, $url) = @_;
-    print "url:$url\n";
+    my ($bucket, $key) = ( $url =~ m|s3://([^/]+)/(.+)$| );
+    printf "bucket, key = %s, %s\n", $bucket , $key;
 }
+
