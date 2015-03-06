@@ -86,20 +86,24 @@ sub cmd_ls {
 
     #print Dumper $tree;
 
-    my $common_prefixes = $tree->{ListBucketResult}->{CommonPrefixes};
+    if ($self->{verbose}) {
+        use JSON;
+        print JSON->new->pretty->encode($tree->{ListBucketResult});
+    } else {
+        my $common_prefixes = $tree->{ListBucketResult}->{CommonPrefixes};
 
-    if (ref $common_prefixes eq "HASH") {
-        $common_prefixes = [$common_prefixes];
+        if (ref $common_prefixes eq "HASH") {
+            $common_prefixes = [$common_prefixes];
+        }
+
+        print $_->{Prefix}, "\n" for  @$common_prefixes;
+
+        my $contents = $tree->{ListBucketResult}->{Contents};
+        if (ref $contents eq "HASH") {
+            $contents = [$contents];
+        }
+
+        print $_->{Key} , "\n" for @$contents;
     }
-
-    print $_->{Prefix}, "\n" for  @$common_prefixes;
-
-    my $contents = $tree->{ListBucketResult}->{Contents};
-    if (ref $contents eq "HASH") {
-        $contents = [$contents];
-    }
-
-    print $_->{Key} , "\n" for @$contents;
-
 }
 
