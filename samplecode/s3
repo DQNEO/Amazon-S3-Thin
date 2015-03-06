@@ -33,7 +33,7 @@ sub run {
 
     $p->getoptionsfromarray(
         \@args,
-        "p|profile=s"   => \(my $profile),
+        "p|profile=s"   => \(my $profile = "default"),
         "h|help"        => \(my $help),
         "version"     => \(my $version),
         "v|verbose"     => \($self->{verbose}),
