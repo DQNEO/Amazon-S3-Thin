@@ -35,7 +35,8 @@ sub run {
         \@args,
         "p|profile=s"   => \(my $profile),
         "h|help"        => \(my $help),
-        "v|version"     => \(my $version),
+        "version"     => \(my $version),
+        "v|verbose"     => \($self->{verbose}),
     );
     if ($version) {
         printf "s3 %s\n", $VERSION;
