@@ -237,7 +237,7 @@ __END__
 
 =head1 NAME
 
-Amazon::S3::Thin - A thin, ligthweight, low-level Amazon S3 client
+Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
 =head1 SYNOPSIS
 
@@ -278,42 +278,46 @@ You can also pass any useragent as you like
 
 =head1 DESCRIPTION
 
-Amazon::S3::Thin - A thin, ligthweight, low-level Amazon S3 client.
+Amazon::S3::Thin is a thin, lightweight, low-level Amazon S3 client.
+It offers the following features:
 
 =over
 
 =item Low Level
 
-It returns HTTP::Response. So you can inspect easily what's happening inside , and can handle error as you like.
+It returns L<HTTP::Response> objects so you can easily inspect
+what's happening inside, and can handle errors as you like.
 
 
 =item Low Dependency
 
-It does require no XML::* modules, so that installation be easy;
+It does not require any XML::* modules, so installation is easy;
 
 =item Low Learning Cost
 
-The interfaces are designed to follow S3 official REST APIs. So it is easy to learn.
+The interfaces are designed to follow S3 official REST APIs.
+So it is easy to learn.
 
 =back
 
 =head1 comparison to precedent modules
 
-There are already usuful modules L<Amazon::S3> and L<Net::Amazon::S3>.
-The 2 precedent modules provides "a Perlish interface", which is easy to understand for Perl programmers.
-But they also hide low-level behaviors.
-For example, the "get_key" method returns undef on 404 status and raises exception on 5xx status.
+There are already some useful modules like L<Amazon::S3>, L<Net::Amazon::S3>
+and L<AWS::S3> on CPAN. They provide a "Perlish" interface, which is easy to
+understand for Perl programmers, but they also hide low-level behaviors.
+For example, the "get_key" method returns C<undef> on 404 status and raises
+an exception on 5xx status.
 
-In some situations, it is very important to see raw HTTP communications.
+In some situations, it is very important to see the raw HTTP communications.
 That's why I made this module.
 
-=head1 TO DO
+=head1 TODO
 
 lots of APIs are not implemented yet.
 
 =head1 REPOSITORY
 
-https://github.com/DQNEO/Amazon-S3-Thin
+L<https://github.com/DQNEO/Amazon-S3-Thin>
 
 =head1 LICENSE
 
@@ -329,16 +333,14 @@ DQNEO
 =head2 ORIGINAL AUTHOR
 
 Timothy Appnel <tima@cpan.org> L<Amazon::S3>
-https://github.com/tima/perl-amazon-s3
+L<https://github.com/tima/perl-amazon-s3>
 
 =head1 SEE ALSO
 
-L<Amazon::S3>, L<Net::Amazon::S3>
+L<Amazon::S3>, L<Net::Amazon::S3>, L<AWS::S3>.
 
-Amazon S3 API Reference : REST API
-http://docs.aws.amazon.com/AmazonS3/latest/API/APIRest.html
+L<Amazon S3 API Reference : REST API|http://docs.aws.amazon.com/AmazonS3/latest/API/APIRest.html>
 
-Amazon S3 API Reference : List of Error Codes
-http://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html#ErrorCodeList
+L<Amazon S3 API Reference : List of Error Codes|http://docs.aws.amazon.com/AmazonS3/latest/API/ErrorResponses.html#ErrorCodeList>
 
 =cut
