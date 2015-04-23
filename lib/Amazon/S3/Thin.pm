@@ -300,7 +300,7 @@ So it is easy to learn.
 
 =back
 
-=head1 comparison to precedent modules
+=head2 Comparison to precedent modules
 
 There are already some useful modules like L<Amazon::S3>, L<Net::Amazon::S3>
 and L<AWS::S3> on CPAN. They provide a "Perlish" interface, which is easy to
@@ -310,6 +310,129 @@ an exception on 5xx status.
 
 In some situations, it is very important to see the raw HTTP communications.
 That's why I made this module.
+
+=head1 CONSTRUCTOR
+
+=head2 new( \%params )
+
+B<Receives:> hashref with options.
+
+B<Returns:> Amazon::S3::Thin object
+
+It can receive the following arguments:
+
+=over 4
+
+=item * C<aws_access_key_id> (B<REQUIRED>) - the access key id
+for your S3 account.
+
+=item * C<aws_secret_access_key> (B<REQUIRED>) - the access key secret
+for your S3 account.
+
+=item * C<secure> - whether to use https or not. Default is 0 (http).
+
+=item * C<host> - the base host to use. Default is 'I<s3.amazonaws.com>'.
+
+=item * C<ua> - a user agent object, compatible with LWP::UserAgent.
+Default is an instance of L<LWP::UserAgent>.
+
+=back
+
+=head1 ACCESSORS
+
+The following accessors are provided. You can use them to get/set your
+object's attributes.
+
+=head2 secure
+
+Whether to use https (1) or http (0) when connecting to S3.
+
+=head2 host
+
+The base host to use for connecting to S3.
+
+=head2 ua
+
+The user agent used internally to perform requests and return responses.
+If you set this attribute, please make sure you do so with an object
+compatible with L<LWP::UserAgent> (i.e. providing the same interface).
+
+=head1 METHODS
+
+=head2 get_object( $bucket, $key )
+
+B<Arguments>: a string with the bucket name, and a string with the key name.
+
+B<Returns>: an L<HTTP::Response> object for the request. Use the C<content()>
+method on the returned object to read the contents:
+
+    my $res = $s3->get_object( 'my.bucket', 'my/key.ext' );
+
+    if ($res->is_success) {
+        my $content = $res->content;
+    }
+
+The GET operation retrieves objects from Amazon S3.
+
+For more information, please refer to
+L<< Amazon's documentation for GET|http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectGET.html >>.
+
+=head2 delete_object( $bucket, $key )
+
+B<Arguments>: a string with the bucket name, and a string with the key name.
+
+B<Returns>: an L<HTTP::Response> object for the request.
+
+The DELETE operation removes the null version (if there is one) of an object
+and inserts a delete marker, which becomes the current version of the
+object. If there isn't a null version, Amazon S3 does not remove any objects.
+
+Use the response object to see if it succeeded or not.
+
+For more information, please refer to
+L<< Amazon's documentation for DELETE|http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectDELETE.html >>.
+
+=head2 copy_object( $src_bucket, $src_key, $dst_bucket, $dst_key )
+
+B<Arguments>: a list with source (bucket, key) and destination (bucket, key)
+
+B<Returns>: an L<HTTP::Response> object for the request.
+
+This method is a variation of the PUT operation as described by
+Amazon's S3 API. It creates a copy of an object that is already stored
+in Amazon S3. This "PUT copy" operation is the same as performing a GET
+from the old bucket/key and then a PUT to the new bucket/key.
+
+For more information, please refer to
+L<< Amazon's documentation for COPY|http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectCOPY.html >>.
+
+=head2 put_object( $bucket, $key, $content [, $headers] )
+
+B<Arguments>:
+
+a list of the following items, in order:
+
+=over 4
+
+=item 1. bucket - a string with the destination bucket
+
+=item 2. key - a string with the destination key
+
+=item 3. content - a string with the content to be uploaded
+
+=item 4. headers (B<optional>) - hashref with extra headr information
+
+=back
+
+B<Returns>: an L<HTTP::Response> object for the request.
+
+The PUT operation adds an object to a bucket. Amazon S3 never adds partial
+objects; if you receive a success response, Amazon S3 added the entire
+object to the bucket.
+
+For more information, please refer to
+L<< Amazon's documentation for PUT|http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectPUT.html >>.
+
 
 =head1 TODO
 
