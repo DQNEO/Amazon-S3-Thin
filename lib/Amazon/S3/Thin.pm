@@ -77,6 +77,12 @@ sub get_object {
     return $self->ua->request($request);
 }
 
+sub head_object {
+    my ($self, $bucket, $key) = @_;
+    my $request = $self->_compose_request('HEAD', $self->_uri($bucket, $key));
+    return $self->ua->request($request);
+}
+
 sub delete_object {
     my ($self, $bucket, $key) = @_;
     my $request = $self->_compose_request('DELETE', $self->_uri($bucket, $key));
@@ -265,6 +271,9 @@ Amazon::S3::Thin - A thin, ligthweight, low-level Amazon S3 client
                               $bucket,
                               {prefix => "foo", delimter => "/"}
                              );
+
+  # just the metadata / exists information without the contents:
+  $response = $s3client->head_object($bucket, $key);
 
 You can also pass any useragent as you like
 
