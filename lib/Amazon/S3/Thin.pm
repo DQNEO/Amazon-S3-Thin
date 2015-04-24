@@ -293,7 +293,7 @@ It offers the following features:
 
 =item Low Level
 
-It returns L<HTTP::Response> objects so you can easily inspect
+It returns an L<HTTP::Response> object so you can easily inspect
 what's happening inside, and can handle errors as you like.
 
 
