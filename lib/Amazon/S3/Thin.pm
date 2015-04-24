@@ -331,11 +331,11 @@ It can receive the following arguments:
 
 =over 4
 
-=item * C<aws_access_key_id> (B<REQUIRED>) - the access key id
-for your S3 account.
+=item * C<aws_access_key_id> (B<REQUIRED>) - an access key id
+of your credentials.
 
-=item * C<aws_secret_access_key> (B<REQUIRED>) - the secret access key
-for your S3 account.
+=item * C<aws_secret_access_key> (B<REQUIRED>) - an secret access key
+ of your credentials.
 
 =item * C<secure> - whether to use https or not. Default is 0 (http).
 
