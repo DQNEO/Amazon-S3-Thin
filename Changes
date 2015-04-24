@@ -2,6 +2,9 @@ Revision history for Perl extension Amazon-S3-Thin
 
 {{$NEXT}}
 
+0.11 2015-04-24T13:17:21Z
+   - refine document
+
 0.10 2015-04-24T13:04:42Z
 
    - add head_object method
