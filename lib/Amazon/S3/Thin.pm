@@ -287,7 +287,10 @@ You can also pass any useragent as you like
 =head1 DESCRIPTION
 
 Amazon::S3::Thin is a thin, lightweight, low-level Amazon S3 client.
-It offers the following features:
+
+It's designed for only ONE purpose: Send a request and get a response.
+
+In detail, it offers the following features:
 
 =over
 
