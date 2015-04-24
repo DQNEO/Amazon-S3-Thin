@@ -380,7 +380,7 @@ method on the returned object to read the contents:
         my $content = $res->content;
     }
 
-The GET operation retrieves objects from Amazon S3.
+The GET operation retrieves an object from Amazon S3.
 
 For more information, please refer to
 L<< Amazon's documentation for GET|http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectGET.html >>.
