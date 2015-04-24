@@ -19,12 +19,13 @@ my $body = "hello world";
 
 my $res1 = $client->put_object($bucket, $key, $body);
 
-
 my $res2 = $client->get_object($bucket, $key);
 
+my $res3 = $client->head_object($bucket, $key);
 
-my $req1 =  $res1->request;
+my $req1 = $res1->request;
 my $req2 = $res2->request;
+my $req3 = $res3->request;
 
 diag "test PUT request";
 is $req1->method, "PUT";
@@ -36,10 +37,16 @@ diag "test GET request";
 is $req2->method, "GET";
 is $req2->uri, "http://tmpfoobar.s3.amazonaws.com/dir%2Fprivate%2Etxt";
 
-my $res3 = $client->list_objects($bucket, {prefix => "12012", delimiter => "/"});
-my $req3 = $res3->request;
-is $req3->method, "GET";
-is $req3->uri, "http://tmpfoobar.s3.amazonaws.com/?delimiter=%2F&prefix=12012";
+diag "test HEAD request";
+is $req3->method, "HEAD";
+is $req3->uri, "http://tmpfoobar.s3.amazonaws.com/dir%2Fprivate%2Etxt";
+
+diag "test GET request for list_objects";
+my $res4 = $client->list_objects($bucket, {prefix => "12012", delimiter => "/"});
+my $req4 = $res4->request;
+is $req4->method, "GET";
+is $req4->uri, "http://tmpfoobar.s3.amazonaws.com/?delimiter=%2F&prefix=12012";
+
 
 done_testing;
 

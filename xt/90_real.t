@@ -33,6 +33,13 @@ is $req->method, "DELETE";
 is $req->content, '';
 is $req->uri, "http://tmpdqneo.s3.amazonaws.com/dir%2Fs3test%2Etxt";
 
+diag "HEAD request on non-existing object";
+$res = $client->head_object($bucket, $key);
+$req = $res->request;
+ok !$res->is_success, "is not success";
+is $res->code, 404;
+is $req->method, "HEAD";
+is $req->uri, "http://tmpdqneo.s3.amazonaws.com/dir%2Fs3test%2Etxt";
 
 diag "GET request";
 $res = $client->get_object($bucket, $key);
@@ -49,6 +56,15 @@ $req =  $res->request;
 is $req->method, "PUT";
 is $req->content, $body;
 is $req->uri, "http://tmpdqneo.s3.amazonaws.com/dir%2Fs3test%2Etxt";
+
+diag "HEAD request";
+$res = $client->head_object($bucket, $key);
+ok $res->is_success, "is_success";
+$req =  $res->request;
+is $req->method, "HEAD";
+is $req->content, '';
+is $req->uri, "http://tmpdqneo.s3.amazonaws.com/dir%2Fs3test%2Etxt";
+like $res->header("x-amz-request-id"), qr/.+/, "has proper headers";
 
 diag "COPY request";
 my $key2 = $key . "_copied";
