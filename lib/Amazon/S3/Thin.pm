@@ -311,10 +311,10 @@ So it is easy to learn.
 =head2 Comparison to precedent modules
 
 There are already some useful modules like L<Amazon::S3>, L<Net::Amazon::S3>
-and L<AWS::S3> on CPAN. They provide a "Perlish" interface, which is easy to
-understand for Perl programmers, but they also hide low-level behaviors.
-For example, the "get_key" method returns C<undef> on 404 status and raises
-an exception on 5xx status.
+and L<AWS::S3> on CPAN. They provide a "Perlish" interface, which looks pretty
+ for Perl programmers, but they also hide low-level behaviors.
+For example, the "get_key" method translate HTTP status 404 into C<undef> and
+ HTTP 5xx status into exception.
 
 In some situations, it is very important to see the raw HTTP communications.
 That's why I made this module.
