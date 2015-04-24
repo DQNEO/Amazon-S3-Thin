@@ -272,7 +272,6 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
                               {prefix => "foo", delimter => "/"}
                              );
 
-  # just the metadata / exists information without the contents:
   $response = $s3client->head_object($bucket, $key);
 
 You can also pass any useragent as you like
