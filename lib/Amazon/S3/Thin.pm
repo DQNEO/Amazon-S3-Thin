@@ -311,7 +311,7 @@ So it is easy to learn.
 =head2 Comparison to precedent modules
 
 There are already some useful modules like L<Amazon::S3>, L<Net::Amazon::S3>
-and L<AWS::S3> on CPAN. They provide a "Perlish" interface, which looks pretty
+ on CPAN. They provide a "Perlish" interface, which looks pretty
  for Perl programmers, but they also hide low-level behaviors.
 For example, the "get_key" method translate HTTP status 404 into C<undef> and
  HTTP 5xx status into exception.
@@ -468,7 +468,7 @@ L<https://github.com/tima/perl-amazon-s3>
 
 =head1 SEE ALSO
 
-L<Amazon::S3>, L<Net::Amazon::S3>, L<AWS::S3>.
+L<Amazon::S3>, L<Net::Amazon::S3>
 
 L<Amazon S3 API Reference : REST API|http://docs.aws.amazon.com/AmazonS3/latest/API/APIRest.html>
 
