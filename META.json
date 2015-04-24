@@ -1,5 +1,5 @@
 {
-   "abstract" : "A thin, ligthweight, low-level Amazon S3 client",
+   "abstract" : "A thin, lightweight, low-level Amazon S3 client",
    "author" : [
       "DQNEO"
    ],
@@ -68,9 +68,10 @@
          "web" : "https://github.com/DQNEO/Amazon-S3-Thin"
       }
    },
-   "version" : "0.09",
+   "version" : "0.10",
    "x_contributors" : [
       "Timothy Appnel <tim@appnel.com>",
+      "Breno G. de Oliveira <garu@cpan.org>",
       "DQNEO <dqneoo@gmail.com>"
    ]
 }
