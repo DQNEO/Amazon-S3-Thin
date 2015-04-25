@@ -6,6 +6,14 @@ use MIME::Base64 ();
 
 my $AMAZON_HEADER_PREFIX = 'x-amz-';
 
+# reserved subresources such as acl or torrent
+our @ordered_subresources = qw(
+        acl delete lifecycle location logging notification partNumber policy
+        requestPayment torrent uploadId uploads versionId versioning versions
+        website
+    );
+
+
 sub new {
     my ($class, $secret) = @_;
     my $self = {secret => $secret};
@@ -15,6 +23,17 @@ sub new {
 # generate a canonical string for the given parameters.  expires is optional and is
 # only used by query string authentication.
 sub calculate_signature {
+    my ($self, $method, $path, $headers, $expires) = @_;
+
+    my $string_to_sign = $self->string_to_sign( $method, $path, $headers, $expires );
+
+    my $hmac = Digest::HMAC_SHA1->new($self->{secret});
+    $hmac->add($string_to_sign);
+    return MIME::Base64::encode_base64($hmac->digest, '');
+}
+
+
+sub string_to_sign {
     my ($self, $method, $path, $headers, $expires) = @_;
 
     my %interesting_headers = ();
@@ -33,9 +52,9 @@ sub calculate_signature {
     $interesting_headers{'content-type'} ||= '';
     $interesting_headers{'content-md5'}  ||= '';
 
-    # just in case someone used this.  it's not necessary in this lib.
-    $interesting_headers{'date'} = ''
-      if $interesting_headers{'x-amz-date'};
+    # x-amz-date becomes date if it exists
+    $interesting_headers{'date'} = delete $interesting_headers{'x-amz-date'}
+        if exists $interesting_headers{'x-amz-date'};
 
     # if you're using expires for query string auth, then it trumps date
     # (and x-amz-date)
@@ -51,24 +70,30 @@ sub calculate_signature {
         }
     }
 
-    # don't include anything after the first ? in the resource...
-    $path =~ /^([^?]*)/;
+    $path =~ /^([^?]*)(.*)/;
     $string_to_sign .= "/$1";
-
-    # ...unless there is an acl or torrent parameter
-    if ($path =~ /[&?]acl($|=|&)/) {
-        $string_to_sign .= '?acl';
-    }
-    elsif ($path =~ /[&?]torrent($|=|&)/) {
-        $string_to_sign .= '?torrent';
-    }
-    elsif ($path =~ /[&?]location($|=|&)/) {
-        $string_to_sign .= '?location';
+    if (! $2) {
+        return $string_to_sign;
     }
 
-    my $hmac = Digest::HMAC_SHA1->new($self->{secret});
-    $hmac->add($string_to_sign);
-    my $signature =  MIME::Base64::encode_base64($hmac->digest, '');
+    my $query_string = $2;
+
+    my %interesting_subresources = map { $_ => '' } @ordered_subresources;
+
+    foreach my $query (split /[&?]/, $query_string) {
+        $query =~ /^([^=]+)/;
+        if (exists $interesting_subresources{$1}) {
+            $interesting_subresources{$1} = $query;
+        }
+    }
+    my $join_char = '?';
+    foreach my $name (@ordered_subresources) {
+        if ($interesting_subresources{$name}) {
+            $string_to_sign .= $join_char . $name;
+            $join_char = '&';
+        }
+    }
+    return $string_to_sign;
 }
 
 sub _trim {
