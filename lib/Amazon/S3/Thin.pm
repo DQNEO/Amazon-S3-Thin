@@ -130,7 +130,6 @@ sub put_object {
     }
 }
 
-# http://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGET.html
 sub list_objects {
     my ($self, $bucket, $opt) = @_;
     croak 'must specify bucket' unless $bucket;
@@ -269,7 +268,7 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
   $response = $s3client->list_objects(
                               $bucket,
-                              {prefix => "foo", delimter => "/"}
+                              {prefix => "foo", delimiter => "/"}
                              );
 
   $response = $s3client->head_object($bucket, $key);
@@ -443,6 +442,48 @@ object to the bucket.
 
 For more information, please refer to
 L<< Amazon's documentation for PUT|http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectPUT.html >>.
+
+
+=head2 list_objects( $bucket [, \%options ] )
+
+B<Arguments>: a string with the bucket name, and (optionally) a hashref
+with any of the following options:
+
+=over 4
+
+=item * C<prefix> (I<string>) - only return keys that begin with the
+specified prefix. You can use prefixes to separate a bucket into different
+groupings of keys, the same way you'd use a folder in a file system.
+
+=item * C<delimiter> (I<string>) - group keys that contain the same string
+between the beginning of the key (or after the prefix, if specified) and the
+first occurrence of the delimiter.
+
+=item * C<encoding-type> (I<string>) - if set to "url", will encode keys
+in the response (useful when the XML parser can't work unicode keys).
+
+=item * C<marker> (I<string>) - specifies the key to start with when listing
+objects. Amazon S3 returns object keys in alphabetical order, starting with
+the key right after the marker, in order.
+
+=item * C<max-keys> (I<string>) - Sets the maximum number of keys returned
+in the response body. You can add this to your request if you want to
+retrieve fewer than the default 1000 keys.
+
+=back
+
+B<Returns>: an L<HTTP::Response> object for the request. Use the C<content()>
+method on the returned object to read the contents:
+
+This method returns some or all (up to 1000) of the objects in a bucket. Note
+that the response might contain fewer keys but will never contain more.
+If there are additional keys that satisfy the search criteria but were not
+returned because the limit (either 1000 or max-keys) was exceeded, the
+response will contain C<< <IsTruncated>true</IsTruncated> >>. To return the
+additional keys, see C<marker> above.
+
+For more information, please refer to
+L<< Amazon's documentation for REST Bucket GET| http://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGET.html >>.
 
 
 =head1 TODO
