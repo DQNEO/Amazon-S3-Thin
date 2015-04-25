@@ -65,7 +65,7 @@ sub string_to_sign {
     # don't include anything after the first ? in the resource...
     $path =~ /^([^?]*)/;
     $string_to_sign .= "/$1";
-    $path = substr($path, length $1);
+    my $query_string = substr($path, length $1);
 
     # ...unless there is a reserved subresource such as acl or torrent
     my @ordered_subresources = qw(
@@ -75,7 +75,7 @@ sub string_to_sign {
     );
     my %interesting_subresources = map { $_ => '' } @ordered_subresources;
 
-    foreach my $query (split /[&?]/, $path) {
+    foreach my $query (split /[&?]/, $query_string) {
         $query =~ /^([^=]+)/;
         if (exists $interesting_subresources{$1}) {
             $interesting_subresources{$1} = $query;
