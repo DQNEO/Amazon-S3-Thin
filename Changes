@@ -2,7 +2,8 @@ Revision history for Perl extension Amazon-S3-Thin
 
 {{$NEXT}}
 
-0.12 2015-04-25T11:08:32Z
+0.13 2015-04-25T11:12:57Z
+
    - documented on list_objects()
 
 0.11 2015-04-24T13:17:21Z
