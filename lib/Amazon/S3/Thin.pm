@@ -8,6 +8,8 @@ use HTTP::Date ();
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape_utf8);
 use Amazon::S3::Thin::SignerV2;
+use Digest::MD5;
+use Encode;
 
 our $VERSION = '0.13';
 
@@ -147,6 +149,39 @@ sub list_objects {
     return $response;
 }
 
+sub delete_multiple_objects {
+    my ($self, $bucket, @keys) = @_;
+
+    my $content = _build_xml_for_delete( @keys );
+
+    my $request = $self->_compose_request(
+        'POST',
+        "$bucket/?delete",
+        {
+            'Content-MD5'    => Digest::MD5::md5_base64($content) . '==',
+            'Content-Length' => length $content,
+        },
+        $content
+    );
+    my $response = $self->ua->request($request);
+    return $response;
+}
+
+sub _build_xml_for_delete {
+    my (@keys) = @_;
+
+    my $content = '<Delete><Quiet>true</Quiet>';
+
+    foreach my $k (@keys) {
+        $content .= '<Object><Key>'
+                  . Encode::encode('UTF-8', $k)
+                  . '</Key></Object>';
+    }
+    $content .= '</Delete>';
+
+    return $content;
+}
+
 sub _uri {
     my ($self, $bucket, $key) = @_;
     return ($key)
@@ -262,6 +297,8 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
   print $response->content; # => "hello world"
 
   $response = $s3client->delete_object($bucket, $key);
+
+  $response = $s3client->delete_multiple_objects( $bucket, @keys );
 
   $response = $s3client->copy_object($src_bucket, $src_key,
                                      $dst_bucket, $dst_key);
@@ -443,6 +480,21 @@ object to the bucket.
 For more information, please refer to
 L<< Amazon's documentation for PUT|http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectPUT.html >>.
 
+=head2 delete_multiple_objects( $bucket, @keys )
+
+B<Arguments>: a string with the bucket name, and an array with all the keys
+to be deleted.
+
+B<Returns>: an L<HTTP::Response> object for the request.
+
+The Multi-Object Delete operation enables you to delete multiple objects
+(up to 1000) from a bucket using a single HTTP request. If you know the
+object keys that you want to delete, then this operation provides a suitable
+alternative to sending individual delete requests with C<delete_object()>,
+reducing per-request overhead.
+
+For more information, please refer to
+L<< Amazon's documentation for DELETE multiple objects|http://docs.aws.amazon.com/AmazonS3/latest/API/multiobjectdeleteapi.html >>.
 
 =head2 list_objects( $bucket [, \%options ] )
 
