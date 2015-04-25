@@ -62,12 +62,13 @@ sub string_to_sign {
         }
     }
 
-    $path =~ /^([^?]*)/;
+    $path =~ /^([^?]*)(.*)/;
     $string_to_sign .= "/$1";
-    my $query_string = substr($path, length $1);
-    if (! $query_string) {
+    if (! $2) {
         return $string_to_sign;
     }
+
+    my $query_string = $2;
 
     # ...unless there is a reserved subresource such as acl or torrent
     my @ordered_subresources = qw(
