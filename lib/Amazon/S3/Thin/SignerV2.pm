@@ -6,6 +6,14 @@ use MIME::Base64 ();
 
 my $AMAZON_HEADER_PREFIX = 'x-amz-';
 
+# reserved subresources such as acl or torrent
+our @ordered_subresources = qw(
+        acl delete lifecycle location logging notification partNumber policy
+        requestPayment torrent uploadId uploads versionId versioning versions
+        website
+    );
+
+
 sub new {
     my ($class, $secret) = @_;
     my $self = {secret => $secret};
@@ -70,12 +78,6 @@ sub string_to_sign {
 
     my $query_string = $2;
 
-    # ...unless there is a reserved subresource such as acl or torrent
-    my @ordered_subresources = qw(
-        acl delete lifecycle location logging notification partNumber policy
-        requestPayment torrent uploadId uploads versionId versioning versions
-        website
-    );
     my %interesting_subresources = map { $_ => '' } @ordered_subresources;
 
     foreach my $query (split /[&?]/, $query_string) {
