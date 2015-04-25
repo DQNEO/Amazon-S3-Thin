@@ -22,6 +22,8 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
     $response = $s3client->delete_object($bucket, $key);
 
+    $response = $s3client->delete_multiple_objects( $bucket, @keys );
+
     $response = $s3client->copy_object($src_bucket, $src_key,
                                        $dst_bucket, $dst_key);
 
@@ -181,6 +183,22 @@ object to the bucket.
 For more information, please refer to
 [Amazon's documentation for PUT](http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectPUT.html).
 
+## delete\_multiple\_objects( $bucket, @keys )
+
+**Arguments**: a string with the bucket name, and an array with all the keys
+to be deleted.
+
+**Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for the request.
+
+The Multi-Object Delete operation enables you to delete multiple objects
+(up to 1000) from a bucket using a single HTTP request. If you know the
+object keys that you want to delete, then this operation provides a suitable
+alternative to sending individual delete requests with `delete_object()`,
+reducing per-request overhead.
+
+For more information, please refer to
+[Amazon's documentation for DELETE multiple objects](http://docs.aws.amazon.com/AmazonS3/latest/API/multiobjectdeleteapi.html).
+
 ## list\_objects( $bucket \[, \\%options \] )
 
 **Arguments**: a string with the bucket name, and (optionally) a hashref
@@ -233,14 +251,14 @@ it under the same terms as Perl itself.
 
 DQNEO
 
-## ORIGINAL AUTHOR
+## THANKS TO
 
-Timothy Appnel <tima@cpan.org> [Amazon::S3](https://metacpan.org/pod/Amazon::S3)
-[https://github.com/tima/perl-amazon-s3](https://github.com/tima/perl-amazon-s3)
+Timothy Appnel
 
 # SEE ALSO
 
 [Amazon::S3](https://metacpan.org/pod/Amazon::S3), [Net::Amazon::S3](https://metacpan.org/pod/Net::Amazon::S3)
+[https://github.com/tima/perl-amazon-s3](https://github.com/tima/perl-amazon-s3)
 
 [Amazon S3 API Reference : REST API](http://docs.aws.amazon.com/AmazonS3/latest/API/APIRest.html)
 

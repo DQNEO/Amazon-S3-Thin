@@ -43,6 +43,8 @@
       "runtime" : {
          "requires" : {
             "Digest::HMAC_SHA1" : "0",
+            "Digest::MD5" : "0",
+            "Encode" : "0",
             "HTTP::Date" : "0",
             "LWP::UserAgent" : "0",
             "MIME::Base64" : "0",
@@ -68,7 +70,7 @@
          "web" : "https://github.com/DQNEO/Amazon-S3-Thin"
       }
    },
-   "version" : "0.13",
+   "version" : "0.14",
    "x_contributors" : [
       "Timothy Appnel <tim@appnel.com>",
       "Breno G. de Oliveira <garu@cpan.org>",
