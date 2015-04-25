@@ -8,6 +8,8 @@ use HTTP::Date ();
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape_utf8);
 use Amazon::S3::Thin::SignerV2;
+use Digest::MD5;
+use Encode;
 
 our $VERSION = '0.13';
 
@@ -152,7 +154,6 @@ sub delete_multiple_objects {
 
     my $content = _build_xml_for_delete( @keys );
 
-    require Digest::MD5;
     my $request = $self->_compose_request(
         'POST',
         "$bucket/?delete",
@@ -169,7 +170,6 @@ sub delete_multiple_objects {
 sub _build_xml_for_delete {
     my (@keys) = @_;
 
-    require Encode;
     my $content = '<Delete><Quiet>true</Quiet>';
 
     foreach my $k (@keys) {
