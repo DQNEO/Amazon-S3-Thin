@@ -62,7 +62,6 @@ sub string_to_sign {
         }
     }
 
-    # don't include anything after the first ? in the resource...
     $path =~ /^([^?]*)/;
     $string_to_sign .= "/$1";
     my $query_string = substr($path, length $1);
