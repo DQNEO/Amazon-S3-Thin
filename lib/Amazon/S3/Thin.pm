@@ -560,6 +560,7 @@ DQNEO
 =head2 THANKS TO
 
 Timothy Appnel
+Breno G. de Oliveira
 
 =head1 SEE ALSO
 
