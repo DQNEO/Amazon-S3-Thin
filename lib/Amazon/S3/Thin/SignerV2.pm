@@ -66,6 +66,9 @@ sub string_to_sign {
     $path =~ /^([^?]*)/;
     $string_to_sign .= "/$1";
     my $query_string = substr($path, length $1);
+    if (! $query_string) {
+        return $string_to_sign;
+    }
 
     # ...unless there is a reserved subresource such as acl or torrent
     my @ordered_subresources = qw(
