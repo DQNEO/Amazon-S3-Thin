@@ -564,8 +564,9 @@ Breno G. de Oliveira
 
 =head1 SEE ALSO
 
-L<Amazon::S3>, L<Net::Amazon::S3>
-L<https://github.com/tima/perl-amazon-s3>
+L<Amazon::S3>, L<https://github.com/tima/perl-amazon-s3>
+
+L<Net::Amazon::S3>
 
 L<Amazon S3 API Reference : REST API|http://docs.aws.amazon.com/AmazonS3/latest/API/APIRest.html>
 
