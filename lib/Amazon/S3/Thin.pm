@@ -11,7 +11,7 @@ use Amazon::S3::Thin::SignerV2;
 use Digest::MD5;
 use Encode;
 
-our $VERSION = '0.14';
+our $VERSION = '0.15';
 
 my $METADATA_PREFIX      = 'x-amz-meta-';
 

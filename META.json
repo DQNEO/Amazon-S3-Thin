@@ -70,7 +70,7 @@
          "web" : "https://github.com/DQNEO/Amazon-S3-Thin"
       }
    },
-   "version" : "0.14",
+   "version" : "0.15",
    "x_contributors" : [
       "Timothy Appnel <tim@appnel.com>",
       "Breno G. de Oliveira <garu@cpan.org>",

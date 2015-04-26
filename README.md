@@ -22,7 +22,7 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
     $response = $s3client->delete_object($bucket, $key);
 
-    $response = $s3client->delete_multiple_objects( $bucket, @keys );
+    $response = $s3client->delete_multiple_objects($bucket, @keys);
 
     $response = $s3client->copy_object($src_bucket, $src_key,
                                        $dst_bucket, $dst_key);
@@ -254,11 +254,13 @@ DQNEO
 ## THANKS TO
 
 Timothy Appnel
+Breno G. de Oliveira
 
 # SEE ALSO
 
-[Amazon::S3](https://metacpan.org/pod/Amazon::S3), [Net::Amazon::S3](https://metacpan.org/pod/Net::Amazon::S3)
-[https://github.com/tima/perl-amazon-s3](https://github.com/tima/perl-amazon-s3)
+[Amazon::S3](https://metacpan.org/pod/Amazon::S3), [https://github.com/tima/perl-amazon-s3](https://github.com/tima/perl-amazon-s3)
+
+[Net::Amazon::S3](https://metacpan.org/pod/Net::Amazon::S3)
 
 [Amazon S3 API Reference : REST API](http://docs.aws.amazon.com/AmazonS3/latest/API/APIRest.html)
 
