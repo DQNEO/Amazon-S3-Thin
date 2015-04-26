@@ -152,7 +152,7 @@ sub list_objects {
 sub delete_multiple_objects {
     my ($self, $bucket, @keys) = @_;
 
-    my $content = _build_xml_for_delete( @keys );
+    my $content = _build_xml_for_delete(@keys);
 
     my $request = $self->_compose_request(
         'POST',
@@ -298,7 +298,7 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
   $response = $s3client->delete_object($bucket, $key);
 
-  $response = $s3client->delete_multiple_objects( $bucket, @keys );
+  $response = $s3client->delete_multiple_objects($bucket, @keys);
 
   $response = $s3client->copy_object($src_bucket, $src_key,
                                      $dst_bucket, $dst_key);
