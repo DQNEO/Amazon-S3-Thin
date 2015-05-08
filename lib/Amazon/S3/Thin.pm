@@ -74,8 +74,8 @@ sub ua {
 }
 
 sub get_object {
-    my ($self, $bucket, $key) = @_;
-    my $request = $self->_compose_request('GET', $self->_uri($bucket, $key));
+    my ($self, $bucket, $key, $headers) = @_;
+    my $request = $self->_compose_request('GET', $self->_uri($bucket, $key), $headers);
     return $self->ua->request($request);
 }
 
@@ -406,9 +406,21 @@ compatible with L<LWP::UserAgent> (i.e. providing the same interface).
 
 =head1 METHODS
 
-=head2 get_object( $bucket, $key )
+=head2 get_object( $bucket, $key [, $headers] )
 
-B<Arguments>: a string with the bucket name, and a string with the key name.
+B<Arguments>:
+
+a list of the following items, in order:
+
+=over 3
+
+=item 1. bucket - a string with the bucket
+
+=item 2. key - a string with the key
+
+=item 3. headers (B<optional>) - hashref with extra headr information
+
+=back
 
 B<Returns>: an L<HTTP::Response> object for the request. Use the C<content()>
 method on the returned object to read the contents:
