@@ -118,7 +118,7 @@ compatible with [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) (i.e. 
 
 ## get\_object( $bucket, $key \[, $headers\] )
 
-**Arguments**: 
+**Arguments**:
 
 a list of the following items, in order:
 
