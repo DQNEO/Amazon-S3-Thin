@@ -32,7 +32,6 @@ is $req1->method, "PUT";
 is $req1->content, $body;
 is $req1->uri, "http://tmpfoobar.s3.amazonaws.com/dir%2Fprivate%2Etxt";
 
-
 diag "test GET request";
 is $req2->method, "GET";
 is $req2->uri, "http://tmpfoobar.s3.amazonaws.com/dir%2Fprivate%2Etxt";
@@ -53,6 +52,13 @@ my $req5 = $res5->request;
 is $req5->method, "POST";
 is $req5->uri, "http://tmpfoobar.s3.amazonaws.com/?delete";
 is $req5->header('Content-MD5'), 'pjGVehBgNtca8xN21pLCCA==';
+
+diag "test GET request with headers";
+my $res6 = $client->get_object($bucket, $key, {"X-Test-Header" => "Foo"});
+my $req6 = $res6->request;
+is $req6->method, "GET";
+is $req6->uri, "http://tmpfoobar.s3.amazonaws.com/dir%2Fprivate%2Etxt";
+is $req6->header("X-Test-Header"), "Foo";
 
 done_testing;
 
