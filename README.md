@@ -116,9 +116,15 @@ compatible with [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) (i.e. 
 
 # METHODS
 
-## get\_object( $bucket, $key )
+## get\_object( $bucket, $key \[, $headers\] )
 
-**Arguments**: a string with the bucket name, and a string with the key name.
+**Arguments**: 
+
+a list of the following items, in order:
+
+- 1. bucket - a string with the bucket
+- 2. key - a string with the key
+- 3. headers (**optional**) - hashref with extra headr information
 
 **Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for the request. Use the `content()`
 method on the returned object to read the contents:
