@@ -34,6 +34,16 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
     $response = $s3client->head_object($bucket, $key);
 
+Requests are signed using using signature version 4 by default. To use
+signature version 2, add a `signature_version` option:
+
+    my $s3client = Amazon::S3::Thin->new(
+        {   aws_access_key_id     => $aws_access_key_id,
+            aws_secret_access_key => $aws_secret_access_key,
+            signature_version     => 2,
+        }
+    );
+
 You can also pass any useragent as you like
 
     my $s3client = Amazon::S3::Thin->new(
@@ -90,10 +100,18 @@ It can receive the following arguments:
 of your credentials.
 - `aws_secret_access_key` (**REQUIRED**) - an secret access key
  of your credentials.
+- `aws_region` - region name for version 4 signatures. default is
+'us-east-1'.
 - `secure` - whether to use https or not. Default is 0 (http).
 - `host` - the base host to use. Default is '_s3.amazonaws.com_'.
 - `ua` - a user agent object, compatible with LWP::UserAgent.
 Default is an instance of [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent).
+- `signature_version` - AWS signature version to use. Supported values
+are 2 and 4. Default is 4.
+- `signer` - Custom object for signing requests. It must have a
+`sign_request` method that accepts an [HTTP::Request](https://metacpan.org/pod/HTTP::Request) object and adds the
+signature. Default is to construct an object using [Amazon::S3::Thin::Signer](https://metacpan.org/pod/Amazon::S3::Thin::Signer)
+`factory` method. If `signer` is supplied, `signature_version` is not used.
 
 # ACCESSORS
 

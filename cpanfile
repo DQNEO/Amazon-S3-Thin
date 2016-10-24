@@ -6,6 +6,7 @@ requires 'LWP::UserAgent';
 requires 'URI::Escape';
 requires 'Encode';
 requires 'Digest::MD5';
+requires 'AWS::Signature4';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
