@@ -34,7 +34,7 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
     $response = $s3client->head_object($bucket, $key);
 
-Requests are signed using using signature version 4 by default. To use
+Requests are signed using signature version 4 by default. To use
 signature version 2, add a `signature_version` option:
 
     my $s3client = Amazon::S3::Thin->new(
