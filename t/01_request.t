@@ -30,15 +30,15 @@ my $req3 = $res3->request;
 diag "test PUT request";
 is $req1->method, "PUT";
 is $req1->content, $body;
-is $req1->uri, "http://tmpfoobar.s3.amazonaws.com/dir%2Fprivate%2Etxt";
+is $req1->uri, "http://tmpfoobar.s3.amazonaws.com/dir/private.txt";
 
 diag "test GET request";
 is $req2->method, "GET";
-is $req2->uri, "http://tmpfoobar.s3.amazonaws.com/dir%2Fprivate%2Etxt";
+is $req2->uri, "http://tmpfoobar.s3.amazonaws.com/dir/private.txt";
 
 diag "test HEAD request";
 is $req3->method, "HEAD";
-is $req3->uri, "http://tmpfoobar.s3.amazonaws.com/dir%2Fprivate%2Etxt";
+is $req3->uri, "http://tmpfoobar.s3.amazonaws.com/dir/private.txt";
 
 diag "test GET request for list_objects";
 my $res4 = $client->list_objects($bucket, {prefix => "12012", delimiter => "/"});
@@ -57,7 +57,7 @@ diag "test GET request with headers";
 my $res6 = $client->get_object($bucket, $key, {"X-Test-Header" => "Foo"});
 my $req6 = $res6->request;
 is $req6->method, "GET";
-is $req6->uri, "http://tmpfoobar.s3.amazonaws.com/dir%2Fprivate%2Etxt";
+is $req6->uri, "http://tmpfoobar.s3.amazonaws.com/dir/private.txt";
 is $req6->header("X-Test-Header"), "Foo";
 
 done_testing;

@@ -4,10 +4,9 @@ use strict;
 use warnings;
 
 use Carp;
-use HTTP::Date ();
 use LWP::UserAgent;
 use URI::Escape qw(uri_escape_utf8);
-use Amazon::S3::Thin::SignerV2;
+use Amazon::S3::Thin::Signer;
 use Digest::MD5;
 use Encode;
 
@@ -27,6 +26,7 @@ sub new {
     $self->secure(0)                unless defined $self->secure;
     $self->host('s3.amazonaws.com') unless defined $self->host;
     $self->ua($self->_default_ua)   unless defined $self->ua;
+    $self->{signature_version} = 4 unless defined $self->{signature_version};
 
     return $self;
 }
@@ -185,13 +185,15 @@ sub _build_xml_for_delete {
 sub _uri {
     my ($self, $bucket, $key) = @_;
     return ($key)
-      ? $bucket . "/" . $self->_urlencode($key)
+      ? $bucket . "/" . $self->_urlencode($key, 1)
       : $bucket . "/";
 }
 
 sub _urlencode {
-    my ($self, $unencoded) = @_;
-    return uri_escape_utf8($unencoded, '^A-Za-z0-9_-');
+    my ($self, $unencoded, $allow_slash) = @_;
+    my $allowed = 'A-Za-z0-9_\-\.';
+    $allowed = "$allowed/" if $allow_slash;
+    return uri_escape_utf8($unencoded, "^$allowed");
 }
 
 sub _validate_acl_short {
@@ -243,20 +245,6 @@ sub _compose_request {
         $http_headers->header("$METADATA_PREFIX$k" => $v);
     }
 
-    # do we need check existance of Authorization ?
-    if (! exists $headers->{Authorization}) {
-        if (not $http_headers->header('Date')) {
-            $http_headers->header(Date => HTTP::Date::time2str(time));
-        }
-
-        my $signer = Amazon::S3::Thin::SignerV2->new($self->{aws_secret_access_key});
-        my $signature = $signer->calculate_signature($method, $path, $http_headers);
-        $http_headers->header(
-            Authorization => sprintf("AWS %s:%s"
-                                     , $self->{aws_access_key_id}
-                                     , $signature));
-    }
-
     my $protocol = $self->secure ? 'https' : 'http';
     my $host     = $self->host;
     my $url;
@@ -267,9 +255,24 @@ sub _compose_request {
         $url = "$protocol://$host/$path";
     }
 
-    return HTTP::Request->new($method, $url, $http_headers, $content);
+    my $request = HTTP::Request->new($method, $url, $http_headers, $content);
+    $self->_sign($request);
+    return $request;
 }
 
+# sign the request using the signer, unless already signed
+sub _sign
+{
+  my ($self, $request) = @_;
+  my $signer = $self->_signer;
+  $signer->sign($request) unless $request->header('Authorization');
+}
+
+sub _signer
+{
+  my $self = shift;
+  $self->{signer} ||= Amazon::S3::Thin::Signer->factory($self);
+}
 
 1;
 
@@ -310,6 +313,16 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
   $response = $s3client->head_object($bucket, $key);
 
+Requests are signed using signature version 4 by default. To use
+signature version 2, add a C<signature_version> option:
+
+  my $s3client = Amazon::S3::Thin->new(
+      {   aws_access_key_id     => $aws_access_key_id,
+          aws_secret_access_key => $aws_secret_access_key,
+          signature_version     => 2,
+      }
+  );
+
 You can also pass any useragent as you like
 
   my $s3client = Amazon::S3::Thin->new(
@@ -318,7 +331,6 @@ You can also pass any useragent as you like
           ua                    => $any_LWP_copmatible_useragent,
       }
   );
-
 
 =head1 DESCRIPTION
 
@@ -334,7 +346,6 @@ In detail, it offers the following features:
 
 It returns an L<HTTP::Response> object so you can easily inspect
 what's happening inside, and can handle errors as you like.
-
 
 =item Low Dependency
 
@@ -376,12 +387,23 @@ of your credentials.
 =item * C<aws_secret_access_key> (B<REQUIRED>) - an secret access key
  of your credentials.
 
+=item * C<region> - region name for version 4 signatures. default is
+'us-east-1'.
+
 =item * C<secure> - whether to use https or not. Default is 0 (http).
 
 =item * C<host> - the base host to use. Default is 'I<s3.amazonaws.com>'.
 
 =item * C<ua> - a user agent object, compatible with LWP::UserAgent.
 Default is an instance of L<LWP::UserAgent>.
+
+=item * C<signature_version> - AWS signature version to use. Supported values
+are 2 and 4. Default is 4.
+
+=item * C<signer> - Custom object for signing requests. It must have a
+C<sign> method that accepts an L<HTTP::Request> object and adds the
+signature. Default is to construct an object using L<Amazon::S3::Thin::Signer>
+C<factory> method. If C<signer> is supplied, C<signature_version> is not used.
 
 =back
 
@@ -548,7 +570,6 @@ additional keys, see C<marker> above.
 
 For more information, please refer to
 L<< Amazon's documentation for REST Bucket GET| http://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGET.html >>.
-
 
 =head1 TODO
 
