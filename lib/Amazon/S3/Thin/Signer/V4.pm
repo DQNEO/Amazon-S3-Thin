@@ -19,7 +19,7 @@ Amazon::S3::Thin::Signer::V4 - AWS Version 4 Signer
     my $request = HTTP::Request->new(...);
 
     # sign the request using the client keys
-    $signer->sign_request($request);
+    $signer->sign($request);
 
 =head1 DESCRIPTION
 
@@ -37,13 +37,13 @@ use parent 'Amazon::S3::Thin::Signer';
 
 =head1 METHODS
 
-=head2 sign_request($request)
+=head2 sign($request)
 
 Signs supplied L<HTTP::Request> object, adding required AWS headers.
 
 =cut
 
-sub sign_request
+sub sign
 {
   my ($self, $request) = @_;
   my $signer = $self->signer;

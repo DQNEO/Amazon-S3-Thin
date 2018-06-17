@@ -5,7 +5,7 @@ use Test::More;
 use HTTP::Request;
 
 {
-  diag "test sign_request";
+  diag "test sign";
 
   my $request = HTTP::Request->new(GET => 'https://mybucket.s3.amazonaws.com/myfile.txt');
   $request->header('Date' => 'Wed, 28 Mar 2007 01:49:49 +0000');
@@ -13,7 +13,7 @@ use HTTP::Request;
       aws_access_key_id => 'accesskey',
       aws_secret_access_key => 'secretkey',
     });
-  $signer->sign_request($request);
+  $signer->sign($request);
   $DB::single = 1;
   my $headers = [ sort split /\n/, $request->headers->as_string ];
   is_deeply ($headers, [

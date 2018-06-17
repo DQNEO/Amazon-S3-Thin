@@ -271,7 +271,7 @@ my $secret_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
 }
 
 {
-  diag "test sign_request";
+  diag "test sign";
 
   my $request = HTTP::Request->new(GET => 'https://mybucket.s3.amazonaws.com/myfile.txt');
   $request->header('Date' => 'Wed, 28 Mar 2007 01:49:49 +0000');
@@ -280,7 +280,7 @@ my $secret_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
       aws_secret_access_key => 'secretkey',
       host => 's3.amazonaws.com',
     });
-  $signer->sign_request($request);
+  $signer->sign($request);
   is_deeply ($request->headers, {
       authorization => 'AWS accesskey:Up4jVMLZzEbhnf+Thj0XJ68JREs=',
       date => 'Wed, 28 Mar 2007 01:49:49 +0000',

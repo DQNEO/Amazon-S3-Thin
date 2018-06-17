@@ -256,16 +256,16 @@ sub _compose_request {
     }
 
     my $request = HTTP::Request->new($method, $url, $http_headers, $content);
-    $self->_sign_request($request);
+    $self->_sign($request);
     return $request;
 }
 
 # sign the request using the signer, unless already signed
-sub _sign_request
+sub _sign
 {
   my ($self, $request) = @_;
   my $signer = $self->_signer;
-  $signer->sign_request($request) unless $request->header('Authorization');
+  $signer->sign($request) unless $request->header('Authorization');
 }
 
 sub _signer
@@ -401,7 +401,7 @@ Default is an instance of L<LWP::UserAgent>.
 are 2 and 4. Default is 4.
 
 =item * C<signer> - Custom object for signing requests. It must have a
-C<sign_request> method that accepts an L<HTTP::Request> object and adds the
+C<sign> method that accepts an L<HTTP::Request> object and adds the
 signature. Default is to construct an object using L<Amazon::S3::Thin::Signer>
 C<factory> method. If C<signer> is supplied, C<signature_version> is not used.
 

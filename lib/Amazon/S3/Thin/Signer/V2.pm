@@ -17,7 +17,7 @@ our @ordered_subresources = qw(
         website
     );
 
-sub sign_request
+sub sign
 {
   my ($self, $request) = @_;
   $request->header(Date => HTTP::Date::time2str(time)) unless $request->header('Date');

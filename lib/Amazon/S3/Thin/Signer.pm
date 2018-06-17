@@ -20,7 +20,7 @@ Amazon::S3::Thin::Signer - Base class and factory for signers
     my $request = HTTP::Request->new(...);
 
     # sign the request using the client keys
-    $signer->sign_request($request);
+    $signer->sign($request);
 
 =head1 DESCRIPTION
 
@@ -73,17 +73,17 @@ sub new
 
 =head1 METHODS
 
-=head2 sign_request($request)
+=head2 sign($request)
 
 Subclasses must override this method with specific implementation to add a signature
 to the supplied C<$request>.
 
 =cut
 
-sub sign_request
+sub sign
 {
   my ($self, $request) = @_;
-  die ref($self) . ' does not implement sign_request method';
+  die ref($self) . ' does not implement sign method';
 }
 
 1;
