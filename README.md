@@ -100,7 +100,7 @@ It can receive the following arguments:
 of your credentials.
 - `aws_secret_access_key` (**REQUIRED**) - an secret access key
  of your credentials.
-- `aws_region` - region name for version 4 signatures. default is
+- `region` - region name for version 4 signatures. default is
 'us-east-1'.
 - `secure` - whether to use https or not. Default is 0 (http).
 - `host` - the base host to use. Default is '_s3.amazonaws.com_'.

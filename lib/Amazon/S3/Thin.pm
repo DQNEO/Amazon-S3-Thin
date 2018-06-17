@@ -387,7 +387,7 @@ of your credentials.
 =item * C<aws_secret_access_key> (B<REQUIRED>) - an secret access key
  of your credentials.
 
-=item * C<aws_region> - region name for version 4 signatures. default is
+=item * C<region> - region name for version 4 signatures. default is
 'us-east-1'.
 
 =item * C<secure> - whether to use https or not. Default is 0 (http).
