@@ -182,6 +182,26 @@ sub _build_xml_for_delete {
     return $content;
 }
 
+sub put_bucket {
+    my ($self, $bucket, $headers) = @_;
+    # 
+    # https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
+    my $region = $self->{region};
+    my $content = <<"EOT";
+<CreateBucketConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
+  <LocationConstraint>$region</LocationConstraint>
+</CreateBucketConfiguration>
+EOT
+    my $request = $self->_compose_request('PUT', $self->_uri($bucket), $headers, $content);
+    return $self->ua->request($request);
+}
+
+sub delete_bucket {
+    my ($self, $bucket) = @_;
+    my $request = $self->_compose_request('DELETE', $self->_uri($bucket));
+    return $self->ua->request($request);
+}
+
 sub _uri {
     my ($self, $bucket, $key) = @_;
     return ($key)
