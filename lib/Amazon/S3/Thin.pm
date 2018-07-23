@@ -26,7 +26,7 @@ sub new {
     $self->secure(0)                unless defined $self->secure;
     $self->host('s3.amazonaws.com') unless defined $self->host;
     $self->ua($self->_default_ua)   unless defined $self->ua;
-    $self->{signature_version} = 4 unless defined $self->{signature_version};
+    $self->{signature_version} = 4  unless defined $self->{signature_version};
 
     return $self;
 }
