@@ -292,6 +292,7 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
       }
   );
 
+  my $bucket = "mybucket";
   my $key = "dir/file.txt";
   my $response;
   $response = $s3client->put_object($bucket, $key, "hello world");
