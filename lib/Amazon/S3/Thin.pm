@@ -187,11 +187,16 @@ sub put_bucket {
     # 
     # https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
     my $region = $self->{region};
-    my $content = <<"EOT";
-<CreateBucketConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">
-  <LocationConstraint>$region</LocationConstraint>
-</CreateBucketConfiguration>
+    my $content ;
+    if ($region eq "us-east-1") {
+        $content = "";
+    } else {
+        my $location_constraint = "<LocationConstraint>$region</LocationConstraint>";
+        $content = <<"EOT";
+<CreateBucketConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">$location_constraint</CreateBucketConfiguration>
 EOT
+    }
+
     my $request = $self->_compose_request('PUT', $self->_uri($bucket), $headers, $content);
     return $self->ua->request($request);
 }
