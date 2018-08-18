@@ -6,6 +6,7 @@ use Test::More;
 my %crd = (
     aws_access_key_id     => "dummy",
     aws_secret_access_key => "dummy",
+    'region' => 'ap-northeast-1',
     );
 
 my $arg;

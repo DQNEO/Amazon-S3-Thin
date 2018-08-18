@@ -27,7 +27,9 @@ sub new {
     $self->host('s3.amazonaws.com') unless defined $self->host;
     $self->ua($self->_default_ua)   unless defined $self->ua;
     $self->{signature_version} = 4  unless defined $self->{signature_version};
-
+    if ($self->{signature_version} == 4 && ! $self->{region}) {
+        die "Please set region when you use signature v4";
+    }
     return $self;
 }
 
@@ -271,14 +273,19 @@ sub _compose_request {
     }
 
     my $protocol = $self->secure ? 'https' : 'http';
-    my $host     = $self->host;
+    my $host     = $self->host; # 's3.amazonaws.com'
     my $url;
 
-    if ($path =~ m{^([^/?]+)(.*)} && $self->_is_dns_bucket($1)) {
-        $url = "$protocol://$1.$host$2";
-    } else {
-        $url = "$protocol://$host/$path";
-    }
+    my $regioned_host = sprintf('s3-%s.amazonaws.com', $self->{region}); # 's3-eu-west-1.amazonaws.com'
+
+    # it seems that we have to use path-style URL in V4 signature?
+    $url = "$protocol://$regioned_host/$path";
+
+    # if ($path =~ m{^([^/?]+)(.*)} && $self->_is_dns_bucket($1)) {
+    #     $url = "$protocol://$1.$host$2";
+    # } else {
+    #     $url = "$protocol://$host/$path";
+    # }
 
     my $request = HTTP::Request->new($method, $url, $http_headers, $content);
     $self->_sign($request);
