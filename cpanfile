@@ -1,4 +1,4 @@
-requires 'perl', '5.008008';
+requires 'perl', '5.010001';
 requires 'Digest::HMAC_SHA1';
 requires 'HTTP::Date';
 requires 'MIME::Base64';
