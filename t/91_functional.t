@@ -91,13 +91,14 @@ SKIP : {
     my $crd = Config::Tiny->read($cred_file)->{$profile};
 
     my $sigver;
+    #test_with_existing_bucket($crd, {signature_version => 4, use_path_style => 0});
     test_with_existing_bucket($crd, {signature_version => 4, use_path_style => 1});
     test_with_existing_bucket($crd, {signature_version => 2, use_path_style => 0});
     diag('Testing with new resources.');
     my @regions = ('ap-northeast-1', 'us-west-1', 'eu-west-1', 'us-east-1');
     for my $region (@regions) {
         test_with_new_bucket($crd, {signature_version => 4, use_path_style => 1, region =>$region});
-        test_with_new_bucket($crd, {signature_version => 2, use_path_style => 0, region =>$region});
+        #test_with_new_bucket($crd, {signature_version => 2, use_path_style => 0, region =>$region});
     }
 }
 
