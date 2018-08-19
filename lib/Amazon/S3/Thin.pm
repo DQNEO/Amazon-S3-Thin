@@ -273,14 +273,8 @@ sub _compose_request {
 sub _sign
 {
   my ($self, $request) = @_;
-  my $signer = $self->_signer;
-  $signer->sign($request) unless $request->header('Authorization');
-}
-
-sub _signer
-{
-  my $self = shift;
   $self->{signer} ||= Amazon::S3::Thin::Signer->factory($self);
+  $self->{signer}->sign($request) unless $request->header('Authorization');
 }
 
 1;
