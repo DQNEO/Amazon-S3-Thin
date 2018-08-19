@@ -33,10 +33,10 @@ use warnings;
 use AWS::Signature4;
 
 sub new {
-    my ($class, $credentials, $thin) = @_;
+    my ($class, $credentials, $region) = @_;
     my $self = {
         credentials => $credentials,
-        %$thin
+        region => $region,
     };
     bless $self, $class;
 }

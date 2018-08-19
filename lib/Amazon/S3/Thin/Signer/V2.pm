@@ -16,13 +16,13 @@ our @ordered_subresources = qw(
     );
 
 sub new {
-    my ($class, $credentials, $thin) = @_;
+    my ($class, $credentials, $host) = @_;
     if (ref($credentials) ne 'Amazon::S3::Thin::Credentials') {
         croak "credentials are not given."
     }
     my $self = {
         credentials => $credentials,
-        host => $thin->{host},
+        host => $host,
     };
     bless $self, $class;
 }

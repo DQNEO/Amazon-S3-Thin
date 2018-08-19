@@ -10,7 +10,7 @@ my $credentials = Amazon::S3::Thin::Credentials->new('accesskey', 'secretkey');
 {
   diag "test signer";
 
-  my $signer = Amazon::S3::Thin::Signer::V4->new($credentials,{});
+  my $signer = Amazon::S3::Thin::Signer::V4->new($credentials);
   my $signer_signer = $signer->signer;
   isa_ok($signer_signer, 'AWS::Signature4', 'signer');
   is_deeply($signer_signer, {
@@ -24,7 +24,7 @@ my $credentials = Amazon::S3::Thin::Credentials->new('accesskey', 'secretkey');
 
   my $request = HTTP::Request->new(GET => 'https://mybucket.s3.amazonaws.com/myfile.txt');
   $request->header('Date' => 'Wed, 28 Mar 2007 01:49:49 +0000');
-  my $signer = Amazon::S3::Thin::Signer::V4->new($credentials,{});
+  my $signer = Amazon::S3::Thin::Signer::V4->new($credentials);
   $signer->sign($request);
   my $headers = [ sort split /\n/, $request->headers->as_string ];
   is_deeply ($headers, [

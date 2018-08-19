@@ -12,6 +12,7 @@ use Amazon::S3::Thin::Credentials;
 our $VERSION = '0.16';
 
 my $METADATA_PREFIX      = 'x-amz-meta-';
+my $MAIN_HOST = 's3.amazonaws.com';
 
 sub new {
     my $class = shift;
@@ -32,7 +33,6 @@ sub new {
     bless $self, $class;
 
     $self->secure(0)                unless defined $self->secure;
-    $self->host('s3.amazonaws.com') unless defined $self->host;
     $self->ua($self->_default_ua)   unless defined $self->ua;
     $self->{debug} = 0              unless defined $self->{debug};
 
@@ -61,7 +61,12 @@ sub _load_signer {
   my $version = shift;
   my $signer_class = "Amazon::S3::Thin::Signer::V$version";
   eval "require $signer_class" or die $@;
-  return $signer_class->new($self->{credentials}, $self);
+
+  if ($version == 2) {
+      return $signer_class->new($self->{credentials}, $MAIN_HOST);
+  } elsif ($version == 4) {
+      return $signer_class->new($self->{credentials}, $self->{region});
+  }
 }
 
 
@@ -84,16 +89,6 @@ sub secure {
         $self->{secure} = shift;
     } else {
         return $self->{secure};
-    }
-}
-
-# accessor
-sub host {
-    my $self = shift;
-    if (@_) {
-        $self->{host} = shift;
-    } else {
-        return $self->{host};
     }
 }
 
@@ -292,7 +287,7 @@ sub _compose_request {
         # it seems that we have to use path-style URL in V4 signature?
         $url = $resource->to_path_style_url($protocol, $self->{region});
     } else {
-        $url = $resource->to_vhost_style_url($protocol, $self->{host});
+        $url = $resource->to_vhost_style_url($protocol, $MAIN_HOST);
     }
 
     my $request = HTTP::Request->new($method, $url, $http_headers, $content);
@@ -423,8 +418,6 @@ of your credentials.
 
 =item * C<secure> - whether to use https or not. Default is 0 (http).
 
-=item * C<host> - the base host to use. Default is 'I<s3.amazonaws.com>'.
-
 =item * C<ua> - a user agent object, compatible with LWP::UserAgent.
 Default is an instance of L<LWP::UserAgent>.
 
@@ -446,10 +439,6 @@ object's attributes.
 =head2 secure
 
 Whether to use https (1) or http (0) when connecting to S3.
-
-=head2 host
-
-The base host to use for connecting to S3.
 
 =head2 ua
 

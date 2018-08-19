@@ -32,27 +32,6 @@ diag "test secure()";
     is $client->secure() , 0;
 }
 
-diag "test host()";
-{
-    $arg = +{
-        %crd,
-    };
-
-    $client = Amazon::S3::Thin->new($arg);
-
-    is $client->host() , 's3.amazonaws.com';
-
-    $arg = +{
-        %crd,
-        host => "www.example.com",
-    };
-
-    $client = Amazon::S3::Thin->new($arg);
-
-    is $client->host() , "www.example.com";
-
-}
-
 diag "test ua()";
 {
     $arg = +{
