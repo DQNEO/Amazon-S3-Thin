@@ -33,8 +33,11 @@ use warnings;
 use AWS::Signature4;
 
 sub new {
-    my ($class, $thin) = @_;
-    my $self = { %$thin };
+    my ($class, $credentials, $thin) = @_;
+    my $self = {
+        credentials => $credentials,
+        %$thin
+    };
     bless $self, $class;
 }
 
@@ -67,8 +70,8 @@ sub signer
 {
   my $self = shift;
   AWS::Signature4->new(
-    -access_key => $self->{aws_access_key_id},
-    -secret_key => $self->{aws_secret_access_key},
+    -access_key => $self->{credentials}->access_key_id,
+    -secret_key => $self->{credentials}->secret_access_key,
   );
 }
 

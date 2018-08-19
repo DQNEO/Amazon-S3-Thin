@@ -9,6 +9,20 @@ my %crd = (
     );
 
 {
+    diag "lack of credientials";
+    eval {
+        my $s3client = Amazon::S3::Thin->new({});
+    };
+    ok $@, $@;
+    eval {
+        my $s3client = Amazon::S3::Thin->new({
+            aws_access_key_id     => "dummy",
+        });
+    };
+    ok $@, $@;
+}
+
+{
     diag "test new v2";
     my $arg = +{
         %crd,

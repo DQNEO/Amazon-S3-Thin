@@ -7,6 +7,7 @@ use LWP::UserAgent;
 use Digest::MD5;
 use Encode;
 use Amazon::S3::Thin::Resource;
+use Amazon::S3::Thin::Credentials;
 
 our $VERSION = '0.16';
 
@@ -16,10 +17,19 @@ sub new {
     my $class = shift;
     my $self  = shift;
 
-    bless $self, $class;
-
+    # check existence of credentials
     croak "No aws_access_key_id"     unless $self->{aws_access_key_id};
     croak "No aws_secret_access_key" unless $self->{aws_secret_access_key};
+
+    # wrap credentials
+    $self->{credentials} = Amazon::S3::Thin::Credentials->new(
+        $self->{aws_access_key_id},
+        $self->{aws_secret_access_key}
+    );
+    delete $self->{aws_access_key_id};
+    delete $self->{aws_secret_access_key};
+
+    bless $self, $class;
 
     $self->secure(0)                unless defined $self->secure;
     $self->host('s3.amazonaws.com') unless defined $self->host;
@@ -47,7 +57,7 @@ sub _load_signer {
   my $version = shift;
   my $signer_class = "Amazon::S3::Thin::Signer::V$version";
   eval "require $signer_class" or die $@;
-  return $signer_class->new($self);
+  return $signer_class->new($self->{credentials}, $self);
 }
 
 
