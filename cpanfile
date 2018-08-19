@@ -13,5 +13,6 @@ on 'test' => sub {
 };
 
 on 'develop' => sub {
+    requires 'LWP::Protocol::https';
     requires 'Config::Tiny';
 }
