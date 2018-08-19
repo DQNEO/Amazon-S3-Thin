@@ -6,7 +6,7 @@ use Data::Dumper;
 
 sub test_with_existing_bucket {
     my $crd = shift;
-
+    my $arg = shift;
     diag('Testing with existing resources.');
 
     # This region is that of the bucket used in this test,
@@ -16,9 +16,9 @@ sub test_with_existing_bucket {
     my %opt = (
         aws_access_key_id => $crd->{aws_access_key_id},
         aws_secret_access_key => $crd->{aws_secret_access_key},
-        signature_version => 4,
+        signature_version => $arg->{signature_version},
         region => $region,
-        use_path_style => 1,
+        use_path_style => $arg->{use_path_style},
     );
 
     my $s3client = Amazon::S3::Thin->new(\%opt);
@@ -43,17 +43,17 @@ sub test_with_existing_bucket {
 
 sub test_with_new_bucket {
     my $crd = shift;
-    my $region = shift;
-    diag(' region ' . $region);
+    my $arg = shift;
+    diag(' region ' . $arg->{region});
     my %opt = (
         aws_access_key_id => $crd->{aws_access_key_id},
         aws_secret_access_key => $crd->{aws_secret_access_key},
-        signature_version => 4,
-        region => $region,
-        use_path_style => 1,
+        signature_version => $arg->{signature_version},
+        region => $arg->{region},
+        use_path_style => $arg->{use_path_style},
     );
     my $s3client = Amazon::S3::Thin->new(\%opt);
-    my $bucket = 'amazon-s3-thin-test-' . $region . time();
+    my $bucket = 's3thin-' . $arg->{region} . $arg->{signature_version}  . time();
     my $response;
     $response = $s3client->put_bucket($bucket);
     is $response->code , 200 , 'create new bucket';
@@ -90,12 +90,14 @@ SKIP : {
     my $cred_file = $ENV{HOME} . "/.aws/credentials";
     my $crd = Config::Tiny->read($cred_file)->{$profile};
 
-    test_with_existing_bucket($crd);
-
+    my $sigver;
+    test_with_existing_bucket($crd, {signature_version => 4, use_path_style => 1});
+    test_with_existing_bucket($crd, {signature_version => 2, use_path_style => 0});
     diag('Testing with new resources.');
     my @regions = ('ap-northeast-1', 'us-west-1', 'eu-west-1', 'us-east-1');
     for my $region (@regions) {
-        test_with_new_bucket($crd, $region);
+        test_with_new_bucket($crd, {signature_version => 4, use_path_style => 1, region =>$region});
+        test_with_new_bucket($crd, {signature_version => 2, use_path_style => 0, region =>$region});
     }
 }
 
