@@ -4,7 +4,7 @@ use warnings;
 use Config::Tiny;
 use Data::Dumper;
 use Amazon::S3::Thin;
-use Test::More;
+use Test::More 'no_plan';
 
 SKIP : {
     
@@ -96,7 +96,5 @@ SKIP : {
 
     $res =  $client->delete_object($bucket, $key2);
     ok $res->is_success, "is_success";
-
-    done_testing;
 
 }
