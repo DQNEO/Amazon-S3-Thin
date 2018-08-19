@@ -310,16 +310,18 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
   use Amazon::S3::Thin;
 
-  my $s3client = Amazon::S3::Thin->new(
-      {   aws_access_key_id     => $aws_access_key_id,
-          aws_secret_access_key => $aws_secret_access_key,
-          region                => $your_region, # e.g. 'ap-northeast-1'
-      }
-  );
+  my $s3client = Amazon::S3::Thin->new({
+        aws_access_key_id     => $aws_access_key_id,
+        aws_secret_access_key => $aws_secret_access_key,
+        region                => $region, # e.g. 'ap-northeast-1'
+      });
 
   my $bucket = "mybucket";
   my $key = "dir/file.txt";
   my $response;
+
+  $response = $s3client->put_bucket($bucket);
+
   $response = $s3client->put_object($bucket, $key, "hello world");
 
   $response = $s3client->get_object($bucket, $key);
@@ -327,36 +329,25 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
   $response = $s3client->delete_object($bucket, $key);
 
-  $response = $s3client->delete_multiple_objects($bucket, @keys);
-
-  $response = $s3client->copy_object($src_bucket, $src_key,
-                                     $dst_bucket, $dst_key);
-
   $response = $s3client->list_objects(
                               $bucket,
                               {prefix => "foo", delimiter => "/"}
                              );
 
-  $response = $s3client->head_object($bucket, $key);
-
-Requests are signed using signature version 4 by default. To use
-signature version 2, add a C<signature_version> option:
-
-  my $s3client = Amazon::S3::Thin->new(
-      {   aws_access_key_id     => $aws_access_key_id,
-          aws_secret_access_key => $aws_secret_access_key,
-          signature_version     => 2,
-      }
-  );
-
 You can also pass any useragent as you like
 
-  my $s3client = Amazon::S3::Thin->new(
-      {   aws_access_key_id     => $aws_access_key_id,
-          aws_secret_access_key => $aws_secret_access_key,
-          ua                    => $any_LWP_copmatible_useragent,
-      }
-  );
+  my $s3client = Amazon::S3::Thin->new({
+          ...
+          ua => $any_LWP_copmatible_useragent,
+      });
+
+Signature version 4 is used by default. 
+To use signature version 2, add a C<signature_version> option:
+
+  my $s3client = Amazon::S3::Thin->new({
+          ...
+          signature_version     => 2,
+      });
 
 =head1 DESCRIPTION
 
