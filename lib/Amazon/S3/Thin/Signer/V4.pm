@@ -30,10 +30,13 @@ This module creates objects that can sign AWS requests using signature version
 
 use strict;
 use warnings;
-
 use AWS::Signature4;
 
-use parent 'Amazon::S3::Thin::Signer';
+sub new {
+    my ($class, $thin) = @_;
+    my $self = { %$thin };
+    bless $self, $class;
+}
 
 =head1 METHODS
 

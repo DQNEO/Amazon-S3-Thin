@@ -6,8 +6,6 @@ use Digest::HMAC_SHA1;
 use MIME::Base64 ();
 use HTTP::Date ();
 
-use parent 'Amazon::S3::Thin::Signer';
-
 my $AMAZON_HEADER_PREFIX = 'x-amz-';
 
 # reserved subresources such as acl or torrent
@@ -16,6 +14,12 @@ our @ordered_subresources = qw(
         requestPayment torrent uploadId uploads versionId versioning versions
         website
     );
+
+sub new {
+    my ($class, $thin) = @_;
+    my $self = { %$thin };
+    bless $self, $class;
+}
 
 sub sign
 {

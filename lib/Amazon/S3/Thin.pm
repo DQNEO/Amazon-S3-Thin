@@ -4,7 +4,6 @@ use strict;
 use warnings;
 use Carp;
 use LWP::UserAgent;
-use Amazon::S3::Thin::Signer;
 use Digest::MD5;
 use Encode;
 use Amazon::S3::Thin::Resource;
