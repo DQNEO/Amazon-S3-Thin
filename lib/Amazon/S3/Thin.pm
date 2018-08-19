@@ -2,13 +2,12 @@ package Amazon::S3::Thin;
 use 5.008001;
 use strict;
 use warnings;
-
 use Carp;
 use LWP::UserAgent;
-use URI::Escape qw(uri_escape_utf8);
 use Amazon::S3::Thin::Signer;
 use Digest::MD5;
 use Encode;
+use Amazon::S3::Thin::Resource;
 
 our $VERSION = '0.16';
 
@@ -143,7 +142,7 @@ sub list_objects {
     if (%$opt) {
         $path .= "?"
           . join('&',
-            map { $_ . "=" . $self->_urlencode($opt->{$_}) } sort keys %$opt);
+            map { $_ . "=" . Amazon::S3::Thin::Resource->urlencode($opt->{$_}) } sort keys %$opt);
     }
 
     my $request = $self->_compose_request('GET', $path);
@@ -211,16 +210,8 @@ sub delete_bucket {
 
 sub _uri {
     my ($self, $bucket, $key) = @_;
-    return ($key)
-      ? $bucket . "/" . $self->_urlencode($key, 1)
-      : $bucket . "/";
-}
-
-sub _urlencode {
-    my ($self, $unencoded, $allow_slash) = @_;
-    my $allowed = 'A-Za-z0-9_\-\.';
-    $allowed = "$allowed/" if $allow_slash;
-    return uri_escape_utf8($unencoded, "^$allowed");
+    my $resource = Amazon::S3::Thin::Resource->new($bucket, $key);
+    return $resource->to_uri;
 }
 
 sub _validate_acl_short {
@@ -256,9 +247,9 @@ sub _is_dns_bucket {
 
 # make the HTTP::Request object
 sub _compose_request {
-    my ($self, $method, $path, $headers, $content, $metadata) = @_;
+    my ($self, $method, $resource, $headers, $content, $metadata) = @_;
     croak 'must specify method' unless $method;
-    croak 'must specify path'   unless defined $path;
+    croak 'must specify resource'   unless defined $resource;
     $headers ||= {};
     $metadata ||= {};
 
@@ -277,6 +268,8 @@ sub _compose_request {
     my $url;
 
     my $regioned_host = sprintf('s3-%s.amazonaws.com', $self->{region}); # 's3-eu-west-1.amazonaws.com'
+
+    my $path = $resource;
 
     # it seems that we have to use path-style URL in V4 signature?
     $url = "$protocol://$regioned_host/$path";
