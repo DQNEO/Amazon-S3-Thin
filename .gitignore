@@ -28,7 +28,4 @@ cover_db/
 
 MYMETA.*
 
-/Amazon-S3-Simple-*
-
-/extlib/
 cpanfile.snapshot
