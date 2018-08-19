@@ -32,6 +32,29 @@ diag "test secure()";
     is $client->secure() , 0;
 }
 
+diag "test debug()";
+{
+    $arg = +{
+        %crd,
+        debug => 1,
+    };
+
+    $client = Amazon::S3::Thin->new($arg);
+
+    is $client->debug() , 1;
+
+    $arg = +{
+        %crd
+    };
+
+    $client = Amazon::S3::Thin->new($arg);
+
+    is $client->debug() , 0;
+
+    $client->debug(1);
+    is $client->debug() , 1;
+}
+
 diag "test ua()";
 {
     $arg = +{

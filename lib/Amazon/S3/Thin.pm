@@ -34,7 +34,7 @@ sub new {
 
     $self->secure(0)                unless defined $self->secure;
     $self->ua($self->_default_ua)   unless defined $self->ua;
-    $self->{debug} = 0              unless defined $self->{debug};
+    $self->debug(0)                 unless defined $self->debug;
 
     $self->{signature_version} = 4  unless defined $self->{signature_version};
     if ($self->{signature_version} == 4 && ! $self->{region}) {
@@ -92,7 +92,15 @@ sub secure {
     }
 }
 
-# accessor
+sub debug {
+    my $self = shift;
+    if (@_) {
+        $self->{debug} = shift;
+    } else {
+        return $self->{debug};
+    }
+}
+
 sub ua {
     my $self = shift;
     if (@_) {
@@ -433,6 +441,10 @@ Whether to use https (1) or http (0) when connecting to S3.
 The user agent used internally to perform requests and return responses.
 If you set this attribute, please make sure you do so with an object
 compatible with L<LWP::UserAgent> (i.e. providing the same interface).
+
+=head2 debug
+
+Debug option.
 
 =head1 METHODS
 
