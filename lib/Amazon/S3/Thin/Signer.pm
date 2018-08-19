@@ -38,24 +38,8 @@ use warnings;
 
 =head1 CONSTRUCTORS
 
-=head2 factory($client)
-
-Constructs a signer object. C<$client> is an Amazon::S3::Thin client object.
-The signer class is based on the C<signature_version> parameter of the client
-object. Supported versions are 2 and 4.
-
-Returns the signer object.
-
 =cut
 
-sub factory
-{
-  my ($class, $thin) = @_;
-  my $version = $thin->{signature_version};
-  my $signer_class = "Amazon::S3::Thin::Signer::V$version";
-  eval "require $signer_class" or die $@;
-  $signer_class->new($thin);
-}
 
 =head2 new($client)
 

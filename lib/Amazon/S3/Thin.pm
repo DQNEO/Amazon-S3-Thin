@@ -25,6 +25,7 @@ sub new {
     $self->secure(0)                unless defined $self->secure;
     $self->host('s3.amazonaws.com') unless defined $self->host;
     $self->ua($self->_default_ua)   unless defined $self->ua;
+
     $self->{signature_version} = 4  unless defined $self->{signature_version};
     if ($self->{signature_version} == 4 && ! $self->{region}) {
         die "Please set region when you use signature v4";
@@ -38,8 +39,18 @@ sub new {
     # see https://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAPI.html
     $self->{use_path_style} = 1 unless defined $self->{use_path_style};
 
+    $self->{signer} = $self->_load_signer($self->{signature_version});
     return $self;
 }
+
+sub _load_signer {
+  my $self = shift;
+  my $version = shift;
+  my $signer_class = "Amazon::S3::Thin::Signer::V$version";
+  eval "require $signer_class" or die $@;
+  return $signer_class->new($self);
+}
+
 
 sub _default_ua {
     my $self = shift;
@@ -265,16 +276,11 @@ sub _compose_request {
     }
 
     my $request = HTTP::Request->new($method, $url, $http_headers, $content);
-    $self->_sign($request);
+    # sign the request using the signer, unless already signed
+    if (!$request->header('Authorization')) {
+        $self->{signer}->sign($request);
+    }
     return $request;
-}
-
-# sign the request using the signer, unless already signed
-sub _sign
-{
-  my ($self, $request) = @_;
-  $self->{signer} ||= Amazon::S3::Thin::Signer->factory($self);
-  $self->{signer}->sign($request) unless $request->header('Authorization');
 }
 
 1;
