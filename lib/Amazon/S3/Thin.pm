@@ -414,10 +414,6 @@ Default is an instance of L<LWP::UserAgent>.
 =item * C<signature_version> - AWS signature version to use. Supported values
 are 2 and 4. Default is 4.
 
-=item * C<signer> - Custom object for signing requests. It must have a
-C<sign> method that accepts an L<HTTP::Request> object and adds the
-signature. Default is to construct an object using L<Amazon::S3::Thin::Signer>
-C<factory> method. If C<signer> is supplied, C<signature_version> is not used.
 
 =back
 
