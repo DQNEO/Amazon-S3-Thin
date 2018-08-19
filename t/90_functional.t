@@ -16,8 +16,13 @@ SKIP : {
 
     my $crd = Config::Tiny->read($config_file)->{default};
 
-    my $arg = $crd;
-    $arg->{region} = 'ap-northeast-1';
+    my $arg = {
+        %$crd,
+        region => 'ap-northeast-1',
+        secure => 0,
+        debug => 0,
+    };
+    my $protocol = 'http';
     my $client = Amazon::S3::Thin->new($arg);
 
     my $bucket = "dqneo-private-test";
@@ -39,7 +44,7 @@ SKIP : {
     is $res->code, 204;
     is $req->method, "DELETE";
     is $req->content, '';
-    is $req->uri, "http://$host/$bucket/dir/s3test.txt";
+    is $req->uri, "$protocol://$host/$bucket/dir/s3test.txt";
 
     diag "HEAD request on non-existing object";
     $res = $client->head_object($bucket, $key);
@@ -47,7 +52,7 @@ SKIP : {
     ok !$res->is_success, "is not success";
     is $res->code, 404;
     is $req->method, "HEAD";
-    is $req->uri, "http://$host/$bucket/dir/s3test.txt";
+    is $req->uri, "$protocol://$host/$bucket/dir/s3test.txt";
 
     diag "GET request";
     $res = $client->get_object($bucket, $key);
@@ -55,7 +60,7 @@ SKIP : {
     ok !$res->is_success, "is not success";
     is $res->code, 404;
     is $req->method, "GET";
-    is $req->uri, "http://$host/$bucket/dir/s3test.txt";
+    is $req->uri, "$protocol://$host/$bucket/dir/s3test.txt";
 
     diag "PUT request";
     $res = $client->put_object($bucket, $key, $body);
@@ -63,7 +68,7 @@ SKIP : {
     $req =  $res->request;
     is $req->method, "PUT";
     is $req->content, $body;
-    is $req->uri, "http://$host/$bucket/dir/s3test.txt";
+    is $req->uri, "$protocol://$host/$bucket/dir/s3test.txt";
 
     diag "HEAD request";
     $res = $client->head_object($bucket, $key);
@@ -71,7 +76,7 @@ SKIP : {
     $req =  $res->request;
     is $req->method, "HEAD";
     is $req->content, '';
-    is $req->uri, "http://$host/$bucket/dir/s3test.txt";
+    is $req->uri, "$protocol://$host/$bucket/dir/s3test.txt";
     like $res->header("x-amz-request-id"), qr/.+/, "has proper headers";
 
     diag "COPY request";
@@ -88,7 +93,7 @@ SKIP : {
     $req = $res->request;
 
     is $req->method, "GET";
-    is $req->uri, "http://$host/$bucket/dir/s3test.txt_copied";
+    is $req->uri, "$protocol://$host/$bucket/dir/s3test.txt_copied";
 
     diag "DELETE request";
     $res =  $client->delete_object($bucket, $key);

@@ -18,6 +18,7 @@ sub test_with_existing_bucket {
     my %opt = (
         aws_access_key_id => $crd->{aws_access_key_id},
         aws_secret_access_key => $crd->{aws_secret_access_key},
+        secure => 0,
         signature_version => $arg->{signature_version},
         region => $region,
 #        use_path_style => $arg->{use_path_style},
@@ -51,6 +52,7 @@ sub test_with_new_bucket {
     my %opt = (
         aws_access_key_id => $crd->{aws_access_key_id},
         aws_secret_access_key => $crd->{aws_secret_access_key},
+        secure => 0,
         signature_version => $arg->{signature_version},
         region => $arg->{region},
 #        use_path_style => $arg->{use_path_style},
