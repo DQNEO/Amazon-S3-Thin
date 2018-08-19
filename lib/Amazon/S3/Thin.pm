@@ -102,7 +102,7 @@ sub ua {
     }
 }
 
-sub request {
+sub _send {
     my ($self, $request) = @_;
     warn "[Request]\n" , $request->as_string if $self->{debug};
     my $response = $self->ua->request($request);
@@ -112,19 +112,19 @@ sub request {
 sub get_object {
     my ($self, $bucket, $key, $headers) = @_;
     my $request = $self->_compose_request('GET', $self->_resource($bucket, $key), $headers);
-    return $self->request($request);
+    return $self->_send($request);
 }
 
 sub head_object {
     my ($self, $bucket, $key) = @_;
     my $request = $self->_compose_request('HEAD', $self->_resource($bucket, $key));
-    return $self->request($request);
+    return $self->_send($request);
 }
 
 sub delete_object {
     my ($self, $bucket, $key) = @_;
     my $request = $self->_compose_request('DELETE', $self->_resource($bucket, $key));
-    return $self->request($request);
+    return $self->_send($request);
 }
 
 sub copy_object {
@@ -132,7 +132,7 @@ sub copy_object {
     my $headers = {};
     $headers->{'x-amz-copy-source'} = $src_bucket . "/" . $src_key;
     my $request = $self->_compose_request('PUT', $self->_resource($dst_bucket, $dst_key), $headers);
-    return $self->request($request);
+    return $self->_send($request);
 }
 
 sub put_object {
@@ -164,7 +164,7 @@ sub put_object {
     }
     else {
         my $request = $self->_compose_request('PUT', $self->_resource($bucket, $key), $headers, $content);
-        return $self->request($request);
+        return $self->_send($request);
     }
 }
 
@@ -181,7 +181,7 @@ sub list_objects {
 
     my $resource = $self->_resource($bucket, undef, $query_string);
     my $request = $self->_compose_request('GET', $resource);
-    my $response = $self->request($request);
+    my $response = $self->_send($request);
     return $response;
 }
 
@@ -199,7 +199,7 @@ sub delete_multiple_objects {
         },
         $content
     );
-    my $response = $self->request($request);
+    my $response = $self->_send($request);
     return $response;
 }
 
@@ -234,13 +234,13 @@ EOT
     }
 
     my $request = $self->_compose_request('PUT', $self->_resource($bucket), $headers, $content);
-    return $self->request($request);
+    return $self->_send($request);
 }
 
 sub delete_bucket {
     my ($self, $bucket) = @_;
     my $request = $self->_compose_request('DELETE', $self->_resource($bucket));
-    return $self->request($request);
+    return $self->_send($request);
 }
 
 sub _resource {
