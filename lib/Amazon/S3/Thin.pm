@@ -34,6 +34,7 @@ sub new {
     $self->secure(0)                unless defined $self->secure;
     $self->host('s3.amazonaws.com') unless defined $self->host;
     $self->ua($self->_default_ua)   unless defined $self->ua;
+    $self->{debug} = 0              unless defined $self->{debug};
 
     $self->{signature_version} = 4  unless defined $self->{signature_version};
     if ($self->{signature_version} == 4 && ! $self->{region}) {
@@ -103,8 +104,10 @@ sub ua {
 
 sub request {
     my ($self, $request) = @_;
-    my $resposne = $self->ua->request($request);
-    return $resposne;
+    warn "[Request]\n" , $request->as_string if $self->{debug};
+    my $response = $self->ua->request($request);
+    warn "[Response]\n" , $response->as_string if $self->{debug};
+    return $response;
 }
 sub get_object {
     my ($self, $bucket, $key, $headers) = @_;
