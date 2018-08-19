@@ -43,12 +43,11 @@ sub to_vhost_style_url {
     my $protocol = shift;
     my $host = shift;
 
-    my $path = $self->to_path;
     my $url;
-
-    if ($path =~ m{^([^/?]+)(.*)} && $self->_is_dns_bucket($1)) {
+    if ($self->_is_dns_bucket($self->{bucket})) {
         $url = "$protocol://$1.$host$2";
     } else {
+        my $path = $self->to_path;
         $url = "$protocol://$host/$path";
     }
     return $url;
