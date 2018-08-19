@@ -49,7 +49,6 @@ sub sign
   my $signer = $self->signer;
   my $digest = Digest::SHA::sha256_hex($request->content);
   $request->header('X-Amz-Content-SHA256', $digest);
-  $DB::single = 1;
   $signer->sign($request, $self->{region}, $digest);
   $request;
 }
