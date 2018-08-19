@@ -414,6 +414,8 @@ Default is an instance of L<LWP::UserAgent>.
 =item * C<signature_version> - AWS signature version to use. Supported values
 are 2 and 4. Default is 4.
 
+=item * C<debug> - debug option. Default is 0 (false). 
+If set 1, contents of HTTP request and response are shown on stderr
 
 =back
 
