@@ -223,27 +223,6 @@ sub _validate_acl_short {
     }
 }
 
-# EU buckets must be accessed via their DNS name. This routine figures out if
-# a given bucket name can be safely used as a DNS name.
-sub _is_dns_bucket {
-    my ($self, $bucketname) = @_;
-
-    if (length $bucketname > 63) {
-        return 0;
-    }
-    if (length $bucketname < 3) {
-        return;
-    }
-    return 0 unless $bucketname =~ m{^[a-z0-9][a-z0-9.-]+$};
-    my @components = split /\./, $bucketname;
-    for my $c (@components) {
-        return 0 if $c =~ m{^-};
-        return 0 if $c =~ m{-$};
-        return 0 if $c eq '';
-    }
-    return 1;
-}
-
 # make the HTTP::Request object
 sub _compose_request {
     my ($self, $method, $resource, $headers, $content, $metadata) = @_;
@@ -266,21 +245,11 @@ sub _compose_request {
     }
 
     my $protocol = $self->secure ? 'https' : 'http';
-    my $host     = $self->host; # 's3.amazonaws.com'
-    my $url;
-
-    my $regioned_host = sprintf('s3-%s.amazonaws.com', $self->{region}); # 's3-eu-west-1.amazonaws.com'
-
-    my $path = $resource->to_uri;
 
     # it seems that we have to use path-style URL in V4 signature?
-    $url = "$protocol://$regioned_host/$path";
-
-    # if ($path =~ m{^([^/?]+)(.*)} && $self->_is_dns_bucket($1)) {
-    #     $url = "$protocol://$1.$host$2";
-    # } else {
-    #     $url = "$protocol://$host/$path";
-    # }
+    my $url = $resource->to_path_style_url($protocol, $self->{region});
+    # If you prefer vhost style, this may help
+    # my $url = $resource->to_vhost_style_url($protocol, $self->{host});
 
     my $request = HTTP::Request->new($method, $url, $http_headers, $content);
     $self->_sign($request);
