@@ -76,19 +76,19 @@ sub ua {
 
 sub get_object {
     my ($self, $bucket, $key, $headers) = @_;
-    my $request = $self->_compose_request('GET', $self->_uri($bucket, $key), $headers);
+    my $request = $self->_compose_request('GET', $self->_resource($bucket, $key), $headers);
     return $self->ua->request($request);
 }
 
 sub head_object {
     my ($self, $bucket, $key) = @_;
-    my $request = $self->_compose_request('HEAD', $self->_uri($bucket, $key));
+    my $request = $self->_compose_request('HEAD', $self->_resource($bucket, $key));
     return $self->ua->request($request);
 }
 
 sub delete_object {
     my ($self, $bucket, $key) = @_;
-    my $request = $self->_compose_request('DELETE', $self->_uri($bucket, $key));
+    my $request = $self->_compose_request('DELETE', $self->_resource($bucket, $key));
     return $self->ua->request($request);
 }
 
@@ -96,7 +96,7 @@ sub copy_object {
     my ($self, $src_bucket, $src_key, $dst_bucket, $dst_key) = @_;
     my $headers = {};
     $headers->{'x-amz-copy-source'} = $src_bucket . "/" . $src_key;
-    my $request = $self->_compose_request('PUT', $self->_uri($dst_bucket, $dst_key), $headers);
+    my $request = $self->_compose_request('PUT', $self->_resource($dst_bucket, $dst_key), $headers);
     return $self->ua->request($request);
 }
 
@@ -123,12 +123,12 @@ sub put_object {
         # I do not understand what it is :(
         #
         # return $self->_send_request_expect_nothing_probed('PUT',
-        #    $self->_uri($bucket, $key), $headers, $content);
+        #    $self->_resource($bucket, $key), $headers, $content);
         #
         die "unable to handle reference";
     }
     else {
-        my $request = $self->_compose_request('PUT', $self->_uri($bucket, $key), $headers, $content);
+        my $request = $self->_compose_request('PUT', $self->_resource($bucket, $key), $headers, $content);
         return $self->ua->request($request);
     }
 }
@@ -138,14 +138,14 @@ sub list_objects {
     croak 'must specify bucket' unless $bucket;
     $opt ||= {};
 
-    my $path = $bucket . "/";
+    my $query_string;
     if (%$opt) {
-        $path .= "?"
-          . join('&',
-            map { $_ . "=" . Amazon::S3::Thin::Resource->urlencode($opt->{$_}) } sort keys %$opt);
+        $query_string = join('&',
+                 map { $_ . "=" . Amazon::S3::Thin::Resource->urlencode($opt->{$_}) } sort keys %$opt);
     }
 
-    my $request = $self->_compose_request('GET', $path);
+    my $resource = $self->_resource($bucket, undef, $query_string);
+    my $request = $self->_compose_request('GET', $resource);
     my $response = $self->ua->request($request);
     return $response;
 }
@@ -154,10 +154,10 @@ sub delete_multiple_objects {
     my ($self, $bucket, @keys) = @_;
 
     my $content = _build_xml_for_delete(@keys);
-
+    my $resource = $self->_resource($bucket, undef, 'delete');
     my $request = $self->_compose_request(
         'POST',
-        "$bucket/?delete",
+        $resource,
         {
             'Content-MD5'    => Digest::MD5::md5_base64($content) . '==',
             'Content-Length' => length $content,
@@ -198,20 +198,19 @@ sub put_bucket {
 EOT
     }
 
-    my $request = $self->_compose_request('PUT', $self->_uri($bucket), $headers, $content);
+    my $request = $self->_compose_request('PUT', $self->_resource($bucket), $headers, $content);
     return $self->ua->request($request);
 }
 
 sub delete_bucket {
     my ($self, $bucket) = @_;
-    my $request = $self->_compose_request('DELETE', $self->_uri($bucket));
+    my $request = $self->_compose_request('DELETE', $self->_resource($bucket));
     return $self->ua->request($request);
 }
 
-sub _uri {
-    my ($self, $bucket, $key) = @_;
-    my $resource = Amazon::S3::Thin::Resource->new($bucket, $key);
-    return $resource->to_uri;
+sub _resource {
+    my ($self, $bucket, $key, $query_string) = @_;
+    return Amazon::S3::Thin::Resource->new($bucket, $key, $query_string);
 }
 
 sub _validate_acl_short {
@@ -250,6 +249,9 @@ sub _compose_request {
     my ($self, $method, $resource, $headers, $content, $metadata) = @_;
     croak 'must specify method' unless $method;
     croak 'must specify resource'   unless defined $resource;
+    if (ref $resource ne 'Amazon::S3::Thin::Resource') {
+        croak 'resource must be an instance of Amazon::S3::Thin::Resource';
+    }
     $headers ||= {};
     $metadata ||= {};
 
@@ -269,7 +271,7 @@ sub _compose_request {
 
     my $regioned_host = sprintf('s3-%s.amazonaws.com', $self->{region}); # 's3-eu-west-1.amazonaws.com'
 
-    my $path = $resource;
+    my $path = $resource->to_uri;
 
     # it seems that we have to use path-style URL in V4 signature?
     $url = "$protocol://$regioned_host/$path";

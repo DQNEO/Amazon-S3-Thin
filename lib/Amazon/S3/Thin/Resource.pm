@@ -7,29 +7,25 @@ sub new {
     my $class = shift;
     my $bucket = shift;
     my $key = shift;
+    my $query_string = shift;
 
     my $self = {
         bucket => $bucket,
         key => $key,
+        query_string => $query_string,
     };
     bless $self, $class;
 }
 
-sub key {
-    my $self = shift;
-    return $self->{key};
-}
-
-sub bucket {
-    my $self = shift;
-    return $self->{bucket};
-}
-
 sub to_uri {
     my $self = shift;
-    return ($self->key)
-      ? $self->bucket . "/" . $self->urlencode($self->key, 1)
-      : $self->bucket . "/";
+    my $path = ($self->{key})
+      ? $self->{bucket} . "/" . $self->urlencode($self->{key}, 1)
+      : $self->{bucket} . "/";
+    if ($self->{query_string}) {
+        $path .= '?' . $self->{query_string};
+    }
+    return $path;
 }
 
 sub urlencode {
