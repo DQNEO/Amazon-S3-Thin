@@ -20,7 +20,12 @@ sub new {
 sub region_specific_host {
     my $self = shift;
     my $region = shift;
-    return sprintf('s3-%s.amazonaws.com', $region); # 's3-eu-west-1.amazonaws.com'
+
+    if ($region eq 'us-east-1') {
+        return 's3.amazonaws.com';
+    }
+
+    return sprintf('s3.%s.amazonaws.com', $region); # 's3.eu-west-1.amazonaws.com'
 }
 
 sub to_path_style_url {
