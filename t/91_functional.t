@@ -92,7 +92,7 @@ SKIP : {
     use Config::Tiny;
 
     # https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html
-    my $profile = 'default';
+    my $profile = 's3thin';
     my $cred_file = $ENV{HOME} . "/.aws/credentials";
     my $crd = Config::Tiny->read($cred_file)->{$profile};
 

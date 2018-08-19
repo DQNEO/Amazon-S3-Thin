@@ -13,8 +13,8 @@ SKIP : {
     }
 
     my $config_file = $ENV{HOME} . "/.aws/credentials";
-
-    my $crd = Config::Tiny->read($config_file)->{default};
+    my $profile = 's3thin';
+    my $crd = Config::Tiny->read($config_file)->{$profile};
 
     my $arg = {
         %$crd,
