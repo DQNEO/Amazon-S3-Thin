@@ -29,6 +29,15 @@ sub new {
     if ($self->{signature_version} == 4 && ! $self->{region}) {
         die "Please set region when you use signature v4";
     }
+
+    # Note:
+    # use "path style" or "virtual hosted style"
+    # Default is "path style"
+    # If you want to use "virtual hosted style", set this to be false.
+    #
+    # see https://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAPI.html
+    $self->{use_path_style} = 1 unless defined $self->{use_path_style};
+
     return $self;
 }
 
@@ -246,10 +255,14 @@ sub _compose_request {
 
     my $protocol = $self->secure ? 'https' : 'http';
 
-    # it seems that we have to use path-style URL in V4 signature?
-    my $url = $resource->to_path_style_url($protocol, $self->{region});
-    # If you prefer vhost style, this may help
-    # my $url = $resource->to_vhost_style_url($protocol, $self->{host});
+    my $url;
+
+    if ($self->{use_path_style}) {
+        # it seems that we have to use path-style URL in V4 signature?
+        $url = $resource->to_path_style_url($protocol, $self->{region});
+    } else {
+        $url = $resource->to_vhost_style_url($protocol, $self->{host});
+    }
 
     my $request = HTTP::Request->new($method, $url, $http_headers, $content);
     $self->_sign($request);
