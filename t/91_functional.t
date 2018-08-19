@@ -4,6 +4,8 @@ use Amazon::S3::Thin;
 use Test::More 'no_plan';
 use Data::Dumper;
 
+my $debug = 0;
+
 sub test_with_existing_bucket {
     my $crd = shift;
     my $arg = shift;
@@ -18,7 +20,8 @@ sub test_with_existing_bucket {
         aws_secret_access_key => $crd->{aws_secret_access_key},
         signature_version => $arg->{signature_version},
         region => $region,
-        use_path_style => $arg->{use_path_style},
+#        use_path_style => $arg->{use_path_style},
+        debug => $debug,
     );
 
     my $s3client = Amazon::S3::Thin->new(\%opt);
@@ -50,7 +53,8 @@ sub test_with_new_bucket {
         aws_secret_access_key => $crd->{aws_secret_access_key},
         signature_version => $arg->{signature_version},
         region => $arg->{region},
-        use_path_style => $arg->{use_path_style},
+#        use_path_style => $arg->{use_path_style},
+        debug => $debug,
     );
     my $s3client = Amazon::S3::Thin->new(\%opt);
     my $bucket = 's3thin-' . $arg->{region} . $arg->{signature_version}  . time();
@@ -91,14 +95,14 @@ SKIP : {
     my $crd = Config::Tiny->read($cred_file)->{$profile};
 
     my $sigver;
-    #test_with_existing_bucket($crd, {signature_version => 4, use_path_style => 0});
-    test_with_existing_bucket($crd, {signature_version => 4, use_path_style => 1});
-    test_with_existing_bucket($crd, {signature_version => 2, use_path_style => 0});
+    test_with_existing_bucket($crd, {signature_version => 4});
+    test_with_existing_bucket($crd, {signature_version => 2});
+
     diag('Testing with new resources.');
     my @regions = ('ap-northeast-1', 'us-west-1', 'eu-west-1', 'us-east-1');
     for my $region (@regions) {
-        test_with_new_bucket($crd, {signature_version => 4, use_path_style => 1, region =>$region});
-        #test_with_new_bucket($crd, {signature_version => 2, use_path_style => 0, region =>$region});
+        test_with_new_bucket($crd, {signature_version => 4, region =>$region});
+        test_with_new_bucket($crd, {signature_version => 2, region =>$region});
     }
 }
 

@@ -43,9 +43,14 @@ sub new {
 
     # Note:
     # use "path style" or "virtual hosted style"
-    #
     # see https://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAPI.html
-    $self->{use_path_style} = 1 if $self->{signature_version} == 4;
+    #
+    # for now, force path_style for v4, force vhost style for v2
+    if ($self->{signature_version} == 4) {
+        $self->{use_path_style} = 1;
+    } else {
+        $self->{use_path_style} = 0;
+    }
 
     $self->{signer} = $self->_load_signer($self->{signature_version});
     return $self;
