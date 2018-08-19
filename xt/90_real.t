@@ -14,7 +14,7 @@ my $arg = $crd;
 $arg->{region} = 'us-east-1';
 my $client = Amazon::S3::Thin->new($arg);
 
-my $bucket = "tmpdqneo";
+my $bucket = "dqneo-private-test";
 my $key =  "dir/s3test.txt";
 my $body = "hello amazon s3";
 
@@ -32,7 +32,7 @@ $req = $res->request;
 ok $res->is_success, "is_success";
 is $req->method, "DELETE";
 is $req->content, '';
-is $req->uri, "http://s3.amazonaws.com/tmpdqneo/dir/s3test.txt";
+is $req->uri, "http://s3.amazonaws.com/dqneo-private-test/dir/s3test.txt";
 
 diag "HEAD request on non-existing object";
 $res = $client->head_object($bucket, $key);
@@ -40,7 +40,7 @@ $req = $res->request;
 ok !$res->is_success, "is not success";
 is $res->code, 404;
 is $req->method, "HEAD";
-is $req->uri, "http://s3.amazonaws.com/tmpdqneo/dir/s3test.txt";
+is $req->uri, "http://s3.amazonaws.com/dqneo-private-test/dir/s3test.txt";
 
 diag "GET request";
 $res = $client->get_object($bucket, $key);
@@ -48,7 +48,7 @@ $req = $res->request;
 ok !$res->is_success, "is not success";
 is $res->code, 404;
 is $req->method, "GET";
-is $req->uri, "http://s3.amazonaws.com/tmpdqneo/dir/s3test.txt";
+is $req->uri, "http://s3.amazonaws.com/dqneo-private-test/dir/s3test.txt";
 
 diag "PUT request";
 $res = $client->put_object($bucket, $key, $body);
@@ -56,7 +56,7 @@ ok $res->is_success, "is_success";
 $req =  $res->request;
 is $req->method, "PUT";
 is $req->content, $body;
-is $req->uri, "http://s3.amazonaws.com/tmpdqneo/dir/s3test.txt";
+is $req->uri, "http://s3.amazonaws.com/dqneo-private-test/dir/s3test.txt";
 
 diag "HEAD request";
 $res = $client->head_object($bucket, $key);
@@ -64,7 +64,7 @@ ok $res->is_success, "is_success";
 $req =  $res->request;
 is $req->method, "HEAD";
 is $req->content, '';
-is $req->uri, "http://s3.amazonaws.com/tmpdqneo/dir/s3test.txt";
+is $req->uri, "http://s3.amazonaws.com/dqneo-private-test/dir/s3test.txt";
 like $res->header("x-amz-request-id"), qr/.+/, "has proper headers";
 
 diag "COPY request";
@@ -81,7 +81,7 @@ ok $res->is_success, "is_success";
 $req = $res->request;
 
 is $req->method, "GET";
-is $req->uri, "http://s3.amazonaws.com/tmpdqneo/dir/s3test.txt_copied";
+is $req->uri, "http://s3.amazonaws.com/dqneo-private-test/dir/s3test.txt_copied";
 
 diag "DELETE request";
 $res =  $client->delete_object($bucket, $key);
