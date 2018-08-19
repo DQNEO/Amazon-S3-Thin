@@ -8,6 +8,18 @@ use HTTP::Request;
 my $credentials = Amazon::S3::Thin::Credentials->new('accesskey', 'secretkey');
 
 {
+  diag "test signer";
+
+  my $signer = Amazon::S3::Thin::Signer::V4->new($credentials,{});
+  my $signer_signer = $signer->signer;
+  isa_ok($signer_signer, 'AWS::Signature4', 'signer');
+  is_deeply($signer_signer, {
+      access_key => 'accesskey',
+      secret_key => 'secretkey',
+    }, 'signer keys');
+}
+
+{
   diag "test sign";
 
   my $request = HTTP::Request->new(GET => 'https://mybucket.s3.amazonaws.com/myfile.txt');
@@ -22,18 +34,6 @@ my $credentials = Amazon::S3::Thin::Credentials->new('accesskey', 'secretkey');
       'X-Amz-Content-SHA256: e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855',
       'X-Amz-Date: 20070328T014949Z',
     ], 'Request headers');
-}
-
-{
-  diag "test signer";
-
-  my $signer = Amazon::S3::Thin::Signer::V4->new($credentials,{});
-  my $signer_signer = $signer->signer;
-  isa_ok($signer_signer, 'AWS::Signature4', 'signer');
-  is_deeply($signer_signer, {
-      access_key => 'accesskey',
-      secret_key => 'secretkey',
-    }, 'signer keys');
 }
 
 done_testing;
