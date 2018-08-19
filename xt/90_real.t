@@ -8,7 +8,7 @@ use Test::More;
 
 my $config_file = $ENV{HOME} . "/.aws/credentials";
 
-my $crd = Config::Tiny->read($config_file)->{dqneo};
+my $crd = Config::Tiny->read($config_file)->{default};
 
 my $arg = $crd;
 my $client = Amazon::S3::Thin->new($arg);
