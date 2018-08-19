@@ -5,7 +5,6 @@ use warnings;
 use FindBin;
 use lib $FindBin::Bin . '/../lib';
 use Amazon::S3::Thin;
-#use S3::CLI;
 use Config::Tiny;
 
 S3::CLI->new->run(@ARGV);
@@ -20,6 +19,12 @@ use Data::Dumper;
 
 sub new {
     return bless {}, shift;
+}
+
+sub help {
+    my ($self, @args) = @_;
+    require Pod::Usage;
+    Pod::Usage::pod2usage(0);
 }
 
 sub run {
@@ -43,18 +48,37 @@ sub run {
         exit 0;
     }
     if ($help) {
-        require Pod::Usage;
-        Pod::Usage::pod2usage(0);
+        $self->help();
+        exit 0;
     }
 
-    my $config_file = $ENV{HOME} . "/.aws/credentials";
-    my $crd = Config::Tiny->read($config_file)->{$profile};
-    $self->{s3client} = Amazon::S3::Thin->new($crd);
+    # https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html
+    my $cred_file = $ENV{HOME} . "/.aws/credentials";
+    my $config_file = $ENV{HOME} . "/.aws/config";
+    my $crd = Config::Tiny->read($cred_file)->{$profile};
+    my $config = Config::Tiny->read($config_file)->{$profile};
+    my $opt = +{
+        aws_access_key_id => $crd->{aws_access_key_id},
+        aws_secret_access_key => $crd->{aws_secret_access_key},
+        region => $config->{region},
+    };
+    $self->{thin_client} = Amazon::S3::Thin->new($opt);
     my $subcmd = shift @args;
-
+    if (!$subcmd) {
+        $self->help();
+        exit 0;
+    }
     #warn Dumper $subcmd, $profile , \@args;    n
     if ($subcmd eq "ls") {
-        return $self->cmd_ls(@args);
+        $self->cmd_ls(@args);
+    } elsif ($subcmd eq "rm") {
+        $self->cmd_rm(@args);
+    } elsif ($subcmd eq "cp") {
+        $self->cmd_cp(@args);
+    } elsif ($subcmd eq "rb") {
+        $self->cmd_rb(@args);
+    } else {        
+        die "invalid sub command";
     }
 
 }
@@ -62,30 +86,38 @@ sub run {
 use XML::TreePP;
 use JSON;
 
-# aws s3 ls s3://yourbucket/dir/file.txt
-sub cmd_ls {
-    my ($self, $url) = @_;
+# aws s3 ls s3://yourbucket/dir
+
+sub _parse_s3_uri {
+    my ($self, $uri) = @_;
     my ($bucket, $key);
     $key = "";
-    if($url =~ m|s3://([^/]+)/(.+)$| ){
+    if($uri =~ m|s3://([^/]+)/(.+)$| ){
         ($bucket, $key) = ($1, $2);
         #warn "bucket, key = %s, %s\n", $bucket , $key;
-    } elsif ($url =~ m|s3://([^/]+)/?$| ){
+    } elsif ($uri =~ m|s3://([^/]+)/?$| ){
         $bucket = $1;
         #warn "bucket only = %s\n", $bucket;
     } else {
         die "bad url";
     }
-
-    my $response = $self->{s3client}->list_objects($bucket,{
+}
+sub cmd_ls {
+    my ($self, $uri) = @_;
+    my ($bucket, $key) = $self->_parse_s3_uri($uri);
+    $key = '' unless defined $key;
+    my $response = $self->{thin_client}->list_objects($bucket,{
         prefix => $key,
         delimiter => "/",
-                                                   });
+    });
+
     my $tpp = XML::TreePP->new();
     my $tree = $tpp->parse($response->content);
 
-    #print Dumper $tree;
-
+    if ($response->code() >= 400) {
+        die "ERROR\n---\n" . $response->content . "\n---";
+    }
+    
     if ($self->{verbose}) {
         use JSON;
         print JSON->new->pretty->encode($tree->{ListBucketResult});
@@ -107,3 +139,23 @@ sub cmd_ls {
     }
 }
 
+sub cmd_cp {
+    my ($self, $uri) = @_;
+    my ($bucket, $key) = $self->_parse_s3_uri($uri);
+    my $response = $self->{thin_client}->get_object($bucket, $key);
+    print $response->content();
+}
+
+sub cmd_rm {
+    my ($self, $uri) = @_;
+    my ($bucket, $key) = $self->_parse_s3_uri($uri);
+    my $response = $self->{thin_client}->delete_object($bucket, $key);
+    warn $response->code();
+}
+
+sub cmd_rb {
+    my ($self, $uri) = @_;
+    my ($bucket, $key) = $self->_parse_s3_uri($uri);
+    my $response = $self->{thin_client}->delete_bucket($bucket);
+    print $response->code();
+}

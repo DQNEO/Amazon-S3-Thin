@@ -6,6 +6,7 @@ use Test::More;
 my %crd = (
     aws_access_key_id     => "dummy",
     aws_secret_access_key => "dummy",
+    'region' => 'ap-northeast-1',
     );
 
 my $arg;
@@ -31,25 +32,27 @@ diag "test secure()";
     is $client->secure() , 0;
 }
 
-diag "test host()";
+diag "test debug()";
 {
     $arg = +{
         %crd,
+        debug => 1,
     };
 
     $client = Amazon::S3::Thin->new($arg);
 
-    is $client->host() , 's3.amazonaws.com';
+    is $client->debug() , 1;
 
     $arg = +{
-        %crd,
-        host => "www.example.com",
+        %crd
     };
 
     $client = Amazon::S3::Thin->new($arg);
 
-    is $client->host() , "www.example.com";
+    is $client->debug() , 0;
 
+    $client->debug(1);
+    is $client->debug() , 1;
 }
 
 diag "test ua()";
