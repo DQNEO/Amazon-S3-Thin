@@ -579,7 +579,13 @@ L<< Amazon's documentation for REST Bucket GET| http://docs.aws.amazon.com/Amazo
 
 =head1 TODO
 
-lots of APIs are not implemented yet.
+=over
+
+=item lots of APIs are not implemented yet.
+
+=item "secure" option does not work on author's machine.
+
+=item Supports both of path_style and virtual hosted style URL.
 
 =head1 REPOSITORY
 
