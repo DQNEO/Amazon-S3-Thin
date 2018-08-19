@@ -14,7 +14,6 @@ use HTTP::Request;
       aws_secret_access_key => 'secretkey',
     });
   $signer->sign($request);
-  $DB::single = 1;
   my $headers = [ sort split /\n/, $request->headers->as_string ];
   is_deeply ($headers, [
       'Authorization: AWS4-HMAC-SHA256 Credential=accesskey/20070328/us-east-1/s3/aws4_request, SignedHeaders=host;x-amz-content-sha256;x-amz-date, Signature=0dea3c9b65eede067ce9e38d48558a63924a6a08a8d21c27cfd7de50e5c78d4b',
