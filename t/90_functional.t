@@ -6,6 +6,9 @@ use Data::Dumper;
 use Amazon::S3::Thin;
 use Test::More 'no_plan';
 
+my $debug = 1;
+my $use_https = 1;
+
 SKIP : {
     
     if ($ENV{USER} ne 'DQNEO') {
@@ -19,10 +22,10 @@ SKIP : {
     my $arg = {
         %$crd,
         region => 'ap-northeast-1',
-        secure => 0,
-        debug => 0,
+        secure => $use_https,
+        debug => $debug,
     };
-    my $protocol = 'http';
+    my $protocol = $use_https ? 'https' : 'http';
     my $client = Amazon::S3::Thin->new($arg);
 
     my $bucket = "dqneo-private-test";
