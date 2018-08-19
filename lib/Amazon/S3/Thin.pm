@@ -18,8 +18,8 @@ sub new {
 
     bless $self, $class;
 
-    die "No aws_access_key_id"     unless $self->{aws_access_key_id};
-    die "No aws_secret_access_key" unless $self->{aws_secret_access_key};
+    croak "No aws_access_key_id"     unless $self->{aws_access_key_id};
+    croak "No aws_secret_access_key" unless $self->{aws_secret_access_key};
 
     $self->secure(0)                unless defined $self->secure;
     $self->host('s3.amazonaws.com') unless defined $self->host;
@@ -27,7 +27,7 @@ sub new {
 
     $self->{signature_version} = 4  unless defined $self->{signature_version};
     if ($self->{signature_version} == 4 && ! $self->{region}) {
-        die "Please set region when you use signature v4";
+        croak "Please set region when you use signature v4";
     }
 
     # Note:
