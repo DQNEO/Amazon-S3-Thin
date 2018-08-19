@@ -82,7 +82,8 @@ sub _default_ua {
     return $ua;
 }
 
-# accessor
+# Accessors
+
 sub secure {
     my $self = shift;
     if (@_) {
@@ -117,6 +118,9 @@ sub _send {
     warn "[Response]\n" , $response->as_string if $self->{debug};
     return $response;
 }
+
+# API calls
+
 sub get_object {
     my ($self, $bucket, $key, $headers) = @_;
     my $request = $self->_compose_request('GET', $self->_resource($bucket, $key), $headers);
