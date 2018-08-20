@@ -1,8 +1,10 @@
-package Amazon::S3::Thin::SignerV2;
+package Amazon::S3::Thin::Signer::V2;
 use strict;
 use warnings;
+use Carp;
 use Digest::HMAC_SHA1;
 use MIME::Base64 ();
+use HTTP::Date ();
 
 my $AMAZON_HEADER_PREFIX = 'x-amz-';
 
@@ -13,11 +15,30 @@ our @ordered_subresources = qw(
         website
     );
 
-
 sub new {
-    my ($class, $secret) = @_;
-    my $self = {secret => $secret};
+    my ($class, $credentials, $host) = @_;
+    if (ref($credentials) ne 'Amazon::S3::Thin::Credentials') {
+        croak "credentials object is not given."
+    }
+    my $self = {
+        credentials => $credentials,
+        host => $host,
+    };
     bless $self, $class;
+}
+
+sub sign
+{
+  my ($self, $request) = @_;
+  $request->header(Date => HTTP::Date::time2str(time)) unless $request->header('Date');
+  my $host = $request->uri->host;
+  my $bucket = substr($host, 0, length($host) - length($self->{host}) - 1);
+  my $path = $bucket . $request->uri->path;
+  my $signature = $self->calculate_signature( $request->method, $path, $request->headers );
+  $request->header(
+    Authorization => sprintf("AWS %s:%s"
+      , $self->{credentials}->access_key_id,
+      , $signature));
 }
 
 # generate a canonical string for the given parameters.  expires is optional and is
@@ -27,11 +48,10 @@ sub calculate_signature {
 
     my $string_to_sign = $self->string_to_sign( $method, $path, $headers, $expires );
 
-    my $hmac = Digest::HMAC_SHA1->new($self->{secret});
+    my $hmac = Digest::HMAC_SHA1->new($self->{credentials}->secret_access_key);
     $hmac->add($string_to_sign);
     return MIME::Base64::encode_base64($hmac->digest, '');
 }
-
 
 sub string_to_sign {
     my ($self, $method, $path, $headers, $expires) = @_;

@@ -8,6 +8,7 @@ WriteMakefile(
     AUTHOR       => 'DQNEO <dqneoo@gmail.com>',
     LICENSE      => 'perl',
     PREREQ_PM    => {
+        'AWS::Signature4'            => '0',
         'Digest::HMAC_SHA1'          => '0',
         'HTTP::Date'                 => '0',
         'MIME::Base64'               => '0',

@@ -42,6 +42,7 @@
       },
       "runtime" : {
          "requires" : {
+            "AWS::Signature4" : "0",
             "Digest::HMAC_SHA1" : "0",
             "Digest::MD5" : "0",
             "Encode" : "0",

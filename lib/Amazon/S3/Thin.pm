@@ -2,34 +2,62 @@ package Amazon::S3::Thin;
 use 5.008001;
 use strict;
 use warnings;
-
 use Carp;
-use HTTP::Date ();
 use LWP::UserAgent;
-use URI::Escape qw(uri_escape_utf8);
-use Amazon::S3::Thin::SignerV2;
 use Digest::MD5;
 use Encode;
+use Amazon::S3::Thin::Resource;
+use Amazon::S3::Thin::Credentials;
 
 our $VERSION = '0.16';
 
 my $METADATA_PREFIX      = 'x-amz-meta-';
+my $MAIN_HOST = 's3.amazonaws.com';
 
 sub new {
     my $class = shift;
     my $self  = shift;
 
+    # check existence of credentials
+    croak "No aws_access_key_id"     unless $self->{aws_access_key_id};
+    croak "No aws_secret_access_key" unless $self->{aws_secret_access_key};
+
+    # wrap credentials
+    $self->{credentials} = Amazon::S3::Thin::Credentials->new(
+        $self->{aws_access_key_id},
+        $self->{aws_secret_access_key}
+    );
+    delete $self->{aws_access_key_id};
+    delete $self->{aws_secret_access_key};
+
     bless $self, $class;
 
-    die "No aws_access_key_id"     unless $self->{aws_access_key_id};
-    die "No aws_secret_access_key" unless $self->{aws_secret_access_key};
-
     $self->secure(0)                unless defined $self->secure;
-    $self->host('s3.amazonaws.com') unless defined $self->host;
     $self->ua($self->_default_ua)   unless defined $self->ua;
+    $self->debug(0)                 unless defined $self->debug;
 
+    $self->{signature_version} = 4  unless defined $self->{signature_version};
+    if ($self->{signature_version} == 4 && ! $self->{region}) {
+        croak "Please set region when you use signature v4";
+    }
+
+    $self->{signer} = $self->_load_signer($self->{signature_version});
     return $self;
 }
+
+sub _load_signer {
+  my $self = shift;
+  my $version = shift;
+  my $signer_class = "Amazon::S3::Thin::Signer::V$version";
+  eval "require $signer_class" or die $@;
+
+  if ($version == 2) {
+      return $signer_class->new($self->{credentials}, $MAIN_HOST);
+  } elsif ($version == 4) {
+      return $signer_class->new($self->{credentials}, $self->{region});
+  }
+}
+
 
 sub _default_ua {
     my $self = shift;
@@ -43,7 +71,8 @@ sub _default_ua {
     return $ua;
 }
 
-# accessor
+# Accessors
+
 sub secure {
     my $self = shift;
     if (@_) {
@@ -53,17 +82,15 @@ sub secure {
     }
 }
 
-# accessor
-sub host {
+sub debug {
     my $self = shift;
     if (@_) {
-        $self->{host} = shift;
+        $self->{debug} = shift;
     } else {
-        return $self->{host};
+        return $self->{debug};
     }
 }
 
-# accessor
 sub ua {
     my $self = shift;
     if (@_) {
@@ -73,30 +100,40 @@ sub ua {
     }
 }
 
+sub _send {
+    my ($self, $request) = @_;
+    warn "[Request]\n" , $request->as_string if $self->{debug};
+    my $response = $self->ua->request($request);
+    warn "[Response]\n" , $response->as_string if $self->{debug};
+    return $response;
+}
+
+# API calls
+
 sub get_object {
     my ($self, $bucket, $key, $headers) = @_;
-    my $request = $self->_compose_request('GET', $self->_uri($bucket, $key), $headers);
-    return $self->ua->request($request);
+    my $request = $self->_compose_request('GET', $self->_resource($bucket, $key), $headers);
+    return $self->_send($request);
 }
 
 sub head_object {
     my ($self, $bucket, $key) = @_;
-    my $request = $self->_compose_request('HEAD', $self->_uri($bucket, $key));
-    return $self->ua->request($request);
+    my $request = $self->_compose_request('HEAD', $self->_resource($bucket, $key));
+    return $self->_send($request);
 }
 
 sub delete_object {
     my ($self, $bucket, $key) = @_;
-    my $request = $self->_compose_request('DELETE', $self->_uri($bucket, $key));
-    return $self->ua->request($request);
+    my $request = $self->_compose_request('DELETE', $self->_resource($bucket, $key));
+    return $self->_send($request);
 }
 
 sub copy_object {
     my ($self, $src_bucket, $src_key, $dst_bucket, $dst_key) = @_;
     my $headers = {};
     $headers->{'x-amz-copy-source'} = $src_bucket . "/" . $src_key;
-    my $request = $self->_compose_request('PUT', $self->_uri($dst_bucket, $dst_key), $headers);
-    return $self->ua->request($request);
+    my $request = $self->_compose_request('PUT', $self->_resource($dst_bucket, $dst_key), $headers);
+    return $self->_send($request);
 }
 
 sub put_object {
@@ -122,13 +159,13 @@ sub put_object {
         # I do not understand what it is :(
         #
         # return $self->_send_request_expect_nothing_probed('PUT',
-        #    $self->_uri($bucket, $key), $headers, $content);
+        #    $self->_resource($bucket, $key), $headers, $content);
         #
         die "unable to handle reference";
     }
     else {
-        my $request = $self->_compose_request('PUT', $self->_uri($bucket, $key), $headers, $content);
-        return $self->ua->request($request);
+        my $request = $self->_compose_request('PUT', $self->_resource($bucket, $key), $headers, $content);
+        return $self->_send($request);
     }
 }
 
@@ -137,15 +174,15 @@ sub list_objects {
     croak 'must specify bucket' unless $bucket;
     $opt ||= {};
 
-    my $path = $bucket . "/";
+    my $query_string;
     if (%$opt) {
-        $path .= "?"
-          . join('&',
-            map { $_ . "=" . $self->_urlencode($opt->{$_}) } sort keys %$opt);
+        $query_string = join('&',
+                 map { $_ . "=" . Amazon::S3::Thin::Resource->urlencode($opt->{$_}) } sort keys %$opt);
     }
 
-    my $request = $self->_compose_request('GET', $path);
-    my $response = $self->ua->request($request);
+    my $resource = $self->_resource($bucket, undef, $query_string);
+    my $request = $self->_compose_request('GET', $resource);
+    my $response = $self->_send($request);
     return $response;
 }
 
@@ -153,17 +190,17 @@ sub delete_multiple_objects {
     my ($self, $bucket, @keys) = @_;
 
     my $content = _build_xml_for_delete(@keys);
-
+    my $resource = $self->_resource($bucket, undef, 'delete');
     my $request = $self->_compose_request(
         'POST',
-        "$bucket/?delete",
+        $resource,
         {
             'Content-MD5'    => Digest::MD5::md5_base64($content) . '==',
             'Content-Length' => length $content,
         },
         $content
     );
-    my $response = $self->ua->request($request);
+    my $response = $self->_send($request);
     return $response;
 }
 
@@ -182,16 +219,34 @@ sub _build_xml_for_delete {
     return $content;
 }
 
-sub _uri {
-    my ($self, $bucket, $key) = @_;
-    return ($key)
-      ? $bucket . "/" . $self->_urlencode($key)
-      : $bucket . "/";
+sub put_bucket {
+    my ($self, $bucket, $headers) = @_;
+    # 
+    # https://docs.aws.amazon.com/general/latest/gr/rande.html#s3_region
+    my $region = $self->{region};
+    my $content ;
+    if ($region eq "us-east-1") {
+        $content = "";
+    } else {
+        my $location_constraint = "<LocationConstraint>$region</LocationConstraint>";
+        $content = <<"EOT";
+<CreateBucketConfiguration xmlns="http://s3.amazonaws.com/doc/2006-03-01/">$location_constraint</CreateBucketConfiguration>
+EOT
+    }
+
+    my $request = $self->_compose_request('PUT', $self->_resource($bucket), $headers, $content);
+    return $self->_send($request);
 }
 
-sub _urlencode {
-    my ($self, $unencoded) = @_;
-    return uri_escape_utf8($unencoded, '^A-Za-z0-9_-');
+sub delete_bucket {
+    my ($self, $bucket) = @_;
+    my $request = $self->_compose_request('DELETE', $self->_resource($bucket));
+    return $self->_send($request);
+}
+
+sub _resource {
+    my ($self, $bucket, $key, $query_string) = @_;
+    return Amazon::S3::Thin::Resource->new($bucket, $key, $query_string);
 }
 
 sub _validate_acl_short {
@@ -204,32 +259,14 @@ sub _validate_acl_short {
     }
 }
 
-# EU buckets must be accessed via their DNS name. This routine figures out if
-# a given bucket name can be safely used as a DNS name.
-sub _is_dns_bucket {
-    my ($self, $bucketname) = @_;
-
-    if (length $bucketname > 63) {
-        return 0;
-    }
-    if (length $bucketname < 3) {
-        return;
-    }
-    return 0 unless $bucketname =~ m{^[a-z0-9][a-z0-9.-]+$};
-    my @components = split /\./, $bucketname;
-    for my $c (@components) {
-        return 0 if $c =~ m{^-};
-        return 0 if $c =~ m{-$};
-        return 0 if $c eq '';
-    }
-    return 1;
-}
-
 # make the HTTP::Request object
 sub _compose_request {
-    my ($self, $method, $path, $headers, $content, $metadata) = @_;
+    my ($self, $method, $resource, $headers, $content, $metadata) = @_;
     croak 'must specify method' unless $method;
-    croak 'must specify path'   unless defined $path;
+    croak 'must specify resource'   unless defined $resource;
+    if (ref $resource ne 'Amazon::S3::Thin::Resource') {
+        croak 'resource must be an instance of Amazon::S3::Thin::Resource';
+    }
     $headers ||= {};
     $metadata ||= {};
 
@@ -243,33 +280,28 @@ sub _compose_request {
         $http_headers->header("$METADATA_PREFIX$k" => $v);
     }
 
-    # do we need check existance of Authorization ?
-    if (! exists $headers->{Authorization}) {
-        if (not $http_headers->header('Date')) {
-            $http_headers->header(Date => HTTP::Date::time2str(time));
-        }
-
-        my $signer = Amazon::S3::Thin::SignerV2->new($self->{aws_secret_access_key});
-        my $signature = $signer->calculate_signature($method, $path, $http_headers);
-        $http_headers->header(
-            Authorization => sprintf("AWS %s:%s"
-                                     , $self->{aws_access_key_id}
-                                     , $signature));
-    }
-
     my $protocol = $self->secure ? 'https' : 'http';
-    my $host     = $self->host;
+
     my $url;
 
-    if ($path =~ m{^([^/?]+)(.*)} && $self->_is_dns_bucket($1)) {
-        $url = "$protocol://$1.$host$2";
+    # Note:
+    # use "path style" or "virtual hosted style"
+    # see https://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAPI.html
+    #
+    # for now, when a signature v4, force path_style
+    if ($self->{signature_version} == 4) {
+        $url = $resource->to_path_style_url($protocol, $self->{region});
     } else {
-        $url = "$protocol://$host/$path";
+        $url = $resource->to_url_without_region($protocol, $MAIN_HOST);
     }
 
-    return HTTP::Request->new($method, $url, $http_headers, $content);
+    my $request = HTTP::Request->new($method, $url, $http_headers, $content);
+    # sign the request using the signer, unless already signed
+    if (!$request->header('Authorization')) {
+        $self->{signer}->sign($request);
+    }
+    return $request;
 }
-
 
 1;
 
@@ -283,14 +315,18 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
   use Amazon::S3::Thin;
 
-  my $s3client = Amazon::S3::Thin->new(
-      {   aws_access_key_id     => $aws_access_key_id,
-          aws_secret_access_key => $aws_secret_access_key,
-      }
-  );
+  my $s3client = Amazon::S3::Thin->new({
+        aws_access_key_id     => $aws_access_key_id,
+        aws_secret_access_key => $aws_secret_access_key,
+        region                => $region, # e.g. 'ap-northeast-1'
+      });
 
+  my $bucket = "mybucket";
   my $key = "dir/file.txt";
   my $response;
+
+  $response = $s3client->put_bucket($bucket);
+
   $response = $s3client->put_object($bucket, $key, "hello world");
 
   $response = $s3client->get_object($bucket, $key);
@@ -298,27 +334,25 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
   $response = $s3client->delete_object($bucket, $key);
 
-  $response = $s3client->delete_multiple_objects($bucket, @keys);
-
-  $response = $s3client->copy_object($src_bucket, $src_key,
-                                     $dst_bucket, $dst_key);
-
   $response = $s3client->list_objects(
                               $bucket,
                               {prefix => "foo", delimiter => "/"}
                              );
 
-  $response = $s3client->head_object($bucket, $key);
-
 You can also pass any useragent as you like
 
-  my $s3client = Amazon::S3::Thin->new(
-      {   aws_access_key_id     => $aws_access_key_id,
-          aws_secret_access_key => $aws_secret_access_key,
-          ua                    => $any_LWP_copmatible_useragent,
-      }
-  );
+  my $s3client = Amazon::S3::Thin->new({
+          ...
+          ua => $any_LWP_copmatible_useragent,
+      });
 
+Signature version 4 is used by default. 
+To use signature version 2, add a C<signature_version> option:
+
+  my $s3client = Amazon::S3::Thin->new({
+          ...
+          signature_version     => 2,
+      });
 
 =head1 DESCRIPTION
 
@@ -334,7 +368,6 @@ In detail, it offers the following features:
 
 It returns an L<HTTP::Response> object so you can easily inspect
 what's happening inside, and can handle errors as you like.
-
 
 =item Low Dependency
 
@@ -376,12 +409,18 @@ of your credentials.
 =item * C<aws_secret_access_key> (B<REQUIRED>) - an secret access key
  of your credentials.
 
-=item * C<secure> - whether to use https or not. Default is 0 (http).
+=item * C<region> - (B<REQUIRED>) region of your buckets you access- (currently used only when signature version is 4)
 
-=item * C<host> - the base host to use. Default is 'I<s3.amazonaws.com>'.
+=item * C<secure> - whether to use https or not. Default is 0 (http).
 
 =item * C<ua> - a user agent object, compatible with LWP::UserAgent.
 Default is an instance of L<LWP::UserAgent>.
+
+=item * C<signature_version> - AWS signature version to use. Supported values
+are 2 and 4. Default is 4.
+
+=item * C<debug> - debug option. Default is 0 (false). 
+If set 1, contents of HTTP request and response are shown on stderr
 
 =back
 
@@ -394,15 +433,15 @@ object's attributes.
 
 Whether to use https (1) or http (0) when connecting to S3.
 
-=head2 host
-
-The base host to use for connecting to S3.
-
 =head2 ua
 
 The user agent used internally to perform requests and return responses.
 If you set this attribute, please make sure you do so with an object
 compatible with L<LWP::UserAgent> (i.e. providing the same interface).
+
+=head2 debug
+
+Debug option.
 
 =head1 METHODS
 
@@ -549,10 +588,13 @@ additional keys, see C<marker> above.
 For more information, please refer to
 L<< Amazon's documentation for REST Bucket GET| http://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGET.html >>.
 
-
 =head1 TODO
 
-lots of APIs are not implemented yet.
+=over
+
+=item lots of APIs are not implemented yet.
+
+=item Supports both of path_style and virtual hosted style URL.
 
 =head1 REPOSITORY
 

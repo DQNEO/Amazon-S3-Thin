@@ -1,36 +1,39 @@
 use strict;
 use warnings;
-use Amazon::S3::Thin::SignerV2;
+use Amazon::S3::Thin::Credentials;
+use Amazon::S3::Thin::Signer::V2;
 use Test::More;
 use HTTP::Headers;
+use HTTP::Request;
 
 # What this test does is only to calculate signature,
 # no HTTP communication.
 {
     diag "test PUT request";
-    my $secret_key = "secretfoobar";
+    my $secret = "secretfoobar";
     my $verb = "PUT";
-    my $path = "example/file%2Etxt";
+    my $path = "example/file.txt";
 
     my $hdr = HTTP::Headers->new;
     $hdr->header("content-length", 15);
     $hdr->header("date", 'Sun, 01 Mar 2015 15:11:25 GMT');
-
-    my $signer = Amazon::S3::Thin::SignerV2->new($secret_key);
+    my $credentials = Amazon::S3::Thin::Credentials->new('', $secret);
+    my $signer = Amazon::S3::Thin::Signer::V2->new($credentials);
     my $sig = $signer->calculate_signature($verb,$path,$hdr);
 
-    is $sig, "n4W+Lf9QQAbx5mo8N3sHWaJUQ/I=";
+    is $sig, "/WcvruHFtEoxcEMmdsfLJ6iZClw=";
 }
 
 {
     diag "test GET request with single subresource";
-    my $secret_key = "somesecret";
+    my $secret = "somesecret";
     my $verb = "GET";
     my $path = "example/?delete";
     my $date = 'Sun, 01 Mar 2015 15:11:25 GMT';
     my $string_to_sign = "$verb\n\n\n$date\n/$path";
 
-    my $signer = Amazon::S3::Thin::SignerV2->new($secret_key);
+    my $credentials = Amazon::S3::Thin::Credentials->new('', $secret);
+    my $signer = Amazon::S3::Thin::Signer::V2->new($credentials);
     my $hdr = HTTP::Headers->new;
     $hdr->header("date", $date);
 
@@ -45,13 +48,14 @@ use HTTP::Headers;
 
 {
     diag "test GET request with single subresource";
-    my $secret_key = "somesecret";
+    my $secret = "somesecret";
     my $verb = "GET";
     my $path = 'example/?delete&versionId=4&invalid&acl&location="foo"';
     my $date = 'Sun, 01 Mar 2015 15:11:25 GMT';
     my $string_to_sign = "$verb\n\n\n$date\n/example/?acl&delete&location&versionId";
 
-    my $signer = Amazon::S3::Thin::SignerV2->new($secret_key);
+    my $credentials = Amazon::S3::Thin::Credentials->new('', $secret);
+    my $signer = Amazon::S3::Thin::Signer::V2->new($credentials);
     my $hdr = HTTP::Headers->new;
     $hdr->header("date", $date);
 
@@ -67,7 +71,8 @@ use HTTP::Headers;
 
 # test cases as described in
 # http://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAuthentication.html#RESTAuthenticationRequestCanonicalization
-my $secret_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
+my $secret = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
+my $credentials = Amazon::S3::Thin::Credentials->new('', $secret);
 {
     diag "test Amazon example object GET";
 
@@ -76,7 +81,7 @@ my $secret_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
     my $path = "johnsmith/photos/puppy.jpg";
     my $string_to_sign = "$verb\n\n\n$date\n/$path";
 
-    my $signer = Amazon::S3::Thin::SignerV2->new($secret_key);
+    my $signer = Amazon::S3::Thin::Signer::V2->new($credentials);
     my $hdr = HTTP::Headers->new;
     $hdr->header("Date", $date);
 
@@ -99,7 +104,7 @@ my $secret_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
     my $content_length = 94328;
     my $string_to_sign = "$verb\n\n$content_type\n$date\n/$path";
 
-    my $signer = Amazon::S3::Thin::SignerV2->new($secret_key);
+    my $signer = Amazon::S3::Thin::Signer::V2->new($credentials);
     my $hdr = HTTP::Headers->new;
     $hdr->header("Date", $date);
     $hdr->header("Content-Type", $content_type);
@@ -123,7 +128,7 @@ my $secret_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
     my $user_agent     = "Mozilla/5.0";
     my $string_to_sign = "$verb\n\n\n$date\n/johnsmith/";
 
-    my $signer = Amazon::S3::Thin::SignerV2->new($secret_key);
+    my $signer = Amazon::S3::Thin::Signer::V2->new($credentials);
     my $hdr = HTTP::Headers->new;
     $hdr->header("Date", $date);
     $hdr->header("User-Agent", $user_agent);
@@ -145,7 +150,7 @@ my $secret_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
     my $path           = "johnsmith/?acl";
     my $string_to_sign = "$verb\n\n\n$date\n/$path";
 
-    my $signer = Amazon::S3::Thin::SignerV2->new($secret_key);
+    my $signer = Amazon::S3::Thin::Signer::V2->new($credentials);
     my $hdr = HTTP::Headers->new;
     $hdr->header("Date", $date);
 
@@ -168,7 +173,7 @@ my $secret_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
     my $amz_date       = "Tue, 27 Mar 2007 21:20:26 +0000";
     my $string_to_sign = "$verb\n\n\n$amz_date\n/$path";
 
-    my $signer = Amazon::S3::Thin::SignerV2->new($secret_key);
+    my $signer = Amazon::S3::Thin::Signer::V2->new($credentials);
     my $hdr = HTTP::Headers->new;
     $hdr->header("Date", $date);
     $hdr->header("User-Agent", $user_agent);
@@ -204,7 +209,7 @@ my $secret_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
 
     my $string_to_sign = "PUT\n4gJE4saaMU4BqNR0kLY+lw==\napplication/x-download\nTue, 27 Mar 2007 21:06:08 +0000\nx-amz-acl:public-read\nx-amz-meta-checksumalgorithm:crc32\nx-amz-meta-filechecksum:0x02661779\nx-amz-meta-reviewedby:joe\@johnsmith.net,jane\@johnsmith.net\n/static.johnsmith.net/db-backup.dat.gz";
 
-    my $signer = Amazon::S3::Thin::SignerV2->new($secret_key);
+    my $signer = Amazon::S3::Thin::Signer::V2->new($credentials);
     my $hdr = HTTP::Headers->new;
     $hdr->header("Date", $date);
     $hdr->header("User-Agent", $user_agent);
@@ -235,7 +240,7 @@ my $secret_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
     my $path           = "";
     my $string_to_sign = "$verb\n\n\n$date\n/$path";
 
-    my $signer = Amazon::S3::Thin::SignerV2->new($secret_key);
+    my $signer = Amazon::S3::Thin::Signer::V2->new($credentials);
     my $hdr = HTTP::Headers->new;
     $hdr->header("Date", $date);
 
@@ -256,7 +261,7 @@ my $secret_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
     my $path           = "dictionary/fran%C3%A7ais/pr%c3%a9f%c3%a8re";
     my $string_to_sign = "$verb\n\n\n$date\n/$path";
 
-    my $signer = Amazon::S3::Thin::SignerV2->new($secret_key);
+    my $signer = Amazon::S3::Thin::Signer::V2->new($credentials);
     my $hdr = HTTP::Headers->new;
     $hdr->header("Date", $date);
 
@@ -269,5 +274,18 @@ my $secret_key = 'wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY';
     is $sig, 'DNEZGsoieTZ92F3bUfSPQcbGmlM=', "puppy unicode keys";
 }
 
+{
+  diag "test sign";
+
+  my $request = HTTP::Request->new(GET => 'https://mybucket.s3.amazonaws.com/myfile.txt');
+  $request->header('Date' => 'Wed, 28 Mar 2007 01:49:49 +0000');
+  my $credentials = Amazon::S3::Thin::Credentials->new('accesskey', 'secretkey');
+  my $signer = Amazon::S3::Thin::Signer::V2->new($credentials, 's3.amazonaws.com');
+  $signer->sign($request);
+  is_deeply ($request->headers, {
+      authorization => 'AWS accesskey:Up4jVMLZzEbhnf+Thj0XJ68JREs=',
+      date => 'Wed, 28 Mar 2007 01:49:49 +0000',
+    }, 'Request headers');
+}
 
 done_testing;

@@ -1,9 +1,12 @@
 use strict;
-use Test::More 0.98;
+use Test::More;
 
 use_ok $_ for qw(
     Amazon::S3::Thin
-    Amazon::S3::Thin::SignerV2
+    Amazon::S3::Thin::Resource
+    Amazon::S3::Thin::Credentials
+    Amazon::S3::Thin::Signer::V2
+    Amazon::S3::Thin::Signer::V4
 );
 
 done_testing;
