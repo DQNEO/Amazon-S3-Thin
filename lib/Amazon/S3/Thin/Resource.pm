@@ -24,7 +24,7 @@ sub to_path_style_url {
     return sprintf('%s://%s/%s',
                    $protocol,
                    $self->_region_specific_host($region),
-                   $self->to_path);
+                   $self->_to_path);
 }
 
 sub _region_specific_host {
@@ -44,7 +44,7 @@ sub to_vhost_style_url {
     my $protocol = shift;
     my $host = shift;
 
-    my $path = $self->to_path;
+    my $path = $self->_to_path;
     my $url;
 
     if ($path =~ m{^([^/?]+)(.*)} && $self->_is_dns_bucket($1)) {
@@ -76,7 +76,7 @@ sub _is_dns_bucket {
 }
 
 
-sub to_path {
+sub _to_path {
     my $self = shift;
     my $path = ($self->{key})
       ? $self->{bucket} . "/" . $self->urlencode($self->{key}, 1)
