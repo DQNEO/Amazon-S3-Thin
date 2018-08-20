@@ -17,7 +17,17 @@ sub new {
     bless $self, $class;
 }
 
-sub region_specific_host {
+sub to_path_style_url {
+    my $self = shift;
+    my $protocol = shift;
+    my $region = shift;
+    return sprintf('%s://%s/%s',
+                   $protocol,
+                   $self->_region_specific_host($region),
+                   $self->to_path);
+}
+
+sub _region_specific_host {
     my $self = shift;
     my $region = shift;
 
@@ -28,15 +38,6 @@ sub region_specific_host {
     return sprintf('s3.%s.amazonaws.com', $region); # 's3.eu-west-1.amazonaws.com'
 }
 
-sub to_path_style_url {
-    my $self = shift;
-    my $protocol = shift;
-    my $region = shift;
-    return sprintf('%s://%s/%s',
-                   $protocol,
-                   $self->region_specific_host($region),
-                   $self->to_path);
-}
 
 sub to_vhost_style_url {
     my $self = shift;
