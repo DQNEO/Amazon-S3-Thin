@@ -4,13 +4,13 @@
       "DQNEO"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v2.3.0, CPAN::Meta::Converter version 2.142690",
+   "generated_by" : "Minilla/v3.1.2, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
    "meta-spec" : {
       "url" : "http://search.cpan.org/perldoc?CPAN::Meta::Spec",
-      "version" : "2"
+      "version" : 2
    },
    "name" : "Amazon-S3-Thin",
    "no_index" : {
@@ -33,6 +33,8 @@
       },
       "develop" : {
          "requires" : {
+            "Config::Tiny" : "0",
+            "LWP::Protocol::https" : "0",
             "Test::CPAN::Meta" : "0",
             "Test::MinimumVersion::Fast" : "0.04",
             "Test::PAUSE::Permissions" : "0.04",
@@ -50,7 +52,7 @@
             "LWP::UserAgent" : "0",
             "MIME::Base64" : "0",
             "URI::Escape" : "0",
-            "perl" : "5.008001"
+            "perl" : "5.010001"
          }
       },
       "test" : {
@@ -71,11 +73,14 @@
          "web" : "https://github.com/DQNEO/Amazon-S3-Thin"
       }
    },
-   "version" : "0.16",
+   "version" : "0.20",
    "x_contributors" : [
-      "Timothy Appnel <tim@appnel.com>",
-      "Breno G. de Oliveira <garu@cpan.org>",
+      "Bob Showalter <showaltb@gmail.com>",
       "Bob Stockdale <bstockdale@zappos.com>",
-      "DQNEO <dqneoo@gmail.com>"
-   ]
+      "Breno G. de Oliveira <garu@cpan.org>",
+      "DQNEO <dqneoo@gmail.com>",
+      "Timothy Appnel <tim@appnel.com>"
+   ],
+   "x_serialization_backend" : "JSON::PP version 2.97001",
+   "x_static_install" : 1
 }

@@ -7,14 +7,18 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
     use Amazon::S3::Thin;
 
-    my $s3client = Amazon::S3::Thin->new(
-        {   aws_access_key_id     => $aws_access_key_id,
-            aws_secret_access_key => $aws_secret_access_key,
-        }
-    );
+    my $s3client = Amazon::S3::Thin->new({
+          aws_access_key_id     => $aws_access_key_id,
+          aws_secret_access_key => $aws_secret_access_key,
+          region                => $region, # e.g. 'ap-northeast-1'
+        });
 
+    my $bucket = "mybucket";
     my $key = "dir/file.txt";
     my $response;
+
+    $response = $s3client->put_bucket($bucket);
+
     $response = $s3client->put_object($bucket, $key, "hello world");
 
     $response = $s3client->get_object($bucket, $key);
@@ -22,36 +26,25 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
     $response = $s3client->delete_object($bucket, $key);
 
-    $response = $s3client->delete_multiple_objects($bucket, @keys);
-
-    $response = $s3client->copy_object($src_bucket, $src_key,
-                                       $dst_bucket, $dst_key);
-
     $response = $s3client->list_objects(
                                 $bucket,
                                 {prefix => "foo", delimiter => "/"}
                                );
 
-    $response = $s3client->head_object($bucket, $key);
-
-Requests are signed using signature version 4 by default. To use
-signature version 2, add a `signature_version` option:
-
-    my $s3client = Amazon::S3::Thin->new(
-        {   aws_access_key_id     => $aws_access_key_id,
-            aws_secret_access_key => $aws_secret_access_key,
-            signature_version     => 2,
-        }
-    );
-
 You can also pass any useragent as you like
 
-    my $s3client = Amazon::S3::Thin->new(
-        {   aws_access_key_id     => $aws_access_key_id,
-            aws_secret_access_key => $aws_secret_access_key,
-            ua                    => $any_LWP_copmatible_useragent,
-        }
-    );
+    my $s3client = Amazon::S3::Thin->new({
+            ...
+            ua => $any_LWP_copmatible_useragent,
+        });
+
+Signature version 4 is used by default. 
+To use signature version 2, add a `signature_version` option:
+
+    my $s3client = Amazon::S3::Thin->new({
+            ...
+            signature_version     => 2,
+        });
 
 # DESCRIPTION
 
@@ -100,18 +93,14 @@ It can receive the following arguments:
 of your credentials.
 - `aws_secret_access_key` (**REQUIRED**) - an secret access key
  of your credentials.
-- `region` - region name for version 4 signatures. default is
-'us-east-1'.
+- `region` - (**REQUIRED**) region of your buckets you access- (currently used only when signature version is 4)
 - `secure` - whether to use https or not. Default is 0 (http).
-- `host` - the base host to use. Default is '_s3.amazonaws.com_'.
 - `ua` - a user agent object, compatible with LWP::UserAgent.
 Default is an instance of [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent).
 - `signature_version` - AWS signature version to use. Supported values
 are 2 and 4. Default is 4.
-- `signer` - Custom object for signing requests. It must have a
-`sign_request` method that accepts an [HTTP::Request](https://metacpan.org/pod/HTTP::Request) object and adds the
-signature. Default is to construct an object using [Amazon::S3::Thin::Signer](https://metacpan.org/pod/Amazon::S3::Thin::Signer)
-`factory` method. If `signer` is supplied, `signature_version` is not used.
+- `debug` - debug option. Default is 0 (false). 
+If set 1, contents of HTTP request and response are shown on stderr
 
 # ACCESSORS
 
@@ -122,15 +111,15 @@ object's attributes.
 
 Whether to use https (1) or http (0) when connecting to S3.
 
-## host
-
-The base host to use for connecting to S3.
-
 ## ua
 
 The user agent used internally to perform requests and return responses.
 If you set this attribute, please make sure you do so with an object
 compatible with [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) (i.e. providing the same interface).
+
+## debug
+
+Debug option.
 
 # METHODS
 
@@ -258,7 +247,8 @@ For more information, please refer to
 
 # TODO
 
-lots of APIs are not implemented yet.
+- lots of APIs are not implemented yet.
+- Supports both of path\_style and virtual hosted style URL.
 
 # REPOSITORY
 

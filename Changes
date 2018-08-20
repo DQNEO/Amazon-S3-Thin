@@ -2,6 +2,22 @@ Revision history for Perl extension Amazon-S3-Thin
 
 {{$NEXT}}
 
+0.20 2018-08-20T15:12:52Z
+   # Features
+   - [Environment] Abandon perl 5.8 (break B.C.)
+   - [Signature v4] Make it work with signature v4. (use path style addressing for v4) (@showaltb)
+   - [Signature v4] Add `region` option. It is required by default (break B.C.)  (@showaltb)
+   - [Signature v4] Add `signature_version` option.  (@showaltb)
+   - [Core] Remove `host` option (break B.C.)
+   - [S3 api]Add API calls of `put_bucket` and `delete_bucket`
+   - [Core] Suppresses uri encoding of the bucket key.  (@showaltb)
+   - [Environment] make it work with Carton on travis
+   - [Dev] Add `debug` option
+
+   # Internal design
+   - Add Credentials class to contain aws credentials
+   - Add Resource class to express URI
+   
 0.16 2015-05-08T04:51:36Z
    - get_object() takes optinal headers
 
