@@ -50,7 +50,7 @@ sub _region_specific_host {
 
 
 # to keep B.C. for old implementation in case region is not given
-sub to_vhost_style_url {
+sub to_url_without_region {
     my $self = shift;
     my $protocol = shift;
     my $main_host = shift;

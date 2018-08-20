@@ -292,7 +292,7 @@ sub _compose_request {
     if ($self->{signature_version} == 4) {
         $url = $resource->to_path_style_url($protocol, $self->{region});
     } else {
-        $url = $resource->to_vhost_style_url($protocol, $MAIN_HOST);
+        $url = $resource->to_url_without_region($protocol, $MAIN_HOST);
     }
 
     my $request = HTTP::Request->new($method, $url, $http_headers, $content);
