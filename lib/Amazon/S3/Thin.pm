@@ -9,7 +9,7 @@ use Encode;
 use Amazon::S3::Thin::Resource;
 use Amazon::S3::Thin::Credentials;
 
-our $VERSION = '0.16';
+our $VERSION = '0.20';
 
 my $METADATA_PREFIX      = 'x-amz-meta-';
 my $MAIN_HOST = 's3.amazonaws.com';
@@ -595,6 +595,8 @@ L<< Amazon's documentation for REST Bucket GET| http://docs.aws.amazon.com/Amazo
 =item lots of APIs are not implemented yet.
 
 =item Supports both of path_style and virtual hosted style URL.
+
+=back
 
 =head1 REPOSITORY
 

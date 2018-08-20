@@ -60,7 +60,7 @@ sub to_url_without_region {
     my $bucket = $self->{bucket};
     if ($self->_is_dns_bucket($self->{bucket})) {
         # vhost style
-        $url = $self->_composer_url($protocol, $bucket . $main_host, $self->key_and_query);
+        $url = $self->_composer_url($protocol, $bucket . '.' . $main_host, $self->key_and_query);
     } else {
         # path style
         $url = $self->_composer_url($protocol, $main_host, $self->{bucket} . "/" . $self->key_and_query);
