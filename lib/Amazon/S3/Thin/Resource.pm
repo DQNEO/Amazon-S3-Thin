@@ -17,14 +17,24 @@ sub new {
     bless $self, $class;
 }
 
+sub _composer_url {
+    my $self = shift;
+    my $protocol = shift;
+    my $host = shift;
+    my $path = shift;
+
+    return "$protocol://$host/$path",
+}
+
 sub to_path_style_url {
     my $self = shift;
     my $protocol = shift;
     my $region = shift;
-    return sprintf('%s://%s/%s',
-                   $protocol,
-                   $self->_region_specific_host($region),
-                   $self->_to_path);
+    return $self->_composer_url(
+        $protocol,
+        $self->_region_specific_host($region),
+        $self->{bucket} . '/' . $self->key_and_query
+    );
 }
 
 sub _region_specific_host {
@@ -39,18 +49,21 @@ sub _region_specific_host {
 }
 
 
+# to keep B.C. for old implementation in case region is not given
 sub to_vhost_style_url {
     my $self = shift;
     my $protocol = shift;
-    my $host = shift;
+    my $main_host = shift;
 
-    my $path = $self->_to_path;
     my $url;
 
-    if ($path =~ m{^([^/?]+)(.*)} && $self->_is_dns_bucket($1)) {
-        $url = "$protocol://$1.$host$2";
+    my $bucket = $self->{bucket};
+    if ($self->_is_dns_bucket($self->{bucket})) {
+        # vhost style
+        $url = $self->_composer_url($protocol, $bucket . $main_host, $self->key_and_query);
     } else {
-        $url = "$protocol://$host/$path";
+        # path style
+        $url = $self->_composer_url($protocol, $main_host, $self->{bucket} . "/" . $self->key_and_query);
     }
     return $url;
 }
@@ -76,20 +89,33 @@ sub _is_dns_bucket {
 }
 
 
-sub _to_path {
+sub key {
     my $self = shift;
 
-    my $key = '';
+    my $key;
     if ($self->{key}) {
         $key = $self->urlencode($self->{key}, 1);
+    } else {
+        $key = '';
     }
+    return $key;
+}
 
-    my $add_query = '';
+sub add_query {
+    my $self = shift;
+
+    my $add_query;
     if ($self->{query_string}) {
         $add_query = '?' . $self->{query_string};
+    } else {
+        $add_query = '';
     }
+    return $add_query;
+}
 
-    return $self->{bucket} . "/" . $key . $add_query;
+sub key_and_query {
+    my $self = shift;
+    return $self->key . $self->add_query;
 }
 
 sub urlencode {
