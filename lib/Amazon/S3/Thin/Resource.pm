@@ -78,13 +78,18 @@ sub _is_dns_bucket {
 
 sub _to_path {
     my $self = shift;
-    my $path = ($self->{key})
-      ? $self->{bucket} . "/" . $self->urlencode($self->{key}, 1)
-      : $self->{bucket} . "/";
-    if ($self->{query_string}) {
-        $path .= '?' . $self->{query_string};
+
+    my $key = '';
+    if ($self->{key}) {
+        $key = $self->urlencode($self->{key}, 1);
     }
-    return $path;
+
+    my $add_query = '';
+    if ($self->{query_string}) {
+        $add_query = '?' . $self->{query_string};
+    }
+
+    return $self->{bucket} . "/" . $key . $add_query;
 }
 
 sub urlencode {
