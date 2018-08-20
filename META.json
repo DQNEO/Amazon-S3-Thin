@@ -73,12 +73,13 @@
          "web" : "https://github.com/DQNEO/Amazon-S3-Thin"
       }
    },
-   "version" : "0.20",
+   "version" : "0.21",
    "x_contributors" : [
       "Bob Showalter <showaltb@gmail.com>",
       "Bob Stockdale <bstockdale@zappos.com>",
       "Breno G. de Oliveira <garu@cpan.org>",
       "DQNEO <dqneoo@gmail.com>",
+      "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Timothy Appnel <tim@appnel.com>"
    ],
    "x_serialization_backend" : "JSON::PP version 2.97001",

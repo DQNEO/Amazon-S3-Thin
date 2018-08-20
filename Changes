@@ -2,6 +2,9 @@ Revision history for Perl extension Amazon-S3-Thin
 
 {{$NEXT}}
 
+0.21 2018-08-20T16:28:02Z
+   - Made buildtool Makefile.PL not executable.
+
 0.20 2018-08-20T15:12:52Z
    # Features
    - [Environment] Abandon perl 5.8 (break B.C.)

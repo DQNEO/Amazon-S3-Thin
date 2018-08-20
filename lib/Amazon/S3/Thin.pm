@@ -9,7 +9,7 @@ use Encode;
 use Amazon::S3::Thin::Resource;
 use Amazon::S3::Thin::Credentials;
 
-our $VERSION = '0.20';
+our $VERSION = '0.21';
 
 my $METADATA_PREFIX      = 'x-amz-meta-';
 my $MAIN_HOST = 's3.amazonaws.com';
