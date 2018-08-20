@@ -41,17 +41,6 @@ sub new {
         croak "Please set region when you use signature v4";
     }
 
-    # Note:
-    # use "path style" or "virtual hosted style"
-    # see https://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAPI.html
-    #
-    # for now, force path_style for v4, force vhost style for v2
-    if ($self->{signature_version} == 4) {
-        $self->{use_path_style} = 1;
-    } else {
-        $self->{use_path_style} = 0;
-    }
-
     $self->{signer} = $self->_load_signer($self->{signature_version});
     return $self;
 }
@@ -295,8 +284,12 @@ sub _compose_request {
 
     my $url;
 
-    if ($self->{use_path_style}) {
-        # it seems that we have to use path-style URL in V4 signature?
+    # Note:
+    # use "path style" or "virtual hosted style"
+    # see https://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAPI.html
+    #
+    # for now, when a signature v4, force path_style
+    if ($self->{signature_version} == 4) {
         $url = $resource->to_path_style_url($protocol, $self->{region});
     } else {
         $url = $resource->to_vhost_style_url($protocol, $MAIN_HOST);
