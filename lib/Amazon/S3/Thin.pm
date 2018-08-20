@@ -596,6 +596,8 @@ L<< Amazon's documentation for REST Bucket GET| http://docs.aws.amazon.com/Amazo
 
 =item Supports both of path_style and virtual hosted style URL.
 
+=back
+
 =head1 REPOSITORY
 
 L<https://github.com/DQNEO/Amazon-S3-Thin>
