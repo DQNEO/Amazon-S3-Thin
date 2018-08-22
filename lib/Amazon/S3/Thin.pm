@@ -453,7 +453,6 @@ Debug option.
 
 B<Arguments>:
 
-a list of the following items, in order:
 
 =over 3
 
@@ -512,7 +511,6 @@ L<< Amazon's documentation for COPY|http://docs.aws.amazon.com/AmazonS3/latest/A
 
 B<Arguments>:
 
-a list of the following items, in order:
 
 =over 4
 
