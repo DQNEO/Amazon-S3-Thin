@@ -219,6 +219,8 @@ sub _build_xml_for_delete {
     return $content;
 }
 
+# Operations on Buckets
+
 sub put_bucket {
     my ($self, $bucket, $headers) = @_;
     # 
@@ -443,7 +445,9 @@ compatible with L<LWP::UserAgent> (i.e. providing the same interface).
 
 Debug option.
 
-=head1 METHODS
+=head1 Operations on Buckets
+
+=head1 Operations on Objects
 
 =head2 get_object( $bucket, $key [, $headers] )
 
