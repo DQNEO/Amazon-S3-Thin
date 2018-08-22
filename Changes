@@ -2,11 +2,14 @@ Revision history for Perl extension Amazon-S3-Thin
 
 {{$NEXT}}
 
+0.22 2018-08-22T14:34:37Z
+   - Add more test and docs
+
 0.21 2018-08-20T16:28:02Z
    - Made buildtool Makefile.PL not executable.
 
 0.20 2018-08-20T15:12:52Z
-   # Features
+   - Features
    - [Environment] Abandon perl 5.8 (break B.C.)
    - [Signature v4] Make it work with signature v4. (use path style addressing for v4) (@showaltb)
    - [Signature v4] Add `region` option. It is required by default (break B.C.)  (@showaltb)
@@ -17,7 +20,7 @@ Revision history for Perl extension Amazon-S3-Thin
    - [Environment] make it work with Carton on travis
    - [Dev] Add `debug` option
 
-   # Internal design
+   - Internal design
    - Add Credentials class to contain aws credentials
    - Add Resource class to express URI
    

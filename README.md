@@ -121,13 +121,27 @@ compatible with [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) (i.e. 
 
 Debug option.
 
-# METHODS
+# Operations on Buckets
+
+## put\_bucket( $bucket \[, $headers\])
+
+**Arguments**:
+
+- 1. bucket - a string with the bucket
+- 2. headers (**optional**) - hashref with extra headr information
+
+## delete\_bucket( $bucket \[, $headers\])
+
+**Arguments**:
+
+- 1. bucket - a string with the bucket
+- 2. headers (**optional**) - hashref with extra headr information
+
+# Operations on Objects
 
 ## get\_object( $bucket, $key \[, $headers\] )
 
 **Arguments**:
-
-a list of the following items, in order:
 
 - 1. bucket - a string with the bucket
 - 2. key - a string with the key
@@ -179,8 +193,6 @@ For more information, please refer to
 ## put\_object( $bucket, $key, $content \[, $headers\] )
 
 **Arguments**:
-
-a list of the following items, in order:
 
 - 1. bucket - a string with the destination bucket
 - 2. key - a string with the destination key
