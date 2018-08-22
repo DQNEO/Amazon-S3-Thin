@@ -447,6 +447,31 @@ Debug option.
 
 =head1 Operations on Buckets
 
+=head2 put_bucket( $bucket [, $headers])
+
+B<Arguments>:
+
+=over 2
+
+=item 1. bucket - a string with the bucket
+
+=item 2. headers (B<optional>) - hashref with extra headr information
+
+=back
+
+=head2 delete_bucket( $bucket [, $headers])
+
+B<Arguments>:
+
+=over 3
+
+=item 1. bucket - a string with the bucket
+
+=item 2. headers (B<optional>) - hashref with extra headr information
+
+=back
+
+
 =head1 Operations on Objects
 
 =head2 get_object( $bucket, $key [, $headers] )
