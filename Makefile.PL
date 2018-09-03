@@ -13,6 +13,7 @@ WriteMakefile(
         'HTTP::Date'                 => '0',
         'MIME::Base64'               => '0',
         'Test::More'                 => '0.01',    # for testing
+        'Config::Tiny'               => '0',       # for testing
         'URI::Escape'                => '0',
     }
 );
