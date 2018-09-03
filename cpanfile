@@ -7,6 +7,7 @@ requires 'URI::Escape';
 requires 'Encode';
 requires 'Digest::MD5';
 requires 'AWS::Signature4';
+requires 'Config::Tiny';
 
 on 'test' => sub {
     requires 'Test::More', '0.98';
