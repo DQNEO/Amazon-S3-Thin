@@ -128,14 +128,14 @@ Debug option.
 **Arguments**:
 
 - 1. bucket - a string with the bucket
-- 2. headers (**optional**) - hashref with extra headr information
+- 2. headers (**optional**) - hashref with extra header information
 
 ## delete\_bucket( $bucket \[, $headers\])
 
 **Arguments**:
 
 - 1. bucket - a string with the bucket
-- 2. headers (**optional**) - hashref with extra headr information
+- 2. headers (**optional**) - hashref with extra header information
 
 # Operations on Objects
 
@@ -145,7 +145,7 @@ Debug option.
 
 - 1. bucket - a string with the bucket
 - 2. key - a string with the key
-- 3. headers (**optional**) - hashref with extra headr information
+- 3. headers (**optional**) - hashref with extra header information
 
 **Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for the request. Use the `content()`
 method on the returned object to read the contents:
@@ -218,7 +218,7 @@ For more information, please refer to
 - 1. bucket - a string with the destination bucket
 - 2. key - a string with the destination key
 - 3. content - a string with the content to be uploaded
-- 4. headers (**optional**) - hashref with extra headr information
+- 4. headers (**optional**) - hashref with extra header information
 
 **Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for the request.
 
