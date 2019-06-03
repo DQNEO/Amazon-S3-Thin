@@ -503,6 +503,32 @@ The GET operation retrieves an object from Amazon S3.
 For more information, please refer to
 L<< Amazon's documentation for GET|http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectGET.html >>.
 
+=head2 head_object( $bucket, $key )
+
+B<Arguments>:
+
+=over 3
+
+=item 1. bucket - a string with the bucket
+
+=item 2. key - a string with the key
+
+=back
+
+B<Returns>: an L<HTTP::Response> object for the request. Use the C<header()>
+method on the returned object to read the metadata:
+
+    my $res = $s3->head_object( 'my.bucket', 'my/key.ext' );
+
+    if ($res->is_success) {
+        my $etag = $res->header('etag'); #=> `"fba9dede5f27731c9771645a39863328"`
+    }
+
+The HEAD operation retrieves metadata of an object from Amazon S3.
+
+For more information, please refer to
+L<< Amazon's documentation for HEAD|http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectHEAD.html >>.
+
 =head2 delete_object( $bucket, $key )
 
 B<Arguments>: a string with the bucket name, and a string with the key name.
