@@ -197,9 +197,9 @@ Use the response object to see if it succeeded or not.
 For more information, please refer to
 [Amazon's documentation for DELETE](http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectDELETE.html).
 
-## copy\_object( $src\_bucket, $src\_key, $dst\_bucket, $dst\_key )
+## copy\_object( $src\_bucket, $src\_key, $dst\_bucket, $dst\_key \[, $headers\] )
 
-**Arguments**: a list with source (bucket, key) and destination (bucket, key)
+**Arguments**: a list with source (bucket, key) and destination (bucket, key), hashref with extra header information (**optional**).
 
 **Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for the request.
 
