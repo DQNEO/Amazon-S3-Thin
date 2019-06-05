@@ -129,8 +129,8 @@ sub delete_object {
 }
 
 sub copy_object {
-    my ($self, $src_bucket, $src_key, $dst_bucket, $dst_key) = @_;
-    my $headers = {};
+    my ($self, $src_bucket, $src_key, $dst_bucket, $dst_key, $headers) = @_;
+    $headers ||= {};
     $headers->{'x-amz-copy-source'} = $src_bucket . "/" . $src_key;
     my $request = $self->_compose_request('PUT', $self->_resource($dst_bucket, $dst_key), $headers);
     return $self->_send($request);
@@ -544,9 +544,9 @@ Use the response object to see if it succeeded or not.
 For more information, please refer to
 L<< Amazon's documentation for DELETE|http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectDELETE.html >>.
 
-=head2 copy_object( $src_bucket, $src_key, $dst_bucket, $dst_key )
+=head2 copy_object( $src_bucket, $src_key, $dst_bucket, $dst_key [, $headers] )
 
-B<Arguments>: a list with source (bucket, key) and destination (bucket, key)
+B<Arguments>: a list with source (bucket, key) and destination (bucket, key), hashref with extra header information (B<optional>).
 
 B<Returns>: an L<HTTP::Response> object for the request.
 

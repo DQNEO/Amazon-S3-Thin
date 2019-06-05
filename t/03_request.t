@@ -61,6 +61,14 @@ is $req6->method, "GET";
 is $req6->uri, "http://s3.ap-north-east-1.amazonaws.com/tmpfoobar/dir/private.txt";
 is $req6->header("X-Test-Header"), "Foo";
 
+diag "test PUT request (copy) with headers";
+my $res7 = $client->copy_object($bucket, $key, $bucket, "copied.txt", {"x-amz-acl" => "public-read"});
+my $req7 = $res7->request;
+is $req7->method, "PUT";
+is $req7->uri, "http://s3.ap-north-east-1.amazonaws.com/tmpfoobar/copied.txt";
+is $req7->header("x-amz-copy-source"), "tmpfoobar/dir/private.txt";
+is $req7->header("x-amz-acl"), "public-read";
+
 done_testing;
 
 package MockUA;
