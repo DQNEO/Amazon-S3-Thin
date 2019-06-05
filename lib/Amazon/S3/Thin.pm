@@ -455,7 +455,7 @@ B<Arguments>:
 
 =item 1. bucket - a string with the bucket
 
-=item 2. headers (B<optional>) - hashref with extra headr information
+=item 2. headers (B<optional>) - hashref with extra header information
 
 =back
 
@@ -467,7 +467,7 @@ B<Arguments>:
 
 =item 1. bucket - a string with the bucket
 
-=item 2. headers (B<optional>) - hashref with extra headr information
+=item 2. headers (B<optional>) - hashref with extra header information
 
 =back
 
@@ -485,7 +485,7 @@ B<Arguments>:
 
 =item 2. key - a string with the key
 
-=item 3. headers (B<optional>) - hashref with extra headr information
+=item 3. headers (B<optional>) - hashref with extra header information
 
 =back
 
@@ -571,7 +571,7 @@ B<Arguments>:
 
 =item 3. content - a string with the content to be uploaded
 
-=item 4. headers (B<optional>) - hashref with extra headr information
+=item 4. headers (B<optional>) - hashref with extra header information
 
 =back
 
