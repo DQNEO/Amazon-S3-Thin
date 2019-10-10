@@ -31,6 +31,9 @@ sub sign
 {
   my ($self, $request) = @_;
   $request->header(Date => HTTP::Date::time2str(time)) unless $request->header('Date');
+  if (defined $self->{credentials}->session_token) {
+    $request->header('X-Amz-Security-Token', $self->{credentials}->session_token);
+  }
   my $host = $request->uri->host;
   my $bucket = substr($host, 0, length($host) - length($self->{host}) - 1);
   my $path = $bucket . $request->uri->path;
