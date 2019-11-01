@@ -288,4 +288,21 @@ my $credentials = Amazon::S3::Thin::Credentials->new('', $secret);
     }, 'Request headers');
 }
 
+{
+    diag "test sign (session token)";
+
+    my $request = HTTP::Request->new(GET => 'https://mybucket.s3.amazonaws.com/myfile.txt');
+    $request->header('Date' => 'Wed, 28 Mar 2007 01:49:49 +0000');
+    my $credentials = Amazon::S3::Thin::Credentials->new('accesskey', 'secretkey', 'sessiontoken');
+    my $signer = Amazon::S3::Thin::Signer::V2->new($credentials, 's3.amazonaws.com');
+    $signer->sign($request);
+    my $headers = $request->headers;
+    delete $headers->{'::std_case'};
+    is_deeply ($headers, {
+        authorization => 'AWS accesskey:jALzlsXtPsSS7qFbE7l2f7Dpx5Y=',
+        date => 'Wed, 28 Mar 2007 01:49:49 +0000',
+        'x-amz-security-token' => 'sessiontoken',
+    }, 'Request headers');
+}
+
 done_testing;

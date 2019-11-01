@@ -53,6 +53,9 @@ sub sign
 {
   my ($self, $request) = @_;
   my $signer = $self->signer;
+  if (defined $self->{credentials}->session_token) {
+    $request->header('X-Amz-Security-Token', $self->{credentials}->session_token);
+  }
   my $digest = Digest::SHA::sha256_hex($request->content);
   $request->header('X-Amz-Content-SHA256', $digest);
   $signer->sign($request, $self->{region}, $digest);
