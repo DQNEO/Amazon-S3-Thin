@@ -30,7 +30,7 @@ sub help {
 sub run {
     my ($self, @args) = @_;
 
-    our $VERSION = "0.24";
+    our $VERSION = "0.25";
 
     my $p = Getopt::Long::Parser->new(
         config => [qw(posix_default no_ignore_case bundling)],

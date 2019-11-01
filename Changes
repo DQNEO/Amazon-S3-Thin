@@ -1,6 +1,8 @@
 Revision history for Perl extension Amazon-S3-Thin
 
 {{$NEXT}}
+
+0.25 2019-11-01T07:15:06Z
    - support aws_session_token
 
 0.24 2019-06-05T07:33:37Z
