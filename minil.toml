@@ -1,4 +1,4 @@
 name = "Amazon-S3-Thin"
-badges = ["travis"]
+badges = ["github-actions"]
 module_maker="ModuleBuildTiny"
 
