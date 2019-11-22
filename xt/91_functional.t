@@ -1,11 +1,22 @@
 use strict;
 use warnings;
+use Test::More;
+use Config::Tiny;
+
 use Amazon::S3::Thin;
-use Test::More 'no_plan';
-use Data::Dumper;
+
+if (!$ENV{EXTENDED_TESTING}) {
+    plan skip_all => 'Skip functional test because it would call S3 APIs and charge real money. $ENV{EXTENDED_TESTING} is not set.';
+}
 
 my $debug = 1;
 my $use_https = 1;
+
+my $config_file = $ENV{HOME} . '/.aws/credentials';
+my $profile = 's3thin';
+my $bucket = $ENV{TEST_S3THIN_BUCKET} || 'dqneo-private-test';
+
+my $crd = Config::Tiny->read($config_file)->{$profile};
 
 sub test_with_existing_bucket {
     my $crd = shift;
@@ -30,7 +41,6 @@ sub test_with_existing_bucket {
     ok $s3client, 'new';
 
     # These bucket and key suppose to exists beforehand.
-    my $bucket = 'dqneo-private-test';
     my $key = 'hello.txt';
 
     my $response;
@@ -85,27 +95,14 @@ sub test_with_new_bucket {
     is $response->code , 204, 'delete created bucket';
 }
 
-SKIP : {
-    if ($ENV{USER} ne 'DQNEO') {
-        skip "functional test because it would call S3 APIs and charge real money.";
-    }
+test_with_existing_bucket($crd, {signature_version => 4});
+test_with_existing_bucket($crd, {signature_version => 2});
 
-    use Config::Tiny;
-
-    # https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html
-    my $profile = 's3thin';
-    my $cred_file = $ENV{HOME} . "/.aws/credentials";
-    my $crd = Config::Tiny->read($cred_file)->{$profile};
-
-    my $sigver;
-    test_with_existing_bucket($crd, {signature_version => 4});
-    test_with_existing_bucket($crd, {signature_version => 2});
-
-    diag('Testing with new resources.');
-    my @regions = ('ap-northeast-1', 'us-west-1', 'eu-west-1', 'us-east-1');
-    for my $region (@regions) {
-        test_with_new_bucket($crd, {signature_version => 4, region =>$region});
-        test_with_new_bucket($crd, {signature_version => 2, region =>$region});
-    }
+diag('Testing with new resources.');
+my @regions = ('ap-northeast-1', 'us-west-1', 'eu-west-1', 'us-east-1');
+for my $region (@regions) {
+    test_with_new_bucket($crd, {signature_version => 4, region =>$region});
+    test_with_new_bucket($crd, {signature_version => 2, region =>$region});
 }
 
+done_testing;
