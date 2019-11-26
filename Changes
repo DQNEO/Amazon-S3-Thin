@@ -4,6 +4,7 @@ Revision history for Perl extension Amazon-S3-Thin
 
    - require Config::Tiny on test
    - fix some author tests
+   - [feature] add generate_presigned_post()
 
 0.25 2019-11-01T07:15:06Z
    - support aws_session_token
