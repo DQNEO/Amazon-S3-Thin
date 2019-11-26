@@ -279,6 +279,47 @@ additional keys, see `marker` above.
 For more information, please refer to
 [Amazon's documentation for REST Bucket GET](https://metacpan.org/pod/&#x20;http:#docs.aws.amazon.com-AmazonS3-latest-API-RESTBucketGET.html).
 
+## generate\_presigned\_post( $bucket, $key \[, $fields, $conditions, $expires\_in \] )
+
+**Arguments**:
+
+- 1. bucket (_string_) - a string with the destination bucket
+- 2. key (_string_) - a string with the destination key
+- 3. fields (_arrayref_) - an arrayref of key/value pairs to prefilled form fields to build on top of
+- 4. conditions (_arrayref_) - an arrayref of condition (arrayref or hashref) to include in the policy
+- 5. expires\_in (_number_) - a number of seconds from the current time before expiring presigned url
+
+**Returns**: a hashref with two elements `url` and `fields`. `url` is the url to post to. `fields` is an arrayref
+filled with the form fields and respective values to use when submitting the post. (You must follow the order of `fields`)
+
+This method generates presigned url for uploading a file to Amazon S3 using HTTP POST.
+The original implementation from boto3, this was transplanted referencing [S3Client.generate\_presigned\_post()](https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Client.generate_presigned_post).
+
+Note: this method is supported only signature v4.
+
+This is an example of generating a presigned url and uploading `test.txt` file.
+In this case, you can set the object metadata `x-amz-meta-foo` with any value and the uploading size is limited to 1MB.
+
+    my $presigned = $s3->generate_presigned_post('my.bucket', 'my/key.ext', [
+        'x-amz-meta-foo' => 'bar',
+    ], [
+        ['starts-with' => '$x-amz-meta-foo', ''],
+        ['content-length-range' => 1, 1024*1024],
+    ], 24*60*60);
+
+    my $ua = LWP::UserAgent->new;
+    my $res = $ua->post(
+        $presigned->{url},
+        Content_Type => 'multipart/form-data',
+        Content      => [
+            @{$presigned->{fields}},
+            file => ['test.txt'],
+        ],
+    );
+
+For more information, please refer to
+[Amazon's documentation for Creating a POST Policy](https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-HTTPPOSTConstructPolicy.html).
+
 # TODO
 
 - lots of APIs are not implemented yet.

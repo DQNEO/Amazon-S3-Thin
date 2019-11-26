@@ -45,11 +45,12 @@
       "runtime" : {
          "requires" : {
             "AWS::Signature4" : "0",
-            "Config::Tiny" : "0",
             "Digest::HMAC_SHA1" : "0",
             "Digest::MD5" : "0",
+            "Digest::SHA" : "0",
             "Encode" : "0",
             "HTTP::Date" : "0",
+            "JSON::PP" : "0",
             "LWP::UserAgent" : "0",
             "MIME::Base64" : "0",
             "URI::Escape" : "0",
@@ -58,6 +59,7 @@
       },
       "test" : {
          "requires" : {
+            "Config::Tiny" : "0",
             "Test::More" : "0.98"
          }
       }
@@ -74,7 +76,7 @@
          "web" : "https://github.com/DQNEO/Amazon-S3-Thin"
       }
    },
-   "version" : "0.25",
+   "version" : "0.26",
    "x_contributors" : [
       "Bob Showalter <showaltb@gmail.com>",
       "Bob Stockdale <bstockdale@zappos.com>",
