@@ -248,6 +248,27 @@ sub delete_bucket {
     return $self->_send($request);
 }
 
+sub generate_presigned_post {
+    my ($self, $bucket, $key, $fields, $conditions, $expires_in) = @_;
+
+    croak 'must specify bucket' unless defined $bucket;
+    croak 'must specify key' unless defined $key;
+
+    if ($self->{signature_version} == 4) {
+        my $resource = $self->_resource($bucket);
+        my $protocol = $self->secure ? 'https' : 'http';
+
+        return {
+            url    => $resource->to_path_style_url($protocol, $self->{region}),
+            fields => $self->{signer}->_generate_presigned_post(
+                $bucket, $key, $fields, $conditions, $expires_in
+            ),
+        };
+    } else {
+        croak 'generate_presigned_post is only supported on signature v4';
+    }
+}
+
 sub _resource {
     my ($self, $bucket, $key, $query_string) = @_;
     return Amazon::S3::Thin::Resource->new($bucket, $key, $query_string);
@@ -643,6 +664,55 @@ additional keys, see C<marker> above.
 
 For more information, please refer to
 L<< Amazon's documentation for REST Bucket GET| http://docs.aws.amazon.com/AmazonS3/latest/API/RESTBucketGET.html >>.
+
+=head2 generate_presigned_post( $bucket, $key [, $fields, $conditions, $expires_in ] )
+
+B<Arguments>:
+
+=over 4
+
+=item 1. bucket (I<string>) - a string with the destination bucket
+
+=item 2. key (I<string>) - a string with the destination key
+
+=item 3. fields (I<arrayref>) - an arrayref of key/value pairs to prefilled form fields to build on top of
+
+=item 4. conditions (I<arrayref>) - an arrayref of condition (arrayref or hashref) to include in the policy
+
+=item 5. expires_in (I<number>) - a number of seconds from the current time before expiring presigned url
+
+=back
+
+B<Returns>: a hashref with two elements C<url> and C<fields>. C<url> is the url to post to. C<fields> is an arrayref
+filled with the form fields and respective values to use when submitting the post. (You must follow the order of C<fields>)
+
+This method generates presigned url for uploading a file to Amazon S3 using HTTP POST.
+The original implementation from boto3, this was transplanted referencing L<< S3Client.generate_presigned_post()|https://boto3.amazonaws.com/v1/documentation/api/latest/reference/services/s3.html#S3.Client.generate_presigned_post >>.
+
+Note: this method is supported only signature v4.
+
+This is an example of generating a presigned url and uploading C<test.txt> file.
+In this case, you can set the object metadata C<x-amz-meta-foo> with any value and the uploading size is limited to 1MB.
+
+    my $presigned = $s3->generate_presigned_post('my.bucket', 'my/key.ext', [
+        'x-amz-meta-foo' => 'bar',
+    ], [
+        ['starts-with' => '$x-amz-meta-foo', ''],
+        ['content-length-range' => 1, 1024*1024],
+    ], 24*60*60);
+
+    my $ua = LWP::UserAgent->new;
+    my $res = $ua->post(
+        $presigned->{url},
+        Content_Type => 'multipart/form-data',
+        Content      => [
+            @{$presigned->{fields}},
+            file => ['test.txt'],
+        ],
+    );
+
+For more information, please refer to
+L<< Amazon's documentation for Creating a POST Policy|https://docs.aws.amazon.com/AmazonS3/latest/API/sigv4-HTTPPOSTConstructPolicy.html >>.
 
 =head1 TODO
 
