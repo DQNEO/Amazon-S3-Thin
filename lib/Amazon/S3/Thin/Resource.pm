@@ -37,6 +37,16 @@ sub to_path_style_url {
     );
 }
 
+sub to_virtual_hosted_style_url {
+    my $self = shift;
+    my $protocol = shift;
+    return $self->_composer_url(
+        $protocol,
+        sprintf("%s.s3.amazonaws.com", $self->{bucket}),
+        $self->key_and_query
+    );
+}
+
 sub _region_specific_host {
     my $self = shift;
     my $region = shift;

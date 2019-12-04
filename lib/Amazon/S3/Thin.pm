@@ -37,6 +37,7 @@ sub new {
     $self->secure(0)                unless defined $self->secure;
     $self->ua($self->_default_ua)   unless defined $self->ua;
     $self->debug(0)                 unless defined $self->debug;
+    $self->virtual_host(0)          unless defined $self->virtual_host;
 
     $self->{signature_version} = 4  unless defined $self->{signature_version};
     if ($self->{signature_version} == 4 && ! $self->{region}) {
@@ -99,6 +100,15 @@ sub ua {
         $self->{ua} = shift;
     } else {
         return $self->{ua};
+    }
+}
+
+sub virtual_host {
+    my $self = shift;
+    if (@_) {
+        $self->{virtual_host} = shift;
+    } else {
+        return $self->{virtual_host};
     }
 }
 
@@ -259,7 +269,9 @@ sub generate_presigned_post {
         my $protocol = $self->secure ? 'https' : 'http';
 
         return {
-            url    => $resource->to_path_style_url($protocol, $self->{region}),
+            ($self->virtual_host
+                ? (url => $resource->to_virtual_hosted_style_url($protocol))
+                : (url => $resource->to_path_style_url($protocol, $self->{region}))),
             fields => $self->{signer}->_generate_presigned_post(
                 $bucket, $key, $fields, $conditions, $expires_in
             ),
@@ -309,13 +321,12 @@ sub _compose_request {
 
     my $url;
 
-    # Note:
-    # use "path style" or "virtual hosted style"
-    # see https://docs.aws.amazon.com/AmazonS3/latest/dev/RESTAPI.html
-    #
-    # for now, when a signature v4, force path_style
     if ($self->{signature_version} == 4) {
-        $url = $resource->to_path_style_url($protocol, $self->{region});
+        if ($self->virtual_host) {
+            $url = $resource->to_virtual_hosted_style_url($protocol);
+        } else {
+            $url = $resource->to_path_style_url($protocol, $self->{region});
+        }
     } else {
         $url = $resource->to_url_without_region($protocol, $MAIN_HOST);
     }
@@ -447,6 +458,8 @@ are 2 and 4. Default is 4.
 
 =item * C<debug> - debug option. Default is 0 (false). 
 If set 1, contents of HTTP request and response are shown on stderr
+
+=item * C<virtual_host> - whether to use virtual-hosted style request format. Default is 0 (path-style).
 
 =back
 
@@ -719,8 +732,6 @@ L<< Amazon's documentation for Creating a POST Policy|https://docs.aws.amazon.co
 =over
 
 =item lots of APIs are not implemented yet.
-
-=item Supports both of path_style and virtual hosted style URL.
 
 =back
 
