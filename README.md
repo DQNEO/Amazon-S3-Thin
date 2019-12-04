@@ -102,6 +102,7 @@ Default is an instance of [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAge
 are 2 and 4. Default is 4.
 - `debug` - debug option. Default is 0 (false). 
 If set 1, contents of HTTP request and response are shown on stderr
+- `virtual_host` - whether to use virtual-hosted style request format. Default is 0 (path-style).
 
 # ACCESSORS
 
@@ -323,7 +324,6 @@ For more information, please refer to
 # TODO
 
 - lots of APIs are not implemented yet.
-- Supports both of path\_style and virtual hosted style URL.
 
 # REPOSITORY
 
