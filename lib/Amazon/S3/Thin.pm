@@ -202,7 +202,8 @@ sub delete_multiple_objects {
     my ($self, $bucket, @keys) = @_;
 
     my $content = _build_xml_for_delete(@keys);
-    my $resource = $self->_resource($bucket, undef, 'delete');
+    # XXX: specify an empty string with `delete` query for calculating signature correctly in AWS::Signature4
+    my $resource = $self->_resource($bucket, undef, 'delete=');
     my $request = $self->_compose_request(
         'POST',
         $resource,

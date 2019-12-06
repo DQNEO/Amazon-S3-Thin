@@ -52,7 +52,7 @@ diag "test POST for delete_multiple_objects";
 my $res5 = $client->delete_multiple_objects( $bucket, 'key/one.txt', 'key/two.png' );
 my $req5 = $res5->request;
 is $req5->method, "POST";
-is $req5->uri, "http://tmpfoobar.s3.amazonaws.com/?delete";
+is $req5->uri, "http://tmpfoobar.s3.amazonaws.com/?delete=";
 is $req5->header('Content-MD5'), 'pjGVehBgNtca8xN21pLCCA==';
 
 diag "test GET request with headers";
