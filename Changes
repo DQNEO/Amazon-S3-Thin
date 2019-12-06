@@ -2,6 +2,8 @@ Revision history for Perl extension Amazon-S3-Thin
 
 {{$NEXT}}
 
+   - [bugfix] fix an incorrect signature calculation in delete_multiple_objects() (broken since version 0.20)
+
 0.27 2019-12-04T13:35:48Z
 
    - [core] support virtual-hosted style request
