@@ -145,7 +145,20 @@ sub copy_object {
     $headers ||= {};
     $headers->{'x-amz-copy-source'} = $src_bucket . "/" . $src_key;
     my $request = $self->_compose_request('PUT', $self->_resource($dst_bucket, $dst_key), $headers);
-    return $self->_send($request);
+    my $res = $self->_send($request);
+
+    # XXX: Since the COPY request might return error response in 200 OK, we'll rewrite the status code to 500 for convenience
+    # ref http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectCOPY.html
+    # ref https://github.com/boto/botocore/blob/4e9b4419ec018716ab1a3fe1587fbdc3cfef200e/botocore/handlers.py#L77-L120
+    if ($self->_looks_like_special_case_error($res)) {
+        $res->code(500);
+    }
+    return $res;
+}
+
+sub _looks_like_special_case_error {
+    my ($self, $res) = @_;
+    return $res->code == 200 && (length $res->content == 0 || $res->content =~ /<Error>/);
 }
 
 sub put_object {
@@ -592,6 +605,9 @@ This method is a variation of the PUT operation as described by
 Amazon's S3 API. It creates a copy of an object that is already stored
 in Amazon S3. This "PUT copy" operation is the same as performing a GET
 from the old bucket/key and then a PUT to the new bucket/key.
+
+Note that the COPY request might return error response in 200 OK, but this method
+will determine the error response and rewrite the status code to 500.
 
 For more information, please refer to
 L<< Amazon's documentation for COPY|http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectCOPY.html >>.

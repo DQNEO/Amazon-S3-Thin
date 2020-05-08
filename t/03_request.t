@@ -96,4 +96,19 @@ sub request {
     return $self->{request};
 }
 
+sub code {
+    my $self = shift;
+    return 200;
+}
+
+sub content {
+    my $self = shift;
+    return <<'XML';
+<CopyObjectResult>
+    <LastModified>2009-10-28T22:32:00</LastModified>
+    <ETag>"9b2cf535f27731c974343645a3985328"</ETag>
+<CopyObjectResult>
+XML
+}
+
 ;
