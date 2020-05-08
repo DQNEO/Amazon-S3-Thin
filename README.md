@@ -210,6 +210,9 @@ Amazon's S3 API. It creates a copy of an object that is already stored
 in Amazon S3. This "PUT copy" operation is the same as performing a GET
 from the old bucket/key and then a PUT to the new bucket/key.
 
+Note that the COPY request might return error response in 200 OK, but this method
+will determine the error response and rewrite the status code to 500.
+
 For more information, please refer to
 [Amazon's documentation for COPY](http://docs.aws.amazon.com/AmazonS3/latest/API/RESTObjectCOPY.html).
 

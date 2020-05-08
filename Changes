@@ -2,6 +2,8 @@ Revision history for Perl extension Amazon-S3-Thin
 
 {{$NEXT}}
 
+0.29 2020-05-08T11:20:28Z
+
    - [core] copy_object(): handle 200 error response and rewrite the status code to 500
 
 0.28 2019-12-06T08:04:13Z
