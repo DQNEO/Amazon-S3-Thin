@@ -18,8 +18,8 @@ sub new {
     my $class = shift;
     my $self  = shift;
 
-    # Jump through some hoops to maintain backwards compatability here. If we don't
-    # get passed any credentials as arguments then try another method
+    # If we have an explicitly-configured credential provider then use that here, otherwise
+    # existing behaviour will be followed
     if ($self->{credential_provider} and $self->{credential_provider} eq 'env') {
         $self->{credentials} = Amazon::S3::Thin::Credentials->from_env;
     }
