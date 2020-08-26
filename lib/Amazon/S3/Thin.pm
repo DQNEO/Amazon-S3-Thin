@@ -18,19 +18,30 @@ sub new {
     my $class = shift;
     my $self  = shift;
 
-    # check existence of credentials
-    croak "No aws_access_key_id"     unless $self->{aws_access_key_id};
-    croak "No aws_secret_access_key" unless $self->{aws_secret_access_key};
+    # Jump through some hoops to maintain backwards compatability here. If we don't
+    # get passed any credentials as arguments then try another method
+    if ($self->{credential_provider} and $self->{credential_provider} eq 'env') {
+        $self->{credentials} = Amazon::S3::Thin::Credentials->from_env;
+    }
+    elsif ($self->{credential_provider} and $self->{credential_provider} eq 'metadata') {
+        $self->{credentials} = Amazon::S3::Thin::Credentials->from_metadata($self);
+    }
+    else {
+        # check existence of credentials
+        croak "No aws_access_key_id"     unless $self->{aws_access_key_id};
+        croak "No aws_secret_access_key" unless $self->{aws_secret_access_key};
 
-    # wrap credentials
-    $self->{credentials} = Amazon::S3::Thin::Credentials->new(
-        $self->{aws_access_key_id},
-        $self->{aws_secret_access_key},
-        $self->{aws_session_token},
-    );
-    delete $self->{aws_access_key_id};
-    delete $self->{aws_secret_access_key};
-    delete $self->{aws_session_token};
+        # wrap credentials
+        $self->{credentials} = Amazon::S3::Thin::Credentials->new(
+            $self->{aws_access_key_id},
+            $self->{aws_secret_access_key},
+            $self->{aws_session_token},
+        );
+        delete $self->{aws_access_key_id};
+        delete $self->{aws_secret_access_key};
+        delete $self->{aws_session_token};
+    }
+    delete $self->{credential_provider};
 
     bless $self, $class;
 
@@ -365,12 +376,24 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
   use Amazon::S3::Thin;
 
+  # Pass in explicit credentials
   my $s3client = Amazon::S3::Thin->new({
         aws_access_key_id     => $aws_access_key_id,
         aws_secret_access_key => $aws_secret_access_key,
         aws_session_token     => $aws_session_token, # optional
         region                => $region, # e.g. 'ap-northeast-1'
       });
+
+  # Get credentials from environment
+  my $s3client = Amazon::S3::Thin->new({region => $region, credential_provider => 'env'});
+
+  # Get credentials from instance metadata
+  my $s3client = Amazon::S3::Thin->new({
+      region              => $region,
+      credential_provider => 'metadata',
+      version             => 2,         # optional (default 2)
+      role                => 'my-role', # optional
+    });
 
   my $bucket = "mybucket";
   my $key = "dir/file.txt";
