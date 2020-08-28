@@ -26,7 +26,7 @@ This module contains AWS credentials and provide getters to the data.
     my $creds = Amazon::S3::Thin::Credentials->new($access_key, $secret_key, $session_token);
 
     # Load from environment
-    my $creds = Amazon::S3::Thin::Credentials->from_env
+    my $creds = Amazon::S3::Thin::Credentials->from_env;
 
     # Load from instance profile
     my $creds = Amazon::S3::Thin::Credentials->from_instance(role => 'foo', version => 2);
@@ -37,7 +37,7 @@ use strict;
 use warnings;
 
 use Carp;
-use JSON::PP;
+use JSON::PP ();
 use LWP::UserAgent;
 
 my $JSON = JSON::PP->new->utf8->canonical;
@@ -51,6 +51,18 @@ sub new {
     };
     return bless $self, $class;
 }
+
+=head2 from_env()
+
+Instantiate C<Amazon::S3::Thin::Credentials> and attempts to populate the credentials from
+current environment.
+
+Croaks if either AWS_ACCESS_KEY_ID or AWS_SECRET_ACCESS_KEY are not set but supports the
+optional AWS_SESSION_TOKEN variable.
+
+    my $creds = Amazon::S3::Thin::Credentials->from_env;
+
+=cut
 
 sub from_env {
     my ($class) = @_;
@@ -66,6 +78,23 @@ sub from_env {
     };
     return bless $self, $class;
 }
+
+=head2 from_metadata()
+
+Instantiate C<Amazon::S3::Thin::Credentials> and attempts to populate the credentials from
+the L<EC2 metadata service|https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-instance-metadata.html>. An instance can have multiple IAM
+roles applied so you may optionally specify a role, otherwise the first one will be used.
+
+In November 2019 AWS released L<version 2|https://aws.amazon.com/blogs/security/defense-in-depth-open-firewalls-reverse-proxies-ssrf-vulnerabilities-ec2-instance-metadata-service/> of the instance metadata service which
+is more secure against Server Side Request Forgery attacks. Using v2 is highly recommended thus
+it is the default here.
+
+    my $creds = Amazon::S3::Thin::Credentials->from_instance(
+        role => 'foo',      # The name of the IAM role on the instance
+        version => 2        # Metadata service version - either 1 or 2
+    );
+
+=cut
 
 sub from_metadata {
     my ($class, $args) = @_;
@@ -99,10 +128,10 @@ sub _instance_metadata {
         ? $role
         : $roles[0];
 
-    my $cred = $ua->get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' / $target_role);
+    my $cred = $ua->get('http://169.254.169.254/latest/meta-data/iam/security-credentials/' . $target_role);
     croak 'Error querying metadata service for credentials: ' . $cred->decoded_content unless $cred->is_success;
 
-    my $obj = eval { decode_json $cred->decoded_content };
+    my $obj = eval { $JSON->decode($cred->decoded_content) };
     croak "Invalid data returned from metadata service: $@" if $@;
 
     return __PACKAGE__->new($obj->{AccessKeyId}, $obj->{SecretAccessKey}, $obj->{Token});

@@ -477,13 +477,30 @@ It can receive the following arguments:
 
 =over 4
 
-=item * C<aws_access_key_id> (B<REQUIRED>) - an access key id
-of your credentials.
+=item * C<credential_provider> (B<default: credentials>) - specify where to source credentials from. Options are:
 
-=item * C<aws_secret_access_key> (B<REQUIRED>) - an secret access key
- of your credentials.
+=over 2
+
+=item * C<credentials> - existing behaviour, pass in credentials via C<aws_access_key_id> and C<aws_secret_access_key>
+
+=item * C<env> - fetch credentials from environment variables
+
+=item * C<metadata> - fetch credentials from EC2 instance metadata service
+
+=back
 
 =item * C<region> - (B<REQUIRED>) region of your buckets you access- (currently used only when signature version is 4)
+
+=item * C<aws_access_key_id> (B<REQUIRED [provider: credentials]>) - an access key id
+of your credentials.
+
+=item * C<aws_secret_access_key> (B<REQUIRED [provider: credentials]>) - an secret access key
+ of your credentials.
+
+=item * C<version> (B<OPTIONAL [provider: metadata]>) - version of metadata service to use, either 1 or 2.
+L<read more|https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html>
+
+=item * C<role> (B<OPTIONAL [provider: metadata]>) - IAM instance role to use, otherwise the first is selected
 
 =item * C<secure> - whether to use https or not. Default is 0 (http).
 
