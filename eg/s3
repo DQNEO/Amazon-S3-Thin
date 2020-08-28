@@ -39,8 +39,9 @@ sub run {
     $p->getoptionsfromarray(
         \@args,
         "p|profile=s"   => \(my $profile = "default"),
+        "r|region=s"    => \(my $region),
         "h|help"        => \(my $help),
-        "version"     => \(my $version),
+        "version"       => \(my $version),
         "v|verbose"     => \($self->{verbose}),
     );
     if ($version) {
@@ -55,14 +56,38 @@ sub run {
     # https://docs.aws.amazon.com/cli/latest/userguide/cli-config-files.html
     my $cred_file = $ENV{HOME} . "/.aws/credentials";
     my $config_file = $ENV{HOME} . "/.aws/config";
-    my $crd = Config::Tiny->read($cred_file)->{$profile};
-    my $config = Config::Tiny->read($config_file)->{$profile};
-    my $opt = +{
-        aws_access_key_id => $crd->{aws_access_key_id},
-        aws_secret_access_key => $crd->{aws_secret_access_key},
-        region => $config->{region},
-    };
-    $self->{thin_client} = Amazon::S3::Thin->new($opt);
+
+    if (-f $config_file and !defined $region) {
+        my $config = Config::Tiny->read($config_file)->{$profile};
+        $region = $config->{region};
+    }
+
+    if (-f $cred_file) {
+        my $crd = Config::Tiny->read($cred_file)->{$profile};
+
+        my $opt = +{
+            aws_access_key_id     => $crd->{aws_access_key_id},
+            aws_secret_access_key => $crd->{aws_secret_access_key},
+            region                => $region
+        };
+        $self->{thin_client} = Amazon::S3::Thin->new($opt);
+    }
+    elsif (defined $ENV{AWS_ACCESS_KEY_ID} and defined $ENV{AWS_SECRET_ACCESS_KEY}) {
+        my $opt = +{
+            credential_provider => 'env',
+            region              => $region
+        };
+        $self->{thin_client} = Amazon::S3::Thin->new($opt);
+    }
+    else {
+        my $opt = +{
+            credential_provider => 'metadata',
+            version             => 1,
+            region              => $region
+        };
+        $self->{thin_client} = Amazon::S3::Thin->new($opt);
+    }
+
     my $subcmd = shift @args;
     if (!$subcmd) {
         $self->help();
