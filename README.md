@@ -7,12 +7,24 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
     use Amazon::S3::Thin;
 
+    # Pass in explicit credentials
     my $s3client = Amazon::S3::Thin->new({
           aws_access_key_id     => $aws_access_key_id,
           aws_secret_access_key => $aws_secret_access_key,
           aws_session_token     => $aws_session_token, # optional
           region                => $region, # e.g. 'ap-northeast-1'
         });
+
+    # Get credentials from environment
+    my $s3client = Amazon::S3::Thin->new({region => $region, credential_provider => 'env'});
+
+    # Get credentials from instance metadata
+    my $s3client = Amazon::S3::Thin->new({
+        region              => $region,
+        credential_provider => 'metadata',
+        version             => 2,         # optional (default 2)
+        role                => 'my-role', # optional
+      });
 
     my $bucket = "mybucket";
     my $key = "dir/file.txt";

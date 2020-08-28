@@ -43,4 +43,18 @@ my %crd = (
     isa_ok($s3client->{signer}, 'Amazon::S3::Thin::Signer::V4', 'new v4');
 }
 
+BEGIN {
+    $ENV{AWS_ACCESS_KEY_ID} = 'dummy';
+    $ENV{AWS_SECRET_ACCESS_KEY} = 'dummy';
+}
+{
+    diag "test from_env";
+    my $arg = +{
+        region => 'ap-northeast-1',
+        credential_provider => 'env'
+    };
+    my $s3client = Amazon::S3::Thin->new($arg);
+    isa_ok($s3client->{signer}, 'Amazon::S3::Thin::Signer::V4', 'new v4');
+}
+
 done_testing;

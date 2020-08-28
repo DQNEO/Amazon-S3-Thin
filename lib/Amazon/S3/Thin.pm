@@ -18,19 +18,30 @@ sub new {
     my $class = shift;
     my $self  = shift;
 
-    # check existence of credentials
-    croak "No aws_access_key_id"     unless $self->{aws_access_key_id};
-    croak "No aws_secret_access_key" unless $self->{aws_secret_access_key};
+    # If we have an explicitly-configured credential provider then use that here, otherwise
+    # existing behaviour will be followed
+    if ($self->{credential_provider} and $self->{credential_provider} eq 'env') {
+        $self->{credentials} = Amazon::S3::Thin::Credentials->from_env;
+    }
+    elsif ($self->{credential_provider} and $self->{credential_provider} eq 'metadata') {
+        $self->{credentials} = Amazon::S3::Thin::Credentials->from_metadata($self);
+    }
+    else {
+        # check existence of credentials
+        croak "No aws_access_key_id"     unless $self->{aws_access_key_id};
+        croak "No aws_secret_access_key" unless $self->{aws_secret_access_key};
 
-    # wrap credentials
-    $self->{credentials} = Amazon::S3::Thin::Credentials->new(
-        $self->{aws_access_key_id},
-        $self->{aws_secret_access_key},
-        $self->{aws_session_token},
-    );
-    delete $self->{aws_access_key_id};
-    delete $self->{aws_secret_access_key};
-    delete $self->{aws_session_token};
+        # wrap credentials
+        $self->{credentials} = Amazon::S3::Thin::Credentials->new(
+            $self->{aws_access_key_id},
+            $self->{aws_secret_access_key},
+            $self->{aws_session_token},
+        );
+        delete $self->{aws_access_key_id};
+        delete $self->{aws_secret_access_key};
+        delete $self->{aws_session_token};
+    }
+    delete $self->{credential_provider};
 
     bless $self, $class;
 
@@ -365,12 +376,24 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
 
   use Amazon::S3::Thin;
 
+  # Pass in explicit credentials
   my $s3client = Amazon::S3::Thin->new({
         aws_access_key_id     => $aws_access_key_id,
         aws_secret_access_key => $aws_secret_access_key,
         aws_session_token     => $aws_session_token, # optional
         region                => $region, # e.g. 'ap-northeast-1'
       });
+
+  # Get credentials from environment
+  my $s3client = Amazon::S3::Thin->new({region => $region, credential_provider => 'env'});
+
+  # Get credentials from instance metadata
+  my $s3client = Amazon::S3::Thin->new({
+      region              => $region,
+      credential_provider => 'metadata',
+      version             => 2,         # optional (default 2)
+      role                => 'my-role', # optional
+    });
 
   my $bucket = "mybucket";
   my $key = "dir/file.txt";
@@ -454,13 +477,30 @@ It can receive the following arguments:
 
 =over 4
 
-=item * C<aws_access_key_id> (B<REQUIRED>) - an access key id
-of your credentials.
+=item * C<credential_provider> (B<default: credentials>) - specify where to source credentials from. Options are:
 
-=item * C<aws_secret_access_key> (B<REQUIRED>) - an secret access key
- of your credentials.
+=over 2
+
+=item * C<credentials> - existing behaviour, pass in credentials via C<aws_access_key_id> and C<aws_secret_access_key>
+
+=item * C<env> - fetch credentials from environment variables
+
+=item * C<metadata> - fetch credentials from EC2 instance metadata service
+
+=back
 
 =item * C<region> - (B<REQUIRED>) region of your buckets you access- (currently used only when signature version is 4)
+
+=item * C<aws_access_key_id> (B<REQUIRED [provider: credentials]>) - an access key id
+of your credentials.
+
+=item * C<aws_secret_access_key> (B<REQUIRED [provider: credentials]>) - an secret access key
+ of your credentials.
+
+=item * C<version> (B<OPTIONAL [provider: metadata]>) - version of metadata service to use, either 1 or 2.
+L<read more|https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html>
+
+=item * C<role> (B<OPTIONAL [provider: metadata]>) - IAM instance role to use, otherwise the first is selected
 
 =item * C<secure> - whether to use https or not. Default is 0 (http).
 
