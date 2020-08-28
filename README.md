@@ -69,7 +69,7 @@ In detail, it offers the following features:
 
 - Low Level
 
-    It returns an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object so you can easily inspect
+    It returns an [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse) object so you can easily inspect
     what's happening inside, and can handle errors as you like.
 
 - Low Dependency
@@ -83,7 +83,7 @@ In detail, it offers the following features:
 
 ## Comparison to precedent modules
 
-There are already some useful modules like [Amazon::S3](https://metacpan.org/pod/Amazon::S3), [Net::Amazon::S3](https://metacpan.org/pod/Net::Amazon::S3)
+There are already some useful modules like [Amazon::S3](https://metacpan.org/pod/Amazon%3A%3AS3), [Net::Amazon::S3](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3)
  on CPAN. They provide a "Perlish" interface, which looks pretty
  for Perl programmers, but they also hide low-level behaviors.
 For example, the "get\_key" method translate HTTP status 404 into `undef` and
@@ -102,14 +102,21 @@ That's why I made this module.
 
 It can receive the following arguments:
 
-- `aws_access_key_id` (**REQUIRED**) - an access key id
-of your credentials.
-- `aws_secret_access_key` (**REQUIRED**) - an secret access key
- of your credentials.
+- `credential_provider` (**default: credentials**) - specify where to source credentials from. Options are:
+    - `credentials` - existing behaviour, pass in credentials via `aws_access_key_id` and `aws_secret_access_key`
+    - `env` - fetch credentials from environment variables
+    - `metadata` - fetch credentials from EC2 instance metadata service
 - `region` - (**REQUIRED**) region of your buckets you access- (currently used only when signature version is 4)
+- `aws_access_key_id` (**REQUIRED \[provider: credentials\]**) - an access key id
+of your credentials.
+- `aws_secret_access_key` (**REQUIRED \[provider: credentials\]**) - an secret access key
+ of your credentials.
+- `version` (**OPTIONAL \[provider: metadata\]**) - version of metadata service to use, either 1 or 2.
+[read more](https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/configuring-instance-metadata-service.html)
+- `role` (**OPTIONAL \[provider: metadata\]**) - IAM instance role to use, otherwise the first is selected
 - `secure` - whether to use https or not. Default is 0 (http).
 - `ua` - a user agent object, compatible with LWP::UserAgent.
-Default is an instance of [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent).
+Default is an instance of [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent).
 - `signature_version` - AWS signature version to use. Supported values
 are 2 and 4. Default is 4.
 - `debug` - debug option. Default is 0 (false). 
@@ -129,7 +136,7 @@ Whether to use https (1) or http (0) when connecting to S3.
 
 The user agent used internally to perform requests and return responses.
 If you set this attribute, please make sure you do so with an object
-compatible with [LWP::UserAgent](https://metacpan.org/pod/LWP::UserAgent) (i.e. providing the same interface).
+compatible with [LWP::UserAgent](https://metacpan.org/pod/LWP%3A%3AUserAgent) (i.e. providing the same interface).
 
 ## debug
 
@@ -161,7 +168,7 @@ Debug option.
 - 2. key - a string with the key
 - 3. headers (**optional**) - hashref with extra header information
 
-**Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for the request. Use the `content()`
+**Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse) object for the request. Use the `content()`
 method on the returned object to read the contents:
 
     my $res = $s3->get_object( 'my.bucket', 'my/key.ext' );
@@ -182,7 +189,7 @@ For more information, please refer to
 - 1. bucket - a string with the bucket
 - 2. key - a string with the key
 
-**Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for the request. Use the `header()`
+**Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse) object for the request. Use the `header()`
 method on the returned object to read the metadata:
 
     my $res = $s3->head_object( 'my.bucket', 'my/key.ext' );
@@ -200,7 +207,7 @@ For more information, please refer to
 
 **Arguments**: a string with the bucket name, and a string with the key name.
 
-**Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for the request.
+**Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse) object for the request.
 
 The DELETE operation removes the null version (if there is one) of an object
 and inserts a delete marker, which becomes the current version of the
@@ -215,7 +222,7 @@ For more information, please refer to
 
 **Arguments**: a list with source (bucket, key) and destination (bucket, key), hashref with extra header information (**optional**).
 
-**Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for the request.
+**Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse) object for the request.
 
 This method is a variation of the PUT operation as described by
 Amazon's S3 API. It creates a copy of an object that is already stored
@@ -237,7 +244,7 @@ For more information, please refer to
 - 3. content - a string with the content to be uploaded
 - 4. headers (**optional**) - hashref with extra header information
 
-**Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for the request.
+**Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse) object for the request.
 
 The PUT operation adds an object to a bucket. Amazon S3 never adds partial
 objects; if you receive a success response, Amazon S3 added the entire
@@ -251,7 +258,7 @@ For more information, please refer to
 **Arguments**: a string with the bucket name, and an array with all the keys
 to be deleted.
 
-**Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for the request.
+**Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse) object for the request.
 
 The Multi-Object Delete operation enables you to delete multiple objects
 (up to 1000) from a bucket using a single HTTP request. If you know the
@@ -282,7 +289,7 @@ the key right after the marker, in order.
 in the response body. You can add this to your request if you want to
 retrieve fewer than the default 1000 keys.
 
-**Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP::Response) object for the request. Use the `content()`
+**Returns**: an [HTTP::Response](https://metacpan.org/pod/HTTP%3A%3AResponse) object for the request. Use the `content()`
 method on the returned object to read the contents:
 
 This method returns some or all (up to 1000) of the objects in a bucket. Note
@@ -293,7 +300,7 @@ response will contain `<IsTruncated>true</IsTruncated>`. To return the
 additional keys, see `marker` above.
 
 For more information, please refer to
-[Amazon's documentation for REST Bucket GET](https://metacpan.org/pod/&#x20;http:#docs.aws.amazon.com-AmazonS3-latest-API-RESTBucketGET.html).
+[Amazon's documentation for REST Bucket GET](https://metacpan.org/pod/%20http%3A#docs.aws.amazon.com-AmazonS3-latest-API-RESTBucketGET.html).
 
 ## generate\_presigned\_post( $bucket, $key \[, $fields, $conditions, $expires\_in \] )
 
@@ -362,9 +369,9 @@ Breno G. de Oliveira
 
 # SEE ALSO
 
-[Amazon::S3](https://metacpan.org/pod/Amazon::S3), [https://github.com/tima/perl-amazon-s3](https://github.com/tima/perl-amazon-s3)
+[Amazon::S3](https://metacpan.org/pod/Amazon%3A%3AS3), [https://github.com/tima/perl-amazon-s3](https://github.com/tima/perl-amazon-s3)
 
-[Net::Amazon::S3](https://metacpan.org/pod/Net::Amazon::S3)
+[Net::Amazon::S3](https://metacpan.org/pod/Net%3A%3AAmazon%3A%3AS3)
 
 [Amazon S3 API Reference : REST API](http://docs.aws.amazon.com/AmazonS3/latest/API/APIRest.html)
 

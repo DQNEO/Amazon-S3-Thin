@@ -4,7 +4,7 @@
       "DQNEO"
    ],
    "dynamic_config" : 0,
-   "generated_by" : "Minilla/v3.1.8, CPAN::Meta::Converter version 2.150010",
+   "generated_by" : "Minilla/v3.1.10, CPAN::Meta::Converter version 2.150010",
    "license" : [
       "perl_5"
    ],
@@ -76,11 +76,12 @@
          "web" : "https://github.com/DQNEO/Amazon-S3-Thin"
       }
    },
-   "version" : "0.29",
+   "version" : "0.30",
    "x_contributors" : [
       "Bob Showalter <showaltb@gmail.com>",
       "Bob Stockdale <bstockdale@zappos.com>",
       "Breno G. de Oliveira <garu@cpan.org>",
+      "Cameron Daniel <cam.daniel@gmail.com>",
       "DQNEO <dqneoo@gmail.com>",
       "Mohammad S Anwar <mohammad.anwar@yahoo.com>",
       "Takumi Akiyama <t.akiym@gmail.com>",
