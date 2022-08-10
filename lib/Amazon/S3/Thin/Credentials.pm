@@ -99,7 +99,7 @@ it is the default here.
 sub from_metadata {
     my ($class, $args) = @_;
 
-    my $ua = LWP::UserAgent->new;
+    my $ua = $args->{ua} // LWP::UserAgent->new;
 
     # Default to the more secure v2 metadata provider
     if (!$args->{version} or $args->{version} != 1) {
