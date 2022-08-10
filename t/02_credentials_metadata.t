@@ -36,6 +36,35 @@ my $arg = +{
   is $credentials->session_token, 'DUMMY-TOKEN';
 }
 
+{
+  diag "test when a role name is specified";
+
+  my $ua = MockUA->new;
+  my $credentials = Amazon::S3::Thin::Credentials->from_metadata(+{
+    %$arg,
+    ua      => $ua,
+    role    => 'DUMMY-INSTANCE-PROFILE-3',
+    version => 1,
+  });
+
+  is_deeply $ua->requests, [
+    {
+      method  => 'GET',
+      uri     => 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+      headers => {},
+    },
+    {
+      method => 'GET',
+      uri     => 'http://169.254.169.254/latest/meta-data/iam/security-credentials/DUMMY-INSTANCE-PROFILE-3',
+      headers => {},
+    },
+  ];
+
+  is $credentials->access_key_id, 'DUMMY-ACCESS-KEY';
+  is $credentials->secret_access_key, 'DUMMY-SECRET-ACCESS-KEY';
+  is $credentials->session_token, 'DUMMY-TOKEN';
+}
+
 done_testing;
 
 package MockUA;
