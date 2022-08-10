@@ -37,6 +37,38 @@ my $arg = +{
 }
 
 {
+  diag "IMDSv2";
+
+  my $ua = MockUA->new;
+  my $credentials = Amazon::S3::Thin::Credentials->from_metadata(+{
+    %$arg,
+    ua => $ua,
+  });
+
+  is_deeply $ua->requests, [
+    {
+      method  => 'PUT',
+      uri     => 'http://169.254.169.254/latest/api/token',
+      headers => { 'X-aws-ec2-metadata-token-ttl-seconds' => 90 },
+    },
+    {
+      method  => 'GET',
+      uri     => 'http://169.254.169.254/latest/meta-data/iam/security-credentials',
+      headers => { 'X-aws-ec2-metadata-token' => 'DUMMY-METADATA-TOKEN' },
+    },
+    {
+      method => 'GET',
+      uri     => 'http://169.254.169.254/latest/meta-data/iam/security-credentials/DUMMY-INSTANCE-PROFILE-1',
+      headers => { 'X-aws-ec2-metadata-token' => 'DUMMY-METADATA-TOKEN' },
+    },
+  ];
+
+  is $credentials->access_key_id, 'DUMMY-ACCESS-KEY';
+  is $credentials->secret_access_key, 'DUMMY-SECRET-ACCESS-KEY';
+  is $credentials->session_token, 'DUMMY-TOKEN';
+}
+
+{
   diag "test when a role name is specified";
 
   my $ua = MockUA->new;
@@ -71,16 +103,28 @@ package MockUA;
 
 sub new {
   my $class = shift;
-  bless { requests => [] }, $class;
+  bless { requests => [], default_headers => {} }, $class;
 }
 
 sub get {
   my ($self, $uri, %form) = @_;
 
-  my $request = +{
-    method  => 'GET',
+  $self->_request('GET', $uri, %form);
+}
+
+sub put {
+  my ($self, $uri, %form) = @_;
+
+  $self->_request('PUT', $uri, %form);
+}
+
+sub _request {
+  my ($self, $method, $uri, %form) = @_;
+
+  my $request = {
+    method  => $method,
     uri     => $uri,
-    headers => \%form,
+    headers => { %{$self->{default_headers}}, %form },
   };
 
   push @{$self->{requests}}, $request;
@@ -92,6 +136,11 @@ sub requests {
   my $self = shift;
   
   $self->{requests};
+}
+
+sub default_header {
+  my ($self, %headers) = @_;
+  $self->{default_headers}->{$_} = $headers{$_} for keys %headers;
 }
 
 package MockResponse;

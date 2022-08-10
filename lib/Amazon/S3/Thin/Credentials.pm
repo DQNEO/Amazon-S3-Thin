@@ -103,9 +103,7 @@ sub from_metadata {
 
     # Default to the more secure v2 metadata provider
     if (!$args->{version} or $args->{version} != 1) {
-        my $res = $ua->get('http://169.254.169.254/latest/api/token', {
-            'X-aws-ec2-metadata-token-ttl-seconds' => 90
-        });
+        my $res = $ua->put('http://169.254.169.254/latest/api/token', 'X-aws-ec2-metadata-token-ttl-seconds' => 90);
         croak 'Error retreiving v2 token from metadata provider: ' . $res->decoded_content
             unless $res->is_success;
 
