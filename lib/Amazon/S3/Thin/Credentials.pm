@@ -29,7 +29,7 @@ This module contains AWS credentials and provide getters to the data.
     my $creds = Amazon::S3::Thin::Credentials->from_env;
 
     # Load from instance profile
-    my $creds = Amazon::S3::Thin::Credentials->from_instance(role => 'foo', version => 2);
+    my $creds = Amazon::S3::Thin::Credentials->from_metadata(role => 'foo', version => 2);
 
 =cut
 
@@ -89,7 +89,7 @@ In November 2019 AWS released L<version 2|https://aws.amazon.com/blogs/security/
 is more secure against Server Side Request Forgery attacks. Using v2 is highly recommended thus
 it is the default here.
 
-    my $creds = Amazon::S3::Thin::Credentials->from_instance(
+    my $creds = Amazon::S3::Thin::Credentials->from_metadata(
         role => 'foo',      # The name of the IAM role on the instance
         version => 2        # Metadata service version - either 1 or 2
     );
@@ -99,13 +99,11 @@ it is the default here.
 sub from_metadata {
     my ($class, $args) = @_;
 
-    my $ua = LWP::UserAgent->new;
+    my $ua = $args->{ua} // LWP::UserAgent->new;
 
     # Default to the more secure v2 metadata provider
     if (!$args->{version} or $args->{version} != 1) {
-        my $res = $ua->get('http://169.254.169.254/latest/api/token', {
-            'X-aws-ec2-metadata-token-ttl-seconds' => 90
-        });
+        my $res = $ua->put('http://169.254.169.254/latest/api/token', 'X-aws-ec2-metadata-token-ttl-seconds' => 90);
         croak 'Error retreiving v2 token from metadata provider: ' . $res->decoded_content
             unless $res->is_success;
 
