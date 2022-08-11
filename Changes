@@ -2,6 +2,10 @@ Revision history for Perl extension Amazon-S3-Thin
 
 {{$NEXT}}
 
+0.31 2022-08-11T17:20:41Z
+
+   - [bugfix] Fix a behavior of creating a session token with IMDSv2 (#41 @masawada++)
+
 0.30 2020-08-28T11:53:24Z
 
    - [core] support extra credential providers
