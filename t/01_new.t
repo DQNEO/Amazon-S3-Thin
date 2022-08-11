@@ -13,13 +13,13 @@ my %crd = (
     eval {
         my $s3client = Amazon::S3::Thin->new({});
     };
-    ok $@, $@;
+    ok $@, 'raised No aws_access_key_id exception';
     eval {
         my $s3client = Amazon::S3::Thin->new({
             aws_access_key_id     => "dummy",
         });
     };
-    ok $@, $@;
+    ok $@, 'raised No aws_secret_access_key exception';
 }
 
 {
