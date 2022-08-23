@@ -79,6 +79,13 @@ sub run {
         };
         $self->{thin_client} = Amazon::S3::Thin->new($opt);
     }
+    elsif (defined $ENV{AWS_CONTAINER_CREDENTIALS_RELATIVE_URI}) {
+        my $opt = +{
+            credential_provider => 'ecs_container',
+            region              => $region
+        };
+        $self->{thin_client} = Amazon::S3::Thin->new($opt);
+    }
     else {
         my $opt = +{
             credential_provider => 'metadata',

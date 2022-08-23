@@ -26,6 +26,12 @@ Amazon::S3::Thin - A thin, lightweight, low-level Amazon S3 client
         role                => 'my-role', # optional
       });
 
+    # Get credentials from ECS task role
+    my $s3client = Amazon::S3::Thin->new({
+        region              => $region,
+        credential_provider => 'ecs_container',
+      });
+
     my $bucket = "mybucket";
     my $key = "dir/file.txt";
     my $response;
