@@ -76,7 +76,7 @@
          "web" : "https://github.com/DQNEO/Amazon-S3-Thin"
       }
    },
-   "version" : "0.31",
+   "version" : "0.32",
    "x_contributors" : [
       "Bob Showalter <showaltb@gmail.com>",
       "Bob Stockdale <bstockdale@zappos.com>",
