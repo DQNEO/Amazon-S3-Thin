@@ -31,6 +31,9 @@ This module contains AWS credentials and provide getters to the data.
     # Load from instance profile
     my $creds = Amazon::S3::Thin::Credentials->from_metadata(role => 'foo', version => 2);
 
+    # Load from ECS task role
+    my $creds = Amazon::S3::Thin::Credentials->from_ecs_container;
+
 =cut
 
 use strict;
@@ -133,6 +136,32 @@ sub _instance_metadata {
     croak "Invalid data returned from metadata service: $@" if $@;
 
     return __PACKAGE__->new($obj->{AccessKeyId}, $obj->{SecretAccessKey}, $obj->{Token});
+}
+
+=head2 from_ecs_container()
+
+Instantiate C<Amazon::S3::Thin::Credentials> and attempts to populate the credentials from
+the L<ECS task role|https://docs.aws.amazon.com/AmazonECS/latest/developerguide/task-iam-roles.html>.
+
+    my $creds = Amazon::S3::Thin::Credentials->from_ecs_container;
+
+=cut
+
+sub from_ecs_container {
+  my ($class, $args) = @_;
+
+  my $ua = $args->{ua} // LWP::UserAgent->new;
+
+  my $relative_uri = $ENV{AWS_CONTAINER_CREDENTIALS_RELATIVE_URI};
+  croak 'The environment variable AWS_CONTAINER_CREDENTIALS_RELATIVE_URI is not set' unless defined $relative_uri;
+
+  my $cred = $ua->get('http://169.254.170.2' . $relative_uri);
+  croak 'Error retrieving container credentials' unless $cred->is_success;
+
+  my $obj = eval { $JSON->decode($cred->decoded_content) };
+  croak "Invalid data returned: $@" if $@;
+
+  return __PACKAGE__->new($obj->{AccessKeyId}, $obj->{SecretAccessKey}, $obj->{Token});
 }
 
 =head2 access_key_id()

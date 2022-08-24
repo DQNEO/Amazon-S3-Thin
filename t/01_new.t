@@ -43,6 +43,29 @@ my %crd = (
     isa_ok($s3client->{signer}, 'Amazon::S3::Thin::Signer::V4', 'new v4');
 }
 
+{
+    diag "test from_ecs_container";
+
+    local $ENV{AWS_CONTAINER_CREDENTIALS_RELATIVE_URI} = '/foobar';
+
+    my $arg = +{
+        credential_provider => 'ecs_container',
+        region => 'ap-northeast-1',
+        ua => MockUA->new,
+    };
+    my $s3client = Amazon::S3::Thin->new($arg);
+    isa_ok($s3client->{signer}, 'Amazon::S3::Thin::Signer::V4', 'new v4');
+
+    package MockUA;
+    sub new { bless {}, shift; }
+    sub get { return MockResponse->new; };
+
+    package MockResponse;
+    sub new { bless {}, shift; }
+    sub is_success { !!1; }
+    sub decoded_content { '{"AccessKeyId": "Key", "SecretAccessKey": "Secret", "Token": "Token"}'; }
+}
+
 BEGIN {
     $ENV{AWS_ACCESS_KEY_ID} = 'dummy';
     $ENV{AWS_SECRET_ACCESS_KEY} = 'dummy';
